@@ -1,0 +1,46 @@
+# ========================
+# Adatok és modellek
+# ========================
+# Az adathalmazokat és a kimentett modelleket nem verziókövetjük a méretük miatt.
+*.csv
+*.tsv
+*.xlsx
+*.parquet
+*.h5
+*.pkl
+*.joblib
+*.model
+/data/
+!/data/sample_*.csv  # Ha esetleg egy kis minta adatot mégis feltöltenél
+
+# ========================
+# Jupyter Notebook
+# ========================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# ========================
+# Python és virtuális környezetek
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env/
+.venv/
+Pipfile.lock
+
+# ========================
+# Streamlit
+# ========================
+# Titkosított kulcsok vagy lokális beállítások védelme
+.streamlit/secrets.toml
+
+# ========================
+# IDE és Operációs rendszer fájlok
+# ========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
