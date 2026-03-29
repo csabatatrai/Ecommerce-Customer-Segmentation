@@ -16,10 +16,6 @@ A felesleges memóriaterhelés elkerülése érdekében egy robusztus "graceful 
 
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
-## Lokális futtatás és környezet beállítása (Setup)
-
-A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
-
 1. Klónozd a repót és navigálj a mappába:
 ```bash
 git clone https://github.com/csabatatrai/ecommerce-customer-segmentation
