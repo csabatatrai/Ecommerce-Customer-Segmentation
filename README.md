@@ -4,11 +4,17 @@ Gépi tanulási projekt Python segítségével.
 
 ## Adathalmaz és reprodukálhatóság
 
-A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data). 
+A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: UCI Machine Learning Repository). 
 
-Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátokat (~100 MB), a nyers CSV fájl nem képezi a repository részét. Annak érdekében, hogy a projekt **bárki számára azonnal, manuális fájlletöltés és Kaggle API kulcsok konfigurálása nélkül reprodukálható legyen**, a kód automatizált adatletöltést használ.
+Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátokat (~100 MB), a nyers CSV fájl nem képezi a repository részét. 
 
-Az `analysis.ipynb` notebook első cellái a hivatalos forrásból, az **UCI Machine Learning Repository**-ból húzzák be az adatokat az `ucimlrepo` csomag segítségével. A sikeres letöltés után a rendszer automatikusan egy memóriahatékony, típusbiztos `Parquet` fájlt generál a `data/processed/` mappába, jelentősen felgyorsítva a későbbi futtatásokat.
+**Technikai döntés és adatbetöltési kihívások:** A projekt tervezésekor az elsődleges cél a teljesen automatizált, API-kulcsok nélküli reprodukálhatóság volt a hivatalos `ucimlrepo` csomag használatával. Bár az adathalmaz létezik az UCI szerverén, a Python API-juk jelenleg nem támogatja a közvetlen, szabványos DataFrame-be történő beolvasást ennél a specifikus adathalmaznál (ID 502).
+
+A felesleges memóriaterhelés elkerülése érdekében egy robusztus "graceful fallback" megoldást implementáltam. Az `analysis.ipynb` notebook első cellája ellenőrzi az adatok meglétét: ha friss klónozás történt, a notebook nem fagy le nyers hibaüzenettel, hanem pontos instrukciókat ad a Kaggle-ről történő letöltéshez. Amint a nyers CSV a helyére kerül, a rendszer automatikusan egy memóriahatékony, típusbiztos `Parquet` fájlt generál a `data/processed/` mappába, jelentősen felgyorsítva a későbbi futtatásokat.
+
+## Lokális futtatás és környezet beállítása (Setup)
+
+A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
