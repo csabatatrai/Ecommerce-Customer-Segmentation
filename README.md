@@ -10,7 +10,7 @@ Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátok
 
 **Technikai döntés és adatbetöltési kihívások:** A projekt tervezésekor az elsődleges cél a teljesen automatizált, API-kulcsok nélküli reprodukálhatóság volt a hivatalos `ucimlrepo` csomag használatával. Bár az adathalmaz létezik az UCI szerverén, a Python API-juk jelenleg nem támogatja a közvetlen, szabványos DataFrame-be történő beolvasást ennél a specifikus adathalmaznál (ID 502).
 
-A felesleges memóriaterhelés elkerülése érdekében egy robusztus "graceful fallback" megoldást implementáltam. Az `analysis.ipynb` notebook első cellája ellenőrzi az adatok meglétét: ha friss klónozás történt, a notebook nem fagy le nyers hibaüzenettel, hanem pontos instrukciókat ad a Kaggle-ről történő letöltéshez. Amint a nyers CSV a helyére kerül, a rendszer automatikusan egy memóriahatékony, típusbiztos `Parquet` fájlt generál a `data/processed/` mappába, jelentősen felgyorsítva a későbbi futtatásokat (típusbiztonság és a kisebb fájlméret miatt is előnyös).
+A felesleges memóriaterhelés elkerülése érdekében egy robusztus "graceful fallback" megoldást implementáltam. A `01_data_preparation.ipynb` notebook első cellája ellenőrzi az adatok meglétét: ha friss klónozás történt, a notebook nem fagy le nyers hibaüzenettel, hanem pontos instrukciókat ad a Kaggle-ről történő letöltéshez. Amint a nyers CSV a helyére kerül, a rendszer automatikusan egy memóriahatékony, típusbiztos `Parquet` fájlt generál a `data/processed/` mappába, jelentősen felgyorsítva a későbbi futtatásokat (típusbiztonság és a kisebb fájlméret miatt is előnyös).
 
 A hatékony verzióközelés érdekében a nagy méretű és bináris formátumú adatfájlok (CSV, Parquet) tudatosan nem részei a repónak (lásd: .gitignore), biztosítva ezzel a projekt gyors klónozhatóságát és a forráskód tisztaságát.
 
@@ -40,6 +40,10 @@ cd ecommerce-customer-segmentation
 ```bash
    jupyter notebook
 ```
+5. Futtasd a notebookokat **sorrendben**:
+   - `01_data_preparation.ipynb` – adatbetöltés és tisztítás
+   - `02_customer_segmentation.ipynb` – RFM feature engineering és szegmentáció
+   - `03_clv_prediction.ipynb` – prediktív modellezés (XGBoost + SHAP)
 
 ## Fejlesztés és verziókezelés (nbstripout)
 
@@ -50,14 +54,17 @@ Ezzel a *best practice* megközelítéssel elkerülhető a felesleges bináris a
 *(Ha te is fejleszteni szeretnéd a kódot, a környezet aktiválása után futtasd az `nbstripout --install` parancsot a lokális Git hook beállításához.)*
 
 ## Mappastruktúra
->Az analysis.ipynb futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
+>A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
 ```bash
 ecommerce-customer-segmentation/
 ├── data/
 │   ├── raw/              # original dirty dataset
 │   └── processed/        # cleaned, Parquet format of data
 ├── pages/                # .py files for multipage Streamlit app
-├── analysis.ipynb        # eda & modelling
+├── config.py             # shared path constants and pipeline parameters
+├── 01_data_preparation.ipynb      # data loading, cleaning, outlier filtering
+├── 02_customer_segmentation.ipynb # RFM engineering, scaling, K-means clustering
+├── 03_clv_prediction.ipynb        # XGBoost CLV modelling + SHAP explanations
 ├── app.py                # Streamlit dashboard's main file
 ├── .gitignore
 ├── requirements.txt
