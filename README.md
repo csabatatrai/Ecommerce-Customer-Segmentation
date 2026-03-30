@@ -2,12 +2,34 @@
 
 Data Science gépi tanulási projekt Python segítségével, Data Engineering és az MLOps-közeli szemléletmóddal kiegészítve.
 
+## Exploratív adatelemzés (EDA) – SQLite alapokon
+
+Az adathalmaz elsődleges feltárása nem közvetlenül Pandas-ban, hanem SQLite adatbázisban történt.
+
+A nyers, „koszos” CSV fájlt egy SQLite táblába (`ecomStore`) töltöttem be, és az exploratív elemzést SQL lekérdezéseken keresztül végeztem. Ez lehetővé tette:
+
+- nagyobb adatmennyiség gyors, aggregáció-alapú vizsgálatát
+- üzleti kérdések strukturált tesztelését (pl. visszaküldési arányok, vásárlói lojalitás)
+- adatminőségi problémák azonosítását (pl. adminisztratív tételek, negatív mennyiségek)
+
+Az EDA során futtatott SQL lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban.
+
+Az itt szerzett felismerések közvetlenül beépítésre kerültek a Python pipeline-ba:
+- → `01_data_preparation.ipynb`: tisztítási szabályok (pl. visszáruk kezelése, szűrések)
+- → `02_customer_segmentation.ipynb`: RFM feature engineering és szegmentációs stratégia
+
+Ez a megközelítés szétválasztja:
+- a **feltárást (SQL)** és
+- a **produkciós pipeline-t (Python + Parquet)**
+
+így a projekt egyszerre reprodukálható és skálázható.
+
 ## Főbb lépések
 
 | # | Lépés | Notebook |
 |---|-------|----------|
 | 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` |
-| 1 | Adattisztítás és technikai outlier-szűrés | `01_data_preparation.ipynb` |
+| 1 | Adattisztítás és technikai outlier-szűrés, alap EDA | `01_data_preparation.ipynb` |
 | 2 | RFM Feature Engineering | `02_customer_segmentation.ipynb` |
 | 3 | Statisztikai outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` |
 | 4 | K-means klaszterezés | `02_customer_segmentation.ipynb` |
