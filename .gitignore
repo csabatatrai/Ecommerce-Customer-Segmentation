@@ -44,3 +44,9 @@ Pipfile.lock
 .idea/
 .DS_Store
 Thumbs.db
+
+# ========================
+# LLM Prompthoz generált exportok (kimenetekkel való ellenőrzéskor)
+# ========================
+analysis.md
+output_*.png
