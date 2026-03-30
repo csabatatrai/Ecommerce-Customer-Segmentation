@@ -2,6 +2,21 @@
 
 Gépi tanulási projekt Python segítségével.
 
+## Főbb lépések
+
+| # | Lépés | Notebook |
+|---|-------|----------|
+| 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` |
+| 1 | Adattisztítás és technikai outlier-szűrés | `01_data_preparation.ipynb` |
+| 2 | RFM Feature Engineering | `02_customer_segmentation.ipynb` |
+| 3 | Statisztikai outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` |
+| 4 | K-means klaszterezés | `02_customer_segmentation.ipynb` |
+| 5 | Kiterjesztett EDA: klaszterek vizualizációja | `02_customer_segmentation.ipynb` |
+| 6 | XGBoost célváltozó tervezés | `03_clv_prediction.ipynb` |
+| 7 | Modellezés és SHAP magyarázatok | `03_clv_prediction.ipynb` |
+| 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` |
+| 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` |
+
 ## Adathalmaz és reprodukálhatóság
 
 A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)). 
