@@ -57,6 +57,8 @@ Ezzel a *best practice* megközelítéssel elkerülhető a felesleges bináris a
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
 ```bash
 ecommerce-customer-segmentation/
+├── assets/
+│   └── images/           # saved plots and figures (auto-generated)
 ├── data/
 │   ├── raw/              # original dirty dataset
 │   └── processed/        # cleaned, Parquet format of data
