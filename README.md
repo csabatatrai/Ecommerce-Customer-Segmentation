@@ -1,6 +1,6 @@
 # ecommerce-customer-segmentation
 
-Gépi tanulási projekt Python segítségével.
+Data Science gépi tanulási projekt Python segítségével, Data Engineering és az MLOps-közeli szemléletmóddal kiegészítve.
 
 ## Főbb lépések
 

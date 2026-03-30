@@ -46,7 +46,7 @@ Pipfile.lock
 Thumbs.db
 
 # ========================
-# LLM Prompthoz generált exportok (kimenetekkel való ellenőrzéskor)
+# LLM Prompthoz generált exportok (Notebookok kimenetekkel való ellenőrzéséhez kellettek)
 # ========================
 analysis.md
 output_*.png
