@@ -4,13 +4,15 @@ Gépi tanulási projekt Python segítségével.
 
 ## Adathalmaz és reprodukálhatóság
 
-A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: UCI Machine Learning Repository). 
+A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)). 
 
 Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátokat (~100 MB), a nyers CSV fájl nem képezi a repository részét. 
 
 **Technikai döntés és adatbetöltési kihívások:** A projekt tervezésekor az elsődleges cél a teljesen automatizált, API-kulcsok nélküli reprodukálhatóság volt a hivatalos `ucimlrepo` csomag használatával. Bár az adathalmaz létezik az UCI szerverén, a Python API-juk jelenleg nem támogatja a közvetlen, szabványos DataFrame-be történő beolvasást ennél a specifikus adathalmaznál (ID 502).
 
 A felesleges memóriaterhelés elkerülése érdekében egy robusztus "graceful fallback" megoldást implementáltam. Az `analysis.ipynb` notebook első cellája ellenőrzi az adatok meglétét: ha friss klónozás történt, a notebook nem fagy le nyers hibaüzenettel, hanem pontos instrukciókat ad a Kaggle-ről történő letöltéshez. Amint a nyers CSV a helyére kerül, a rendszer automatikusan egy memóriahatékony, típusbiztos `Parquet` fájlt generál a `data/processed/` mappába, jelentősen felgyorsítva a későbbi futtatásokat.
+
+A hatékony verzióközelés érdekében a nagy méretű és bináris formátumú adatfájlok (CSV, Parquet) tudatosan nem részei a repónak (lásd: .gitignore), biztosítva ezzel a projekt gyors klónozhatóságát és a forráskód tisztaságát.
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
@@ -19,11 +21,15 @@ A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda)
 1. Klónozd a repót és navigálj a mappába:
 ```bash
 git clone https://github.com/csabatatrai/ecommerce-customer-segmentation
+```
+```bash
 cd ecommerce-customer-segmentation
 ```
 2. Hozz létre egy új környezetet:
 ```bash
    conda create --name ecommerce_env python=3.10
+```
+```bash
    conda activate ecommerce_env
 ```
 3. Telepítsd a függőségeket:
@@ -44,6 +50,7 @@ Ezzel a *best practice* megközelítéssel elkerülhető a felesleges bináris a
 *(Ha te is fejleszteni szeretnéd a kódot, a környezet aktiválása után futtasd az `nbstripout --install` parancsot a lokális Git hook beállításához.)*
 
 ## Mappastruktúra
+>Az analysis.ipynb futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
 ```bash
 ecommerce-customer-segmentation/
 ├── data/
@@ -52,7 +59,6 @@ ecommerce-customer-segmentation/
 ├── pages/                # .py files for multipage Streamlit app
 ├── analysis.ipynb        # eda & modelling
 ├── app.py                # Streamlit dashboard's main file
-├── CONTEXT.md            # this is my secret ingredient
 ├── .gitignore
 ├── requirements.txt
 ├── models/               # model & transformator serialization
