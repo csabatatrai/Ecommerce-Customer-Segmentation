@@ -95,20 +95,22 @@ Ezzel a *best practice* megközelítéssel elkerülhető a felesleges bináris a
 ```bash
 ecommerce-customer-segmentation/
 ├── assets/
-│   └── images/           # saved plots and figures (auto-generated)
+│   └── images/               # mentett ábrák és vizualizációk (auto-generált)
 ├── data/
-│   ├── raw/              # original dirty dataset
-│   └── processed/        # cleaned, Parquet format of data
-├── pages/                # .py files for multipage Streamlit app
-├── config.py             # shared path constants and pipeline parameters
-├── 01_data_preparation.ipynb      # data loading, cleaning, outlier filtering
-├── 02_customer_segmentation.ipynb # RFM engineering, scaling, K-means clustering
-├── 03_clv_prediction.ipynb        # XGBoost CLV modelling + SHAP explanations
-├── app.py                # Streamlit dashboard's main file
+│   ├── raw/                  # nyers, eredeti adatfájlok
+│   └── processed/            # tisztított, Parquet formátumú adatok
+├── pages/                    # .py fájlok Streamlitnek (többoldalas alkalmazás)
+├── sql/                      # SQL szkriptek az adatbázis feltérképezéséhez
+│   └── eda_exploratory_analysis.sql # feltáró adatelemzési lekérdezések (EDA)
+├── config.py                 # közös útvonal-konstansok és pipeline paraméterek
+├── 01_data_preparation.ipynb # adatbetöltés, tisztítás, outlier szűrés
+├── 02_customer_segmentation.ipynb # RFM feature engineering, skálázás, K-means klaszterezés
+├── 03_clv_prediction.ipynb    # XGBoost CLV modellezés + SHAP magyarázatok
+├── app.py                    # Streamlit dashboard főfájl
 ├── .gitignore
 ├── requirements.txt
-├── models/               # model & transformator serialization
-│   ├── kmeans_rfm.joblib          
-│   ├── xgboost_clv.joblib         
-│   └── scaler_rfm.joblib          
+└── models/                   # szerializált modell- és transzformátor-objektumok (joblib)
+    ├── kmeans_rfm.joblib     # illesztett KMeans klaszterező
+    ├── xgboost_clv.joblib    # illesztett XGBoost regresszor
+    └── scaler_rfm.joblib     # StandardScaler transzformátor (RFM feature-ökhöz)   
 ```
