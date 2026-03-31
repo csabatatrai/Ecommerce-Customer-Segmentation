@@ -79,10 +79,11 @@ ORDER BY SalesMonth;
 -- Kérdés: Mekkora a vásárlók "hallgatási ideje"? Ez indokolta a
 -- recency_days feature bevezetését az RFM modellben.
 -- Megjegyzés: julianday() az SQLite dátumkülönbség-számítás natív módja.
+-- JAVÍTOTT VERZIÓ (1.5-ös query):a julianday('now') a mai dátumot veszi alapul, cserélve lett
 SELECT 
     "Customer ID",
     MAX(InvoiceDate) AS LastPurchaseDate,
-    CAST(julianday('now') - julianday(MAX(InvoiceDate)) AS INTEGER) AS DaysSinceLastPurchase
+    CAST(julianday((SELECT MAX(InvoiceDate) FROM ecomStore)) - julianday(MAX(InvoiceDate)) AS INTEGER) AS DaysSinceLastPurchase
 FROM ecomStore
 WHERE Invoice NOT LIKE 'C%'
   AND "Customer ID" IS NOT NULL

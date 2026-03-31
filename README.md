@@ -27,6 +27,8 @@ Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátok
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
+> **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Ha a saját gépeden eltérő mappastruktúrát használnál, az útvonalakat ott tudod egy helyen módosítani.
+
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
 1. Klónozd a repót és navigálj a mappába:
@@ -60,7 +62,7 @@ jupyter notebook
 
 > **Fontos:** A pipeline globális paraméterei (útvonalak, `CUTOFF_DATE`, `Q_THRESHOLD`) a `config.py` fájlban vannak központosítva. Ha szükséges, a notebookok futtatása előtt itt állítsd be őket.
 
-> **Fejlesztőknek:** A notebookok kimenetének tisztántartásához (hogy ne kerüljenek fel a kimenetek is pl. Github-ra) futtasd az `nbstripout --install` parancsot a lokális Git hook beállításához.
+> **Fejlesztőknek:** A notebookok kimenetének tisztántartásához (hogy ne kerüljenek fel a kimenetek is pl. GitHub-ra) futtasd az `nbstripout --install` parancsot a lokális Git hook beállításához.
 
 ## Exploratív adatelemzés (EDA) - SQLite alapokon
 
