@@ -4,18 +4,18 @@ Data Science gépi tanulási projekt Python segítségével, Data Engineering é
 
 ## Főbb lépések
 
-| # | Lépés | Notebook |
-|---|-------|----------|
-| 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` |
-| 1 | Adattisztítás és technikai outlier-szűrés, alap EDA | `01_data_preparation.ipynb` |
-| 2 | RFM Feature Engineering | `02_customer_segmentation.ipynb` |
-| 3 | Statisztikai outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` |
-| 4 | K-means klaszterezés | `02_customer_segmentation.ipynb` |
-| 5 | Kiterjesztett EDA: klaszterek vizualizációja | `02_customer_segmentation.ipynb` |
-| 6 | XGBoost célváltozó tervezés | `03_clv_prediction.ipynb` |
-| 7 | Modellezés és SHAP magyarázatok | `03_clv_prediction.ipynb` |
-| 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` |
-| 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` |
+| # | Lépés | Notebook | Lefutott eredmények megtekintése |
+|---|-------|----------|----------------------------------|
+| 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` | [📊 Megtekintés](docs/01_data_preparation.md) |
+| 1 | Adattisztítás és technikai outlier-szűrés, alap EDA | `01_data_preparation.ipynb` | [📊 Megtekintés](docs/01_data_preparation.md) |
+| 2 | RFM Feature Engineering | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
+| 3 | Statisztikai outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
+| 4 | K-means klaszterezés | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
+| 5 | Kiterjesztett EDA: klaszterek vizualizációja | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
+| 6 | XGBoost célváltozó tervezés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
+| 7 | Modellezés és SHAP magyarázatok | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
+| 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
+| 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
 
 ## Adathalmaz, alapötlet
 
