@@ -21,3 +21,8 @@ notebook==7.5.5
 # Automatikusan kitisztítja a notebook kimeneteket commit előtt:
 nbstripout==0.9.1
 nbformat==5.10.4
+
+# Valahová:
+xgboost==3.2.
+shap==0.49.
+streamlit==1.55.0
