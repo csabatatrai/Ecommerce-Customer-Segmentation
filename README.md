@@ -71,13 +71,18 @@ jupyter notebook
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
-```
+```text
 ecommerce-customer-segmentation/
 ├── assets/
 │   └── images/               # mentett ábrák és vizualizációk (auto-generált)
 ├── data/
 │   ├── raw/                  # nyers, eredeti adatfájlok
 │   └── processed/            # tisztított, Parquet formátumú adatok
+├── docs/                     # 🚀 LEFUTOTT EREDMÉNYEK (Markdown portfólió nézet)
+│   ├── images/               # Jupyter által generált inline ábrák
+│   ├── 01_data_preparation.md
+│   ├── 02_customer_segmentation.md
+│   └── 03_clv_prediction.md
 ├── pages/                    # .py fájlok Streamlitnek (többoldalas alkalmazás)
 ├── sql/                      # SQL szkriptek az adatbázis feltérképezéséhez
 │   └── eda_exploratory_analysis.sql
@@ -89,7 +94,3 @@ ecommerce-customer-segmentation/
 ├── .gitignore
 ├── requirements.txt
 └── models/                   # szerializált modell- és transzformátor-objektumok (joblib)
-    ├── kmeans_rfm.joblib
-    ├── xgboost_clv.joblib
-    └── scaler_rfm.joblib
-```
