@@ -27,72 +27,49 @@ Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátok
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
-> **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Ha a saját gépeden eltérő mappastruktúrát használnál, az útvonalakat ott tudod egy helyen módosítani.
+> **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
 
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
 1. Klónozd a repót és navigálj a mappába:
 ```bash
 git clone https://github.com/csabatatrai/ecommerce-customer-segmentation
-```
-```bash
 cd ecommerce-customer-segmentation
 ```
+
 2. Hozz létre egy új környezetet:
 ```bash
 conda create --name ecommerce_env python=3.10
-```
-```bash
 conda activate ecommerce_env
 ```
+
 3. Telepítsd a függőségeket:
 ```bash
 pip install -r requirements.txt
 ```
+
 4. Töltsd le a nyers adathalmazt a [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data), csomagold ki, és az `online_retail_II.csv` fájlt helyezd el a `data/raw/` mappába.
 
 5. Indítsd el a Jupytert:
 ```bash
 jupyter notebook
 ```
+
 6. Futtasd a notebookokat **sorrendben**:
    - `01_data_preparation.ipynb` – adatbetöltés és tisztítás
    - `02_customer_segmentation.ipynb` – RFM feature engineering és szegmentáció
    - `03_clv_prediction.ipynb` – prediktív modellezés (XGBoost + SHAP)
 
-> **Fontos:** A pipeline globális paraméterei (útvonalak, `CUTOFF_DATE`, `Q_THRESHOLD`) a `config.py` fájlban vannak központosítva. Ha szükséges, a notebookok futtatása előtt itt állítsd be őket.
+## Megjegyzések
 
-> **Fejlesztőknek:** A notebookok kimenetének tisztántartásához (hogy ne kerüljenek fel a kimenetek is pl. GitHub-ra) futtasd az `nbstripout --install` parancsot a lokális Git hook beállításához.
+> [!NOTE]
+>Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
 
-## Exploratív adatelemzés (EDA) - SQLite alapokon
+> [!NOTE]
+> Kimeneti adatformátum: **Parquet**
 
-Az adathalmaz elsődleges feltárása nem közvetlenül Pandas-ban, hanem SQLite adatbázisban történt. A lekérdezések futtatásához használt eszköz: [DB Browser for SQLite](https://sqlitebrowser.org/).
-
-A nyers, „koszos" CSV fájlt egy SQLite táblába (`ecomStore` néven) töltöttem be, és az exploratív elemzést SQL lekérdezéseken keresztül végeztem. Ez lehetővé tette:
-
-- nagyobb adatmennyiség gyors, aggregáció-alapú vizsgálatát
-- üzleti kérdések strukturált tesztelését (pl. visszaküldési arányok, vásárlói lojalitás)
-- adatminőségi problémák azonosítását (pl. adminisztratív tételek, negatív mennyiségek)
-
-Az EDA során futtatott SQL lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban.
-
-Az itt szerzett felismerések közvetlenül beépítésre kerültek a Python pipeline-ba:
-→ `01_data_preparation.ipynb`: tisztítási szabályok (pl. visszáruk kezelése, szűrések)
-→ `02_customer_segmentation.ipynb`: RFM feature engineering és szegmentációs stratégia
-
-Ez a megközelítés szétválasztja:
-- a **feltárást (SQL)** és
-- a **produkciós pipeline-t (Python + Parquet)**
-
-így a projekt egyszerre reprodukálható és skálázható.
-
-## Műszaki megjegyzések
-
-**Adatformátum (Parquet):** A nyers CSV adatokat az első lépésben Apache Parquet formátumba transzformálom és a `data/processed/` mappában tárolom. Az oszlop-alapú tárolás gyorsabb beolvasást és kisebb memóriahasználatot tesz lehetővé, a Parquet pedig megőrzi a sémát (pl. `InvoiceDate` datetime, `Customer ID` integer típusa), elkerülve a CSV-re jellemző ismételt típuskonverziós hibákat.
-
-**Verziókezelés (nbstripout):** Az `nbstripout` Git-filter biztosítja, hogy a távoli repóba kizárólag a forráskód kerüljön be, a futtatási metaadatok nélkül. A nagy méretű adatfájlok (CSV, Parquet) tudatosan nem részei a repónak (lásd: `.gitignore`).
-
-**Adatbetöltési kihívások:** A projekt tervezésekor az elsődleges cél a teljesen automatizált reprodukálhatóság volt a hivatalos `ucimlrepo` csomag használatával. Bár az adathalmaz létezik az UCI szerverén, a Python API jelenleg nem támogatja a közvetlen DataFrame-be történő beolvasást ennél a specifikus adathalmaznál (ID 502). A `01_data_preparation.ipynb` első cellája ezért egy "graceful fallback" megoldást alkalmaz: ha a nyers CSV hiányzik, pontos letöltési instrukciókat ad, és nem fagy le nyers hibaüzenettel.
+> [!NOTE]
+> Verziókezelés **nbstripout** Git-filterre, így nem szemeteli tele a repo-t a notebook futtatási metaadatokkal, `nbstripout --install` parancs futtatása szükséges terminálból a lokális Git hook beállításához
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
