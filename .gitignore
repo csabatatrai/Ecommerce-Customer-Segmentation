@@ -48,5 +48,5 @@ Thumbs.db
 # ========================
 # LLM Prompthoz generált exportok (Notebookok kimenetekkel való ellenőrzéséhez kellettek)
 # ========================
-analysis.md
-output_*.png
+# analysis.md # eredetileg egy monolitikus fájlban történt az elemzés, később lett modulokra bontva
+# output_*.png # a projekt portfólió jellege miatt mégis szükségessé vált .png-k feltöltése a markdown fájlokhoz
