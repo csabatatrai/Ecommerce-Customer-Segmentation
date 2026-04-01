@@ -17,13 +17,11 @@ Data Science gépi tanulási projekt Python segítségével, Data Engineering é
 | 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` |
 | 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` |
 
-## Adathalmaz
+## Adathalmaz, alapötlet
 
 A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)).
 
 Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykereskedő 2009–2011 közötti tranzakcióit tartalmazza, közel 1 millió sorban. Az ügyfelek viszonteladók (B2B) és magánszemélyek (B2C) vegyesen, ami indokolja az RFM-alapú szegmentációs megközelítést: a visszatérő, nagyértékű vásárlók azonosítása és a lemorzsolódás előrejelzése ebben a szegmensben különösen üzletileg releváns.
-
-Mivel a nyers adathalmaz mérete meghaladja a GitHub által preferált korlátokat (~100 MB), a nyers CSV fájl nem képezi a repository részét, a notebook futtatás közben tölti le.
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
@@ -60,7 +58,7 @@ jupyter notebook
    - `02_customer_segmentation.ipynb` – RFM feature engineering és szegmentáció
    - `03_clv_prediction.ipynb` – prediktív modellezés (XGBoost + SHAP)
 
-## Megjegyzések
+## Kiegészítő műszaki megoldások
 
 > [!NOTE]
 >Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
