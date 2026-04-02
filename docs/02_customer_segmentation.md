@@ -1219,6 +1219,34 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 
 
 ```python
-# A notebook legutolsó cellája
 !python update_docs.py
 ```
+
+    Dokumentáció frissítése elindult...
+    ========================================
+    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
+    [01_data_preparation.ipynb] Kész! [OK]
+    
+    [02_customer_segmentation.ipynb] Konvertálás Markdown-ná...
+    [02_customer_segmentation.ipynb] Kész! [OK]
+    
+    [03_churn_prediction.ipynb] Konvertálás Markdown-ná...
+    [03_churn_prediction.ipynb] Kész! [OK]
+    
+    ========================================
+    Minden markdown és képhivatkozás sikeresen generálva!
+    
+
+    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
+    [NbConvertApp] Support files will be in 01_data_preparation_files\
+    [NbConvertApp] Making directory docs\01_data_preparation_files
+    [NbConvertApp] Writing 20461 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
+    [NbConvertApp] Support files will be in 02_customer_segmentation_files\
+    [NbConvertApp] Making directory docs\02_customer_segmentation_files
+    [NbConvertApp] Writing 39819 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
+    [NbConvertApp] Support files will be in 03_churn_prediction_files\
+    [NbConvertApp] Making directory docs\03_churn_prediction_files
+    [NbConvertApp] Writing 59168 bytes to docs\03_churn_prediction.md
+    
