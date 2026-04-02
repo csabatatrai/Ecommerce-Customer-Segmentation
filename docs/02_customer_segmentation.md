@@ -140,21 +140,8 @@ print("-" * 50)
 display(rfm.head())
 ```
 
-    Task was destroyed but it is pending!
-    task: <Task pending name='Task-143' coro=<_async_in_context.<locals>.run_in_context_pre311() done, defined at D:\Anaconda\envs\ecommerce_env\lib\site-packages\ipykernel\utils.py:76> wait_for=<Task pending name='Task-144' coro=<_async_in_context.<locals>.preserve_context() running at D:\Anaconda\envs\ecommerce_env\lib\site-packages\ipykernel\utils.py:68> cb=[Task.task_wakeup()]> cb=[ZMQStream._run_callback.<locals>._log_error() at D:\Anaconda\envs\ecommerce_env\lib\site-packages\zmq\eventloop\zmqstream.py:563]>
-    
-
     Ügyfélszintű RFM és Return feature-ök kiszámítása a megfigyelési ablakból...
     
-    
-
-    D:\Anaconda\envs\ecommerce_env\lib\abc.py:123: RuntimeWarning: coroutine '_async_in_context.<locals>.preserve_context' was never awaited
-      return _abc_subclasscheck(cls, subclass)
-    RuntimeWarning: Enable tracemalloc to get the object allocation traceback
-    Task was destroyed but it is pending!
-    task: <Task pending name='Task-144' coro=<_async_in_context.<locals>.preserve_context() running at D:\Anaconda\envs\ecommerce_env\lib\site-packages\ipykernel\utils.py:68> cb=[Task.task_wakeup()]>
-    
-
     Feature Engineering sikeresen befejeződött.
     Létrejött RFM mátrix dimenziói: 5,243 ügyfél, 6 feature
     --------------------------------------------------
@@ -1240,13 +1227,13 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 20461 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 21836 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 39819 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 41194 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
     [NbConvertApp] Support files will be in 03_churn_prediction_files\
     [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59168 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 58968 bytes to docs\03_churn_prediction.md
     

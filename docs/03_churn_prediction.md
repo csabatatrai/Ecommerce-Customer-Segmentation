@@ -556,6 +556,8 @@ print("      a 02-es notebook üzleti szegmenseivel (VIP Bajnokok stb.).")
 
 Az imbalanced osztályeloszlás miatt **PR-AUC** (Precision-Recall AUC) a fő metrika - ez sokkal informatívabb, mint az ROC-AUC, ha az egyik osztály ritkább. Mellette F1-score és Recall is szerepel a teljes kép kedvéért.
 
+### 8.1 – Keresztvalidáció mindkét modellre
+
 
 ```python
 # ============================================================
@@ -584,6 +586,8 @@ print("✔️ Modell B kész.")
     Modell B keresztvalidáció futtatása (5-fold StratifiedKFold)...
     ✔️ Modell B kész.
     
+
+### 8.2 – Eredmények összehasonlítása
 
 
 ```python
@@ -692,6 +696,8 @@ else:
     🏆 Nyertes modell: A: Csak RFM (PR-AUC: nan vs nan)
     
 
+### 8.3 – CV eredmények vizualizálása
+
 
 ```python
 # ============================================================
@@ -725,9 +731,11 @@ plt.show()
 
 
     
-![png](images/03_churn_prediction_03_churn_prediction_14_1.png)
+![png](images/03_churn_prediction_03_churn_prediction_17_1.png)
     
 
+
+### 8.4 – A nyertes modell betanítása a TELJES adathalmazon
 
 
 ```python
@@ -759,7 +767,7 @@ print("\n⚠️ A tréning metrikák mindig optimistábban néznek ki, mint a CV
     
 
 ---
-## 8.5 Hiperparaméter-hangolás – `RandomizedSearchCV`
+### 8.5 Hiperparaméter-hangolás – `RandomizedSearchCV`
 
 Az alábbi cella futtatható, de **nem kötelező** a notebook többi részéhez - az eredmény automatikusan felülírja a `winner_pipeline`-t, ha a keresés jobb paramétert talál.
 
@@ -875,6 +883,8 @@ print("   Ha a RSCV eredménye jobb, töröld a kommentet a két sor elől fent.
 
 A SHAP (SHapley Additive exPlanations) értékek megmutatják, hogy az egyes feature-ök mennyivel "tolják" a modell kimenetét az átlagtól el - pozitív irányban (churn felé) vagy negatív irányban (megtartás felé).
 
+### 9.1 – SHAP adatok előkészítése
+
 
 ```python
 # ============================================================
@@ -925,13 +935,15 @@ print(f"Feature nevek: {feature_names_transformed}")
 
 ```
 
-    ExactExplainer explainer: 5244it [00:42, 123.00it/s]                                                                   
+    ExactExplainer explainer: 5244it [00:45, 114.72it/s]                                                                   
     
 
     ✔️ SHAP értékek kiszámítva: (5243, 5, 2)
        Churn=1 szelet alakja:   (5243, 5)
     Feature nevek: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio']
     
+
+### 9.2 – SHAP Summary Plot (Globális feature fontosság)
 
 
 ```python
@@ -964,21 +976,9 @@ print("  • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)")
 ```
 
     SHAP Summary Plot generálása...
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\shap_summary_plot.png
     
 
-
-    
-![png](images/03_churn_prediction_03_churn_prediction_20_1.png)
-    
-
-
-    
-    📊 Értelmezés:
-      • Magasabb recency → nagyobb churn valószínűség (logikus: aki rég vásárolt, lemorzsolódik)
-      • Alacsony frequency → nagyobb churn kockázat
-      • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)
-    
+### 9.3 – SHAP Waterfall Plot: Egy VIP, lemorzsolódó ügyfél magyarázata
 
 
 ```python
@@ -1029,69 +1029,12 @@ print(f"\nÁbra mentve: {fig_path}")
 plt.show()
 ```
 
-    Elemzett VIP lemorzsolódó ügyfél: 17305
-    
-    Az elemzett ügyfél profilja:
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>recency_days</th>
-      <th>frequency</th>
-      <th>monetary_total</th>
-      <th>monetary_avg</th>
-      <th>return_ratio</th>
-      <th>churn</th>
-      <th>churn_proba</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>17305</th>
-      <td>556.0</td>
-      <td>1.0</td>
-      <td>2135.46</td>
-      <td>2135.46</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>0.969839</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\shap_waterfall_vip_churn.png
-    
-
-
-    
-![png](images/03_churn_prediction_03_churn_prediction_21_3.png)
-    
-
-
 ---
 ## 10. Üzleti kiértékelés és Akciótervek
 
 A modell önmagában nem elegendő - az előrejelzéseket üzleti akciótervre kell lefordítani. Az alábbi szegmentáció a churn valószínűség és a monetary érték kombinációján alapul.
+
+### 10.1 – Prioritizált akciólista generálása + szegmenscímkék becsatolása a 02-es notebookból
 
 
 ```python
@@ -1167,149 +1110,7 @@ display(cross_tab)
 
 ```
 
-    ✔️ Szegmenscímkék becsatolva ('Segment' oszlopból)
-       Egyedi szegmensek: ['Elvesztett / Inaktív', 'Lemorzsolódó / Alvó', 'VIP Bajnokok', 'Új / Ígéretes']
-    
-    Üzleti akció-szegmensek összefoglalása:
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Akció kategória</th>
-      <th>Ügyfelek száma</th>
-      <th>Arány (%)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>⚠️  Alacsony Értékű, Lemorzsolódó – Win-Back</td>
-      <td>2143</td>
-      <td>40.9</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>💎 VIP Stabil – Lojalitás Program</td>
-      <td>1912</td>
-      <td>36.5</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>🚨 VIP Veszélyben – Azonnali Retenció</td>
-      <td>708</td>
-      <td>13.5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>✅ Alacsony Értékű, Stabil – Standard Kommunikáció</td>
-      <td>480</td>
-      <td>9.2</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    
-    RFM-szegmens × Churn-kockázat kereszttábla:
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>action</th>
-      <th>⚠️  Alacsony Értékű, Lemorzsolódó – Win-Back</th>
-      <th>✅ Alacsony Értékű, Stabil – Standard Kommunikáció</th>
-      <th>💎 VIP Stabil – Lojalitás Program</th>
-      <th>🚨 VIP Veszélyben – Azonnali Retenció</th>
-      <th>Összesen</th>
-    </tr>
-    <tr>
-      <th>rfm_segment</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Elvesztett / Inaktív</th>
-      <td>1917</td>
-      <td>70</td>
-      <td>4</td>
-      <td>107</td>
-      <td>2098</td>
-    </tr>
-    <tr>
-      <th>Lemorzsolódó / Alvó</th>
-      <td>156</td>
-      <td>69</td>
-      <td>829</td>
-      <td>570</td>
-      <td>1624</td>
-    </tr>
-    <tr>
-      <th>VIP Bajnokok</th>
-      <td>0</td>
-      <td>0</td>
-      <td>847</td>
-      <td>14</td>
-      <td>861</td>
-    </tr>
-    <tr>
-      <th>Új / Ígéretes</th>
-      <td>70</td>
-      <td>341</td>
-      <td>232</td>
-      <td>17</td>
-      <td>660</td>
-    </tr>
-    <tr>
-      <th>Összesen</th>
-      <td>2143</td>
-      <td>480</td>
-      <td>1912</td>
-      <td>708</td>
-      <td>5243</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+### 10.2 – VIP Veszélyben lista (TOP 20 legértékesebb, leginkább lemorzsolódó ügyfél)
 
 
 ```python
@@ -1340,261 +1141,6 @@ print("   2. Exkluzív visszatérési kupon (pl. 15-20% kedvezmény)")
 print("   3. Win-back email sorozat (3 üzenet, 2 hetes intervallummal)")
 print("   4. NPS felmérés küldése (proaktív panaszkezelés)")
 ```
-
-    VIP Veszélyben ügyfelek száma: 708
-    
-    Top 20 legmagasabb kockázatú VIP ügyfél (azonnali intézkedés javasolt):
-    
-
-
-<style type="text/css">
-#T_e2cc8_row0_col3 {
-  background-color: #67000d;
-  color: #f1f1f1;
-}
-#T_e2cc8_row1_col3, #T_e2cc8_row2_col3 {
-  background-color: #920a13;
-  color: #f1f1f1;
-}
-#T_e2cc8_row3_col3 {
-  background-color: #ce1a1e;
-  color: #f1f1f1;
-}
-#T_e2cc8_row4_col3 {
-  background-color: #d52221;
-  color: #f1f1f1;
-}
-#T_e2cc8_row5_col3 {
-  background-color: #e12d26;
-  color: #f1f1f1;
-}
-#T_e2cc8_row6_col3 {
-  background-color: #eb372a;
-  color: #f1f1f1;
-}
-#T_e2cc8_row7_col3 {
-  background-color: #ed392b;
-  color: #f1f1f1;
-}
-#T_e2cc8_row8_col3 {
-  background-color: #f0402f;
-  color: #f1f1f1;
-}
-#T_e2cc8_row9_col3 {
-  background-color: #f5523a;
-  color: #f1f1f1;
-}
-#T_e2cc8_row10_col3 {
-  background-color: #f6563d;
-  color: #f1f1f1;
-}
-#T_e2cc8_row11_col3 {
-  background-color: #fc8565;
-  color: #f1f1f1;
-}
-#T_e2cc8_row12_col3 {
-  background-color: #fc8f6f;
-  color: #000000;
-}
-#T_e2cc8_row13_col3 {
-  background-color: #fca689;
-  color: #000000;
-}
-#T_e2cc8_row14_col3 {
-  background-color: #fcab8f;
-  color: #000000;
-}
-#T_e2cc8_row15_col3 {
-  background-color: #fcb79c;
-  color: #000000;
-}
-#T_e2cc8_row16_col3 {
-  background-color: #fee1d3;
-  color: #000000;
-}
-#T_e2cc8_row17_col3 {
-  background-color: #fee2d5;
-  color: #000000;
-}
-#T_e2cc8_row18_col3 {
-  background-color: #fff2ec;
-  color: #000000;
-}
-#T_e2cc8_row19_col3 {
-  background-color: #fff5f0;
-  color: #000000;
-}
-</style>
-<table id="T_e2cc8">
-  <thead>
-    <tr>
-      <th class="blank level0" >&nbsp;</th>
-      <th id="T_e2cc8_level0_col0" class="col_heading level0 col0" >monetary_total</th>
-      <th id="T_e2cc8_level0_col1" class="col_heading level0 col1" >frequency</th>
-      <th id="T_e2cc8_level0_col2" class="col_heading level0 col2" >recency_days</th>
-      <th id="T_e2cc8_level0_col3" class="col_heading level0 col3" >churn_proba</th>
-    </tr>
-    <tr>
-      <th class="index_name level0" >Customer ID</th>
-      <th class="blank col0" >&nbsp;</th>
-      <th class="blank col1" >&nbsp;</th>
-      <th class="blank col2" >&nbsp;</th>
-      <th class="blank col3" >&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th id="T_e2cc8_level0_row0" class="row_heading level0 row0" >17305</th>
-      <td id="T_e2cc8_row0_col0" class="data row0 col0" >£2,135</td>
-      <td id="T_e2cc8_row0_col1" class="data row0 col1" >1</td>
-      <td id="T_e2cc8_row0_col2" class="data row0 col2" >556 nap</td>
-      <td id="T_e2cc8_row0_col3" class="data row0 col3" >96.98%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row1" class="row_heading level0 row1" >14091</th>
-      <td id="T_e2cc8_row1_col0" class="data row1 col0" >£9,530</td>
-      <td id="T_e2cc8_row1_col1" class="data row1 col1" >2</td>
-      <td id="T_e2cc8_row1_col2" class="data row1 col2" >562 nap</td>
-      <td id="T_e2cc8_row1_col3" class="data row1 col3" >96.61%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row2" class="row_heading level0 row2" >12396</th>
-      <td id="T_e2cc8_row2_col0" class="data row2 col0" >£931</td>
-      <td id="T_e2cc8_row2_col1" class="data row2 col1" >1</td>
-      <td id="T_e2cc8_row2_col2" class="data row2 col2" >582 nap</td>
-      <td id="T_e2cc8_row2_col3" class="data row2 col3" >96.61%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row3" class="row_heading level0 row3" >16118</th>
-      <td id="T_e2cc8_row3_col0" class="data row3 col0" >£4,255</td>
-      <td id="T_e2cc8_row3_col1" class="data row3 col1" >1</td>
-      <td id="T_e2cc8_row3_col2" class="data row3 col2" >560 nap</td>
-      <td id="T_e2cc8_row3_col3" class="data row3 col3" >95.90%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row4" class="row_heading level0 row4" >14969</th>
-      <td id="T_e2cc8_row4_col0" class="data row4 col0" >£906</td>
-      <td id="T_e2cc8_row4_col1" class="data row4 col1" >1</td>
-      <td id="T_e2cc8_row4_col2" class="data row4 col2" >611 nap</td>
-      <td id="T_e2cc8_row4_col3" class="data row4 col3" >95.78%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row5" class="row_heading level0 row5" >13204</th>
-      <td id="T_e2cc8_row5_col0" class="data row5 col0" >£967</td>
-      <td id="T_e2cc8_row5_col1" class="data row5 col1" >1</td>
-      <td id="T_e2cc8_row5_col2" class="data row5 col2" >639 nap</td>
-      <td id="T_e2cc8_row5_col3" class="data row5 col3" >95.62%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row6" class="row_heading level0 row6" >16749</th>
-      <td id="T_e2cc8_row6_col0" class="data row6 col0" >£4,158</td>
-      <td id="T_e2cc8_row6_col1" class="data row6 col1" >2</td>
-      <td id="T_e2cc8_row6_col2" class="data row6 col2" >499 nap</td>
-      <td id="T_e2cc8_row6_col3" class="data row6 col3" >95.47%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row7" class="row_heading level0 row7" >15823</th>
-      <td id="T_e2cc8_row7_col0" class="data row7 col0" >£3,048</td>
-      <td id="T_e2cc8_row7_col1" class="data row7 col1" >2</td>
-      <td id="T_e2cc8_row7_col2" class="data row7 col2" >637 nap</td>
-      <td id="T_e2cc8_row7_col3" class="data row7 col3" >95.44%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row8" class="row_heading level0 row8" >12482</th>
-      <td id="T_e2cc8_row8_col0" class="data row8 col0" >£21,942</td>
-      <td id="T_e2cc8_row8_col1" class="data row8 col1" >27</td>
-      <td id="T_e2cc8_row8_col2" class="data row8 col2" >484 nap</td>
-      <td id="T_e2cc8_row8_col3" class="data row8 col3" >95.36%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row9" class="row_heading level0 row9" >14063</th>
-      <td id="T_e2cc8_row9_col0" class="data row9 col0" >£9,472</td>
-      <td id="T_e2cc8_row9_col1" class="data row9 col1" >7</td>
-      <td id="T_e2cc8_row9_col2" class="data row9 col2" >594 nap</td>
-      <td id="T_e2cc8_row9_col3" class="data row9 col3" >95.16%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row10" class="row_heading level0 row10" >15633</th>
-      <td id="T_e2cc8_row10_col0" class="data row10 col0" >£4,157</td>
-      <td id="T_e2cc8_row10_col1" class="data row10 col1" >13</td>
-      <td id="T_e2cc8_row10_col2" class="data row10 col2" >417 nap</td>
-      <td id="T_e2cc8_row10_col3" class="data row10 col3" >95.11%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row11" class="row_heading level0 row11" >12368</th>
-      <td id="T_e2cc8_row11_col0" class="data row11 col0" >£918</td>
-      <td id="T_e2cc8_row11_col1" class="data row11 col1" >1</td>
-      <td id="T_e2cc8_row11_col2" class="data row11 col2" >536 nap</td>
-      <td id="T_e2cc8_row11_col3" class="data row11 col3" >94.55%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row12" class="row_heading level0 row12" >13734</th>
-      <td id="T_e2cc8_row12_col0" class="data row12 col0" >£3,445</td>
-      <td id="T_e2cc8_row12_col1" class="data row12 col1" >4</td>
-      <td id="T_e2cc8_row12_col2" class="data row12 col2" >416 nap</td>
-      <td id="T_e2cc8_row12_col3" class="data row12 col3" >94.42%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row13" class="row_heading level0 row13" >15413</th>
-      <td id="T_e2cc8_row13_col0" class="data row13 col0" >£6,799</td>
-      <td id="T_e2cc8_row13_col1" class="data row13 col1" >5</td>
-      <td id="T_e2cc8_row13_col2" class="data row13 col2" >599 nap</td>
-      <td id="T_e2cc8_row13_col3" class="data row13 col3" >94.11%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row14" class="row_heading level0 row14" >15015</th>
-      <td id="T_e2cc8_row14_col0" class="data row14 col0" >£2,255</td>
-      <td id="T_e2cc8_row14_col1" class="data row14 col1" >13</td>
-      <td id="T_e2cc8_row14_col2" class="data row14 col2" >409 nap</td>
-      <td id="T_e2cc8_row14_col3" class="data row14 col3" >94.05%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row15" class="row_heading level0 row15" >17039</th>
-      <td id="T_e2cc8_row15_col0" class="data row15 col0" >£1,955</td>
-      <td id="T_e2cc8_row15_col1" class="data row15 col1" >1</td>
-      <td id="T_e2cc8_row15_col2" class="data row15 col2" >512 nap</td>
-      <td id="T_e2cc8_row15_col3" class="data row15 col3" >93.90%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row16" class="row_heading level0 row16" >12671</th>
-      <td id="T_e2cc8_row16_col0" class="data row16 col0" >£2,622</td>
-      <td id="T_e2cc8_row16_col1" class="data row16 col1" >1</td>
-      <td id="T_e2cc8_row16_col2" class="data row16 col2" >514 nap</td>
-      <td id="T_e2cc8_row16_col3" class="data row16 col3" >93.31%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row17" class="row_heading level0 row17" >16736</th>
-      <td id="T_e2cc8_row17_col0" class="data row17 col0" >£2,905</td>
-      <td id="T_e2cc8_row17_col1" class="data row17 col1" >5</td>
-      <td id="T_e2cc8_row17_col2" class="data row17 col2" >413 nap</td>
-      <td id="T_e2cc8_row17_col3" class="data row17 col3" >93.27%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row18" class="row_heading level0 row18" >13902</th>
-      <td id="T_e2cc8_row18_col0" class="data row18 col0" >£23,346</td>
-      <td id="T_e2cc8_row18_col1" class="data row18 col1" >5</td>
-      <td id="T_e2cc8_row18_col2" class="data row18 col2" >540 nap</td>
-      <td id="T_e2cc8_row18_col3" class="data row18 col3" >92.88%</td>
-    </tr>
-    <tr>
-      <th id="T_e2cc8_level0_row19" class="row_heading level0 row19" >18051</th>
-      <td id="T_e2cc8_row19_col0" class="data row19 col0" >£2,276</td>
-      <td id="T_e2cc8_row19_col1" class="data row19 col1" >7</td>
-      <td id="T_e2cc8_row19_col2" class="data row19 col2" >542 nap</td>
-      <td id="T_e2cc8_row19_col3" class="data row19 col3" >92.80%</td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-    
-    💡 Javasolt akciók a VIP Veszélyben szegmensre:
-       1. Személyes account manager megkeresés (ha B2B ügyfél)
-       2. Exkluzív visszatérési kupon (pl. 15-20% kedvezmény)
-       3. Win-back email sorozat (3 üzenet, 2 hetes intervallummal)
-       4. NPS felmérés küldése (proaktív panaszkezelés)
-    
 
 
 ```python
@@ -1630,19 +1176,6 @@ print(f"   érdemes a threshold-ot lejjebb venni (pl. 0.3-ra).")
 plt.show()
 ```
 
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\precision_recall_curve.png
-    
-    🎯 F1-t maximalizáló threshold: 0.354
-       Ha az üzleti cél a RECALL maximalizálása (nem akarunk egyetlen lemorzsolódót sem kihagyni),
-       érdemes a threshold-ot lejjebb venni (pl. 0.3-ra).
-    
-
-
-    
-![png](images/03_churn_prediction_03_churn_prediction_25_1.png)
-    
-
-
 ---
 ## 11. Export – A modell és az előrejelzések mentése
 
@@ -1658,11 +1191,6 @@ print(f"✔️ Nyertes Pipeline mentve: {MODEL_PATH}")
 print(f"   Modell: {winner_name}")
 print(f"   Fájlméret: {MODEL_PATH.stat().st_size / 1024:.1f} KB")
 ```
-
-    ✔️ Nyertes Pipeline mentve: D:\Workspace\ecommerce-customer-segmentation\models\xgboost_churn.joblib
-       Modell: A: Csak RFM
-       Fájlméret: 426.2 KB
-    
 
 
 ```python
@@ -1690,21 +1218,6 @@ print(f"  Előrejelzések mentve:    {PREDICTIONS_PATH}")
 print("="*60)
 ```
 
-    ✔️ Előrejelzések mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
-       Dimenziók: 5,243 ügyfél × 10 oszlop
-    
-    Oszlopok: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio', 'churn_proba', 'churn_pred', 'actual_churn', 'rfm_segment', 'action']
-    
-    ============================================================
-    03_clv_prediction.ipynb – KÉSZ
-    ============================================================
-      Modell:                  A: Csak RFM
-      CV PR-AUC (átlag):       nan
-      Modell mentve:           D:\Workspace\ecommerce-customer-segmentation\models\xgboost_churn.joblib
-      Előrejelzések mentve:    D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
-    ============================================================
-    
-
 
 ```python
 
@@ -1722,32 +1235,3 @@ print("="*60)
 ```python
 !python update_docs.py
 ```
-
-    Dokumentáció frissítése elindult...
-    ========================================
-    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
-    [01_data_preparation.ipynb] Kész! [OK]
-    
-    [02_customer_segmentation.ipynb] Konvertálás Markdown-ná...
-    [02_customer_segmentation.ipynb] Kész! [OK]
-    
-    [03_churn_prediction.ipynb] Konvertálás Markdown-ná...
-    [03_churn_prediction.ipynb] Kész! [OK]
-    
-    ========================================
-    Minden markdown és képhivatkozás sikeresen generálva!
-    
-
-    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
-    [NbConvertApp] Support files will be in 01_data_preparation_files\
-    [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 21836 bytes to docs\01_data_preparation.md
-    [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
-    [NbConvertApp] Support files will be in 02_customer_segmentation_files\
-    [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 41194 bytes to docs\02_customer_segmentation.md
-    [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Support files will be in 03_churn_prediction_files\
-    [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 41484 bytes to docs\03_churn_prediction.md
-    

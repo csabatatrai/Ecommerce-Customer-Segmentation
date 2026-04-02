@@ -1,44 +1,35 @@
 """
-E-commerce Customer Analytics – Streamlit Multi-Page App
-Belépési pont: streamlit run app.py
+pages/99_🛠️_Streamlit_Showcase.py
+Egy átfogó puskázó oldal a Streamlit képességeinek teszteléséhez.
 """
+
 import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import datetime
+import time
 
-st.set_page_config(
-    page_title="E-Commerce Customer Analytics",
-    page_icon="🛒",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+# ── Oldal konfiguráció ─────────────────────────────────────────────────────────
+st.set_page_config(page_title="Streamlit Kézikönyv", page_icon="🛠️", layout="wide")
 
-st.title("🛒 E-Commerce Customer Analytics Dashboard")
-st.markdown("---")
+st.title("🛠️ Streamlit Képességek és Elemek")
+st.markdown("Ezen az oldalon végigkattintgathatod a Streamlit legfontosabb funkcióit. Szemezgess belőle bátran a projektjeidhez!")
 
-st.markdown("""
-### Üdvözöljük az ügyfél-elemzési dashboardon!
+# Tabok (fülek) használata a rendszerezéshez
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📝 Szöveg és Adat", 
+    "🎛️ Bemeneti Elemek (Widgetek)", 
+    "📊 Grafikonok", 
+    "🏗️ Elrendezés (Layout)", 
+    "🔔 Állapot és Visszajelzés"
+])
 
-Ez az alkalmazás az **Online Retail II** adathalmazon alapuló, három-fázisú gépi tanulási
-pipeline üzleti eredményeit mutatja be interaktív vizualizációk és szűrők segítségével.
+# =====================================================================
+# TAB 1: Szöveg és Adat megjelenítés
+# =====================================================================
 
-Az alábbi oldalak érhetők el a bal oldali menüből:
-
-| Oldal | Tartalom |
-|---|---|
-| 📊 **RFM Szegmentáció** | K-Means alapú ügyfélszegmentáció, szegmensprofil és snake-plot |
-| 🔴 **Churn Előrejelzés** | XGBoost churn-modell eredményei, akciótérkép, VIP-lista |
-| 🔍 **Ügyfél Kereső** | Egyedi ügyfél RFM-profil és churn-kockázat keresője |
-
----
-
-**Adatforrás:** [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii) –  
-~1 millió tranzakció, 2009–2011, UK alapú webáruház  
-**Cutoff dátum:** 2011-09-09 (90 napos célablak)
-""")
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.info("📊 **RFM Szegmentáció**\n\nK-Means (K=4) klaszterezés RFM feature-ök alapján")
-with col2:
-    st.warning("🔴 **Churn Előrejelzés**\n\nXGBoost modell – 55.7%-os churn arány kezelése")
-with col3:
-    st.success("🔍 **Ügyfél Kereső**\n\nEgyéni ügyfélprofil és testreszabott akciójavaslat")
+with st.container(border=True):
+    st.subheader("💡 Üzleti Insight")
+    st.write("A negyedéves eladások 15%-kal nőttek a kampány hatására.")
+    st.caption("Forrás: Értékesítési adatbázis, 2024 Q3")
