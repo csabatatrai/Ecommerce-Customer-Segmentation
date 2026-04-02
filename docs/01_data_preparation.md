@@ -459,7 +459,7 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 
 
     
-![png](images/output_13_1.png)
+![png](images/01_data_preparation_01_data_preparation_13_1.png)
     
 
 
@@ -469,4 +469,10 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     </a>
 </div>
 
-*Az ugrás gomb csak Jupyter környezetben működik.
+*Az ugrás gomb nem minden környezetben működik!
+
+
+```python
+# A notebook legutolsó cellája
+!python update_docs.py
+```

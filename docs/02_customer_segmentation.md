@@ -297,7 +297,7 @@ display(rfm[features_to_plot].skew().to_frame(name='Skewness').round(2))
 
 
     
-![png](images/output_9_1.png)
+![png](images/02_customer_segmentation_02_customer_segmentation_9_1.png)
     
 
 
@@ -616,7 +616,7 @@ print(f"Maximális Sziluett-pontszám: {best_score:.4f}\n")
 
 
     
-![png](images/output_15_1.png)
+![png](images/02_customer_segmentation_02_customer_segmentation_15_1.png)
     
 
 
@@ -1038,7 +1038,7 @@ print(f"✔️ Interaktív HTML ábra mentve ide: {fig_path_3d_html}")
 
 
     
-![png](images/output_23_1.png)
+![png](images/02_customer_segmentation_02_customer_segmentation_23_1.png)
     
 
 
@@ -1109,7 +1109,7 @@ display(cluster_profile)
 
 
     
-![png](images/output_26_1.png)
+![png](images/02_customer_segmentation_02_customer_segmentation_26_1.png)
     
 
 
@@ -1215,4 +1215,10 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     </a>
 </div>
 
-*Az ugrás gomb csak Jupyter környezetben működik.
+*Az ugrás gomb nem minden környezetben működik!
+
+
+```python
+# A notebook legutolsó cellája
+!python update_docs.py
+```

@@ -731,7 +731,7 @@ plt.show()
 
 
     
-![png](images/output_14_1.png)
+![png](images/03_churn_prediction_03_churn_prediction_14_1.png)
     
 
 
@@ -975,7 +975,7 @@ print("  • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)")
 
 
     
-![png](images/output_20_1.png)
+![png](images/03_churn_prediction_03_churn_prediction_20_1.png)
     
 
 
@@ -1087,7 +1087,7 @@ plt.show()
 
 
     
-![png](images/output_21_3.png)
+![png](images/03_churn_prediction_03_churn_prediction_21_3.png)
     
 
 
@@ -1642,7 +1642,7 @@ plt.show()
 
 
     
-![png](images/output_25_1.png)
+![png](images/03_churn_prediction_03_churn_prediction_25_1.png)
     
 
 
@@ -1719,4 +1719,29 @@ print("="*60)
     </a>
 </div>
 
-*Az ugrás gomb csak Jupyter környezetben működik.
+*Az ugrás gomb nem minden környezetben működik!
+
+
+```python
+# A notebook legutolsó cellája
+!python update_docs.py
+```
+
+    Dokumentáció frissítése elindult...
+    ========================================
+    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
+    
+
+    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
+    [NbConvertApp] Support files will be in 01_data_preparation_files\
+    [NbConvertApp] Making directory docs\01_data_preparation_files
+    [NbConvertApp] Writing 20461 bytes to docs\01_data_preparation.md
+    Traceback (most recent call last):
+      File "D:\Workspace\ecommerce-customer-segmentation\update_docs.py", line 63, in <module>
+        update_documentation()
+      File "D:\Workspace\ecommerce-customer-segmentation\update_docs.py", line 59, in update_documentation
+        print(f"[{notebook}] Kész! \u2714\ufe0f\n")
+      File "D:\Anaconda\envs\ecommerce_env\lib\encodings\cp1250.py", line 19, in encode
+        return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+    UnicodeEncodeError: 'charmap' codec can't encode characters in position 34-35: character maps to <undefined>
+    
