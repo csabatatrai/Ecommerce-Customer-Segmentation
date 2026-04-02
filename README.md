@@ -12,10 +12,10 @@ Data Science gépi tanulási projekt Python segítségével, Data Engineering é
 | 3 | Statisztikai outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
 | 4 | K-means klaszterezés | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
 | 5 | Kiterjesztett EDA: klaszterek vizualizációja | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md) |
-| 6 | XGBoost célváltozó tervezés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
-| 7 | Modellezés és SHAP magyarázatok | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
-| 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
-| 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_clv_prediction.md) |
+| 6 | XGBoost célváltozó tervezés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
+| 7 | Modellezés és SHAP magyarázatok | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
+| 8 | Üzleti kiértékelés | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
+| 9 | Export (Streamlit / BI) | `03_clv_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 
 ## Adathalmaz, alapötlet
 
