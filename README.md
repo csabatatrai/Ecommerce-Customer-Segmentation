@@ -1,5 +1,4 @@
 <a id="teteje"></a>
-# ecommerce-customer-segmentation
 # Ecommerce Customer Segmentation & Churn Prediction
 
 ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
@@ -26,9 +25,6 @@
 | 7 | Modellezés és SHAP magyarázatok | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 | 8 | Üzleti kiértékelés | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 | 9 | Export (Streamlit / BI) | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
-
-### Klaszterezés vizualizációja (K-means)
-![K-means clustering](https://github.com/csabatatrai/csabatatrai/blob/main/kmeans.gif?raw=true)
 
 ### Vásárlások dinamikája
 ![Purchases dynamics](https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true)
