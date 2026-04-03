@@ -27,7 +27,7 @@
 | 9 | Export (Streamlit / BI) | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 
 ### Vásárlások dinamikája
-![Purchases dynamics](https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true)
+[<img src="https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true" alt="Purchases dynamics" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
 
 ## Felhasznált adathalmaz
 
