@@ -121,6 +121,31 @@ ecommerce-customer-segmentation/
 ├── requirements.txt
 └── models/                   # szerializált modell- és transzformátor-objektumok (joblib)  
 ```
+## Architektúra-diagram
+
+```mermaid
+flowchart TD
+    CSV[("📂 online_retail_II.csv\nKaggle / UCI · ~1M sor")]
+    SQL["🔍 SQL EDA\nSQLite / DB Browser"]
+    CFG(["⚙️ config.py\nÚtvonalak · paraméterek"])
+
+    SQL -.->|feltárás| CSV
+    CFG -.-> PREP
+    CFG -.-> SEG
+    CFG -.-> CHURN
+    CSV --> PREP
+
+    PREP["📋 01 Adatelőkészítés\nParquet konverzió · tisztítás · outlier szűrés"]
+    SEG["🎯 02 Ügyfélszegmentáció\nRFM Feature Engineering · K-means K=4"]
+    CHURN["🤖 03 Churn Prediction\nXGBoost · SHAP · A/B pipeline tesztelés"]
+    DASH["📊 Streamlit Dashboard"]
+
+    PREP --> SEG --> CHURN --> DASH
+
+    PREP -.->|kimenet| P1[("💾 Parquet fájlok\nraw · cleaned · rfm_ready")]
+    SEG  -.->|kimenet| M1[("🧩 Modellek × 2\nscaler · kmeans_rfm .joblib")]
+    CHURN-.->|kimenet| P2[("📈 Előrejelzések\nxgboost.joblib · churn_pred.parquet")]
+```
 
 ## Kapcsolat a készítővel
 
@@ -139,3 +164,4 @@ Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hason
   </a>
   <br>
 </p>
+
