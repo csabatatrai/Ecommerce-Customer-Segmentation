@@ -50,3 +50,5 @@ Thumbs.db
 # ========================
 # analysis.md # eredetileg egy monolitikus fájlban történt az elemzés, később lett modulokra bontva
 # output_*.png # a projekt portfólió jellege miatt mégis szükségessé vált .png-k feltöltése a markdown fájlokhoz
+
+.claude/
