@@ -2,7 +2,10 @@
 # ecommerce-customer-segmentation
 
 Data Science gépi tanulási projekt Python segítségével, Data Engineering és az MLOps-közeli szemléletmóddal kiegészítve.
-[![Adattermék](https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true)](https://csabatatrai.hu/)
+
+<a href="https://csabatatrai.hu/" target="_blank" title="Kattints a portfólióm megtekintéséhez!">
+  <img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép">
+</a>
 
 ## Főbb lépések
 
