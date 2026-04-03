@@ -132,8 +132,10 @@ Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hason
 
 ---
 
-<div style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 30px 0;">
-    <a href="#teteje" style="display: inline-flex; align-items: center; justify-content: center; background-color: #c0253f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
-        ⬆ Visszaugrás az oldal elejére
-    </a>
-</div>
+<p align="center">
+  <br>
+  <a href="#teteje">
+    <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére">
+  </a>
+  <br>
+</p>
