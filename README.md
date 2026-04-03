@@ -3,9 +3,11 @@
 
 Data Science gépi tanulási projekt Python segítségével, Data Engineering és az MLOps-közeli szemléletmóddal kiegészítve.
 
-<a href="https://csabatatrai.hu/" target="_blank" title="Kattints a portfólióm megtekintéséhez!">
-  <img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép">
-</a>
+[<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
+
+<p align="center">
+  <a href="https://csabatatrai.hu/">🌐 Látogasd meg a portfóliómat (külső weboldal)</a>
+</p>
 
 ## Főbb lépések
 
