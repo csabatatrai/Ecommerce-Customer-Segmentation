@@ -28,16 +28,12 @@
 | 9 | Export (Streamlit / BI) | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 
 ### Klaszterezés vizualizációja (K-means)
-<video src="https://github.com/csabatatrai/csabatatrai/blob/main/kmeans.mp4?raw=true" width="100%" controls>
-  A böngésződ nem támogatja a videók lejátszását.
-</video>
+![K-means clustering](https://github.com/csabatatrai/csabatatrai/blob/main/kmeans.gif?raw=true)
 
 ### Vásárlások dinamikája
-<video src="https://github.com/csabatatrai/csabatatrai/blob/main/Vásárlások.mp4?raw=true" width="100%" controls>
-  A böngésződ nem támogatja a videók lejátszását.
-</video>
+![Purchases dynamics](https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true)
 
-## Adathalmaz, alapötlet
+## Felhasznált adathalmaz
 
 A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)).
 
