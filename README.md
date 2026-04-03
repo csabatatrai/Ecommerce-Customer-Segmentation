@@ -1,7 +1,10 @@
 <a id="teteje"></a>
 # ecommerce-customer-segmentation
+# Ecommerce Customer Segmentation & Churn Prediction
 
-Data Science gépi tanulási projekt Python segítségével, Data Engineering és az MLOps-közeli szemléletmóddal kiegészítve.
+![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
+
+**Végponttól végpontig tartó adattermék, amely az RFM alapú szegmentációt ötvözi prediktív churn-modellezéssel, SQL-alapú feltárással és interaktív Streamlit dashboarddal, data engineering és MLOps-közeli szemlélettel.**
 
 [<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
 
@@ -23,6 +26,16 @@ Data Science gépi tanulási projekt Python segítségével, Data Engineering é
 | 7 | Modellezés és SHAP magyarázatok | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 | 8 | Üzleti kiértékelés | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 | 9 | Export (Streamlit / BI) | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
+
+### Klaszterezés vizualizációja (K-means)
+<video src="https://github.com/csabatatrai/csabatatrai/blob/main/kmeans.mp4?raw=true" width="100%" controls>
+  A böngésződ nem támogatja a videók lejátszását.
+</video>
+
+### Vásárlások dinamikája
+<video src="https://github.com/csabatatrai/csabatatrai/blob/main/Vásárlások.mp4?raw=true" width="100%" controls>
+  A böngésződ nem támogatja a videók lejátszását.
+</video>
 
 ## Adathalmaz, alapötlet
 
