@@ -58,9 +58,9 @@ jupyter notebook
 ```
 
 6. Futtasd a notebookokat **sorrendben**:
-   - `01_data_preparation.ipynb` – adatbetöltés és tisztítás
-   - `02_customer_segmentation.ipynb` – RFM feature engineering és szegmentáció
-   - `03_clv_prediction.ipynb` – prediktív modellezés (XGBoost + SHAP)
+   - `01_data_preparation.ipynb` – Adatelőkészítés: Data Preparation (Adattisztítás és Parquet Pipeline)
+   - `02_customer_segmentation.ipynb` – Ügyfélszegmentáció: Customer Segmentation (RFM Elemzés és K-means)
+   - `03_churn_prediction.ipynb` – Prediktív Modellezés: Churn Prediction (XGBoost Klasszifikáció)
 
 ## Kiegészítő műszaki megoldások
 
@@ -86,7 +86,7 @@ ecommerce-customer-segmentation/
 │   ├── images/               # Jupyter által generált inline ábrák
 │   ├── 01_data_preparation.md
 │   ├── 02_customer_segmentation.md
-│   └── 03_churn_prediction.ipynb
+│   └── 03_churn_prediction.md
 ├── pages/                    # .py fájlok Streamlitnek (többoldalas alkalmazás)
 ├── sql/                      # SQL szkriptek az adatbázis feltérképezéséhez
 │   └── eda_exploratory_analysis.sql
