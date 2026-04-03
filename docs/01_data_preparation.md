@@ -1,5 +1,8 @@
 <a id="teteje"></a>
-# 01 Adatelőkészítés (Data Preparation)
+# 01 Adatelőkészítés: Data Preparation (tisztítás és transzformáció)
+---
+**Függőség:** `config.py` (Útvonalak definíciója)
+
 ---
 
 **Bemenet:** `data/raw/online_retail_II.csv`  
@@ -9,6 +12,7 @@
 - `data/processed/online_retail_ready_for_rfm.parquet` **(Végső kimenet a következő fázishoz)**
 
 ---
+
 <a id="0-adatbetöltés-és-parquet-konverzió"></a>
 ## 0. Adatbetöltés és Parquet-konverzió
 
@@ -498,13 +502,13 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 22026 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 22103 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 40106 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 40443 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
     [NbConvertApp] Support files will be in 03_churn_prediction_files\
     [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59502 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 59329 bytes to docs\03_churn_prediction.md
     

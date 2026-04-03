@@ -1,6 +1,10 @@
 <a id="teteje"></a>
-# 02 Ügyfélszegmentáció (Customer Segmentation)
+# 02 Ügyfélszegmentáció: Customer Segmentation (RFM & K-means)
 ---
+**Függőség:** `config.py` (Útvonalak definíciója és a `Q_THRESHOLD` paraméter az outlierek szűréséhez)
+
+---
+
 **Bemenet:** `data/processed/online_retail_ready_for_rfm.parquet`  
 **Kimenetek:** 
 - `data/processed/rfm_features.parquet` (Feature-engineering utáni állapot)
@@ -1233,13 +1237,13 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 22014 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 22103 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 40106 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 40443 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
     [NbConvertApp] Support files will be in 03_churn_prediction_files\
     [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59502 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 59329 bytes to docs\03_churn_prediction.md
     
