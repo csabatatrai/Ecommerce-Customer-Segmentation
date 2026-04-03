@@ -774,7 +774,7 @@ Az alábbi cella futtatható, de **nem kötelező** a notebook többi részéhez
 > **Futtatási idő:** ~5–15 perc CPU-n (100 iteráció × 3-fold CV). Gyorsításhoz csökkentsd `n_iter`-t (pl. 20-ra) vagy a `cv` foldok számát.
 
 **Miért `RandomizedSearchCV` és nem `GridSearchCV`?**  
-A keresési tér nagy (~10k kombináció), és a randomizált keresés általában közel azonos eredményt ad töredéknyi idő alatt — *Bergstra & Bengio (2012)* empirikusan igazolta.
+A keresési tér nagy (~10k kombináció), és a randomizált keresés általában közel azonos eredményt ad töredéknyi idő alatt, *Bergstra & Bengio (2012)* empirikusan igazolta.
 
 
 
@@ -935,13 +935,7 @@ print(f"Feature nevek: {feature_names_transformed}")
 
 ```
 
-    ExactExplainer explainer: 5244it [00:45, 114.72it/s]                                                                   
-    
-
-    ✔️ SHAP értékek kiszámítva: (5243, 5, 2)
-       Churn=1 szelet alakja:   (5243, 5)
-    Feature nevek: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio']
-    
+    ExactExplainer explainer:  57%|█████████████████████████████                      | 2982/5243 [00:26<00:10, 214.08it/s]
 
 ### 9.2 – SHAP Summary Plot (Globális feature fontosság)
 
@@ -974,9 +968,6 @@ print("  • Alacsony frequency → nagyobb churn kockázat")
 print("  • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)")
 
 ```
-
-    SHAP Summary Plot generálása...
-    
 
 ### 9.3 – SHAP Waterfall Plot: Egy VIP, lemorzsolódó ügyfél magyarázata
 

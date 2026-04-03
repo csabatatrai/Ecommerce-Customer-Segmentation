@@ -28,6 +28,9 @@ Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykere
 
 > **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
 
+> [!TIP]
+> **Kódolvasás Visual Studio Code-ban:** Ha VSC-t használsz a projekt megtekintéséhez, erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
+
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
 1. Klónozd a repót és navigálj a mappába:
@@ -83,14 +86,14 @@ ecommerce-customer-segmentation/
 │   ├── images/               # Jupyter által generált inline ábrák
 │   ├── 01_data_preparation.md
 │   ├── 02_customer_segmentation.md
-│   └── 03_clv_prediction.md
+│   └── 03_churn_prediction.ipynb
 ├── pages/                    # .py fájlok Streamlitnek (többoldalas alkalmazás)
 ├── sql/                      # SQL szkriptek az adatbázis feltérképezéséhez
 │   └── eda_exploratory_analysis.sql
 ├── config.py                 # közös útvonal-konstansok és pipeline paraméterek
 ├── 01_data_preparation.ipynb
 ├── 02_customer_segmentation.ipynb
-├── 03_clv_prediction.ipynb
+├── 03_churn_prediction.ipynb
 ├── app.py                    # Streamlit dashboard főfájl
 ├── .gitignore
 ├── requirements.txt

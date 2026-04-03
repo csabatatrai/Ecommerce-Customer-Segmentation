@@ -1,8 +1,12 @@
 <a id="teteje"></a>
 # 01 Adatelőkészítés (Data Preparation)
+---
 
 **Bemenet:** `data/raw/online_retail_II.csv`  
-**Kimenet:** `data/processed/online_retail_ready_for_rfm.parquet`
+**Kimenetek:** 
+- `data/raw/online_retail_raw.parquet` (Nyers adat gyorsítótárazva)
+- `data/processed/online_retail_cleaned.parquet` (Köztes tisztított állapot)
+- `data/processed/online_retail_ready_for_rfm.parquet` **(Végső kimenet a következő fázishoz)**
 
 ---
 <a id="0-adatbetöltés-és-parquet-konverzió"></a>
@@ -57,7 +61,7 @@ else:
 
     PROJECT_ROOT:  D:\Workspace\ecommerce-customer-segmentation
     RAW_FILE:      D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.csv
-    PARQUET_OUT:   D:\Workspace\ecommerce-customer-segmentation\data\processed\online_retail_raw.parquet
+    PARQUET_OUT:   D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
     Fájlrendszer ellenőrizve: a szükséges adatfájlok rendelkezésre állnak!
     
@@ -108,7 +112,7 @@ else:
     CSV fájl betöltése innen: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.csv ... (ez eltarthat egy percig)
     Összesített sorok (nyers): 1,067,371
     
-    Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\online_retail_raw.parquet
+    Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     Fájlméret:      6.9 MB
     Sorok:          1,067,371 | Oszlopok: 8
     
@@ -412,7 +416,7 @@ a célváltozó (y) majdani legyártásához.
 
 Az ábra a teljes időszak napi bevételét mutatja; a piros szaggatott vonal jelöli
 a tervezett cutoff-ot. Ha utána az adatok sűrűsége és volumene elegendőnek tűnik,
-a `CUTOFF_DATE` értéke végleges — a `03_clv_prediction.ipynb` notebook már ezt
+a `CUTOFF_DATE` értéke végleges, a `03_clv_prediction.ipynb` notebook már ezt
 az értéket veszi alapul.
 
 
@@ -494,13 +498,13 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 20461 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 22026 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 39819 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 40106 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
     [NbConvertApp] Support files will be in 03_churn_prediction_files\
     [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59168 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 59502 bytes to docs\03_churn_prediction.md
     

@@ -1,10 +1,16 @@
 <a id="teteje"></a>
 # 02 Ügyfélszegmentáció (Customer Segmentation)
-
+---
 **Bemenet:** `data/processed/online_retail_ready_for_rfm.parquet`  
-**Kimenet:** `data/processed/rfm_features.parquet`, `models/scaler_rfm.joblib`
+**Kimenetek:** 
+- `data/processed/rfm_features.parquet` (Feature-engineering utáni állapot)
+- `data/processed/customer_segments.parquet` (Végső klaszterezett ügyféladatok)
+- `models/scaler_rfm.joblib` (StandardScaler objektum)
+- `models/kmeans_rfm.joblib` (A tanított K-means modell)
 
 *Az adatok előkészítése a `01_data_preparation.ipynb` notebookban történt.*
+
+---
 
 
 ```python
@@ -632,13 +638,13 @@ Fentiek alapján: **felülbíráljuk a kód K=2-es javaslatát, és a végleges 
 
 ```python
 # ============================================================
-# K-means Automata Kiértékelő Ciklus (K=3-tól 10-ig)
+# K-means Automata Kiértékelő Ciklus (K=2-től 10-ig)
 # ============================================================
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 import pandas as pd
 
-print("Klaszterszámok értékelése K=3-tól K=10-ig...\n")
+print("Klaszterszámok értékelése K=2-től K=10-ig...\n")
 
 results = []
 k_range = range(2, 11)
@@ -683,7 +689,7 @@ evaluation_df = pd.DataFrame(results)
 display(evaluation_df)
 ```
 
-    Klaszterszámok értékelése K=3-tól K=10-ig...
+    Klaszterszámok értékelése K=2-től K=10-ig...
     
     
 
@@ -1227,13 +1233,13 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 21836 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 22014 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 41194 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 40106 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
     [NbConvertApp] Support files will be in 03_churn_prediction_files\
     [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 58968 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 59502 bytes to docs\03_churn_prediction.md
     
