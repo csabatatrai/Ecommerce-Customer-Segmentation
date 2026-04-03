@@ -32,8 +32,19 @@ Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykere
 | 8 | Üzleti kiértékelés | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 | 9 | Export (Streamlit / BI) | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md) |
 
-### Vásárlások dinamikája
-[<img src="https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true" alt="Purchases dynamics" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
+### 📊 Interaktív Dashboard & Vizualizáció
+
+> **Ízelítő:** Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be.
+
+<p align="center">
+  <a href="https://csabatatrai.hu/">
+    <img src="https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true" alt="Purchases dynamics" title="Kattints a teljes dashboardért!">
+  </a>
+  <br>
+  <a href="https://csabatatrai.hu/">
+    <img src="https://img.shields.io/badge/Kattints_a_teljes_dashboardért-E4405F?style=for-the-badge&logo=streamlit&logoColor=white" alt="Dashboard gomb">
+  </a>
+</p>
 
 ## Lokális futtatás és környezet beállítása (Setup)
 
