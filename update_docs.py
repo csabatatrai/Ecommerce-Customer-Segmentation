@@ -4,7 +4,7 @@ Jupyter notebookok → Markdown dokumentacio, leiro kepnevekkel.
 Normal hasznalat (minden notebook vegen automatikusan fut):
     python update_docs.py --notebook 03_churn_prediction.ipynb
 
-Teljes ujraepites (ha abraat toroltel, vagy a script logikajat modositottad):
+Teljes dokimentacio ujraepites (ha abraat toroltel, vagy a script logikajat modositottad):
     python update_docs.py --clean
 
 A --clean flag torli a teljes docs/ mappat, majd nullarol ujrageneralja.
