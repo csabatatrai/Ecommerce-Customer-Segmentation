@@ -97,19 +97,32 @@ jupyter notebook
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
+
 ```
 ecommerce-customer-segmentation/
-├── sql/                            # SQL szkriptek az adatok feltérképezéséhez
-│   └── eda_exploratory_analysis.sql
+│
+├── config.py                         # közös útvonal-konstansok és pipeline paraméterek
+├── requirements.txt
+├── .gitignore
 │
 ├── data/
-│   ├── raw/                        # nyers, tisztítatlan adatfájlok
-│   └── processed/                  # tisztított, Parquet formátumú adatfájlok
+│   ├── raw/                          # 💾 nyers, tisztítatlan adatfájlok
+│   └── processed/                    # 💾 tisztított, Parquet formátumú adatfájlok
 │
-├── models/                         # szerializált modell- és transzformátor-objektumok (joblib)
+├── sql/                            
+│   └── eda_exploratory_analysis.sql  # SQL szkriptek az adatok feltérképezéséhez
 │
-├── docs/                           # 🚀 LEFUTOTT EREDMÉNYEK (Markdown portfólió nézet)
-│   ├── images/                     # notebookonként generált almappák update_docs.py által
+├── 01_data_preparation.ipynb         # adattisztítás
+├── 02_customer_segmentation.ipynb    # RFM feature engineering és K-means klaszterezés
+├── 03_churn_prediction.ipynb         # XGBoost predikció
+│
+├── models/                           # szerializált modell- és transzformátor-objektumok (joblib)
+│
+├── app.py                            # Streamlit dashboard főfájl
+├── pages/                            # Streamlitnek dashboardok
+│
+├── docs/                             # 🟢 Lefuttatott notebookok markdownban és adatvizualizációk
+│   ├── images/
 │   │   ├── 01_data_preparation/
 │   │   ├── 02_customer_segmentation/
 │   │   └── 03_churn_prediction/
@@ -117,19 +130,7 @@ ecommerce-customer-segmentation/
 │   ├── 02_customer_segmentation.md
 │   └── 03_churn_prediction.md
 │
-├── app.py                          # Streamlit dashboard főfájl
-├── pages/                          # .py fájlok Streamlitnek (többoldalas dashboard alkalmazás)
-│
-├── config.py                       # közös útvonal-konstansok és pipeline paraméterek
-├── update_docs.py                  # 💡 dokumentáció-automatizáló szkript (NB -> MD konverzió)
-│
-│
-├── 01_data_preparation.ipynb       # adattisztítás
-├── 02_customer_segmentation.ipynb  # RFM feature engineering és K-means klaszterezés
-├── 03_churn_prediction.ipynb       # XGBoost predikció
-│
-├── .gitignore
-└── requirements.txt
+└── update_docs.py                    # 💡 dokumentáció-automatizáló szkript
 
 ```
 
