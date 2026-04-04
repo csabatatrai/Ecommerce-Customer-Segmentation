@@ -104,9 +104,9 @@ ecommerce-customer-segmentation/
 ├── <a href="requirements.txt">requirements.txt</a>
 ├── .gitignore
 │
-├── <a href="data/">data/</a>
-│   ├── <a href="data/raw/">raw/</a>                          # 💾 nyers, tisztítatlan adatfájlok
-│   └── <a href="data/processed/">processed/</a>                    # 💾 tisztított, Parquet formátumú adatfájlok
+├── data/
+│   ├── raw/                          # 🚨 ide kell menteni a kiinduló csv fájlt
+│   └── processed/                    # 💾 tisztított, Parquet formátumú adatfájlok
 │
 ├── <a href="sql/">sql/</a>
 │   └── <a href="sql/eda_exploratory_analysis.sql">eda_exploratory_analysis.sql</a>  # SQL szkriptek
@@ -115,7 +115,7 @@ ecommerce-customer-segmentation/
 ├── <a href="02_customer_segmentation.ipynb">02_customer_segmentation.ipynb</a>    # RFM feature engineering és K-means klaszterezés
 ├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost predikció
 │
-├── <a href="models/">models/</a>                           # szerializált modell- és transzformátor-objektumok (joblib)
+├── models/                           # 🚨notebook hozza létre, szerializált modell- és transzformátor-objektumok (joblib)
 │
 ├── <a href="app.py">app.py</a>                            # Streamlit dashboard főfájl
 ├── <a href="pages/">pages/</a>                            # Streamlitnek dashboardok

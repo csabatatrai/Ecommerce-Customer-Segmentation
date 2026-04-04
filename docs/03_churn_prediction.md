@@ -22,6 +22,7 @@ Ebben a fázisban a gépi tanulás felügyelt részére térünk át. A célunk,
 Mert az már egy aggregált, előre klaszterezett snapshot. Ha abból próbálnánk célváltozót képezni, az RFM értékekben már benne lenne a jövő (*time-travel leakage*). A megoldás: a tisztított tranzakciós adatokat (`READY_FOR_RFM_PARQUET`) töltjük be, és a cutoff-ot itt, futásidőben alkalmazzuk.
 
 ---
+
 ## 6. Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása
 
 
@@ -388,7 +389,6 @@ display(X.head())
 </div>
 
 
----
 ## 7. A/B Modellezés: Pipeline-ok felépítése
 
 ### Az adatszivárgás-mentes K-Means Pipeline logikája
@@ -579,7 +579,6 @@ print("      a 02-es notebook üzleti szegmenseivel (VIP Bajnokok stb.).")
           a 02-es notebook üzleti szegmenseivel (VIP Bajnokok stb.).
     
 
----
 ## 8. Keresztvalidáció és modellek összehasonlítása
 
 Az imbalanced osztályeloszlás miatt **PR-AUC** (Precision-Recall AUC) a fő metrika - ez sokkal informatívabb, mint az ROC-AUC, ha az egyik osztály ritkább. Mellette F1-score és Recall is szerepel a teljes kép kedvéért.
@@ -938,7 +937,6 @@ else:
        A winner_pipeline változatlan marad. (Eltérő fold-szám miatt ez várható lehet.)
     
 
----
 ## 9. Modell magyarázata SHAP segítségével
 
 A SHAP (SHapley Additive exPlanations) értékek megmutatják, hogy az egyes feature-ök mennyivel "tolják" a modell kimenetét az átlagtól el - pozitív irányban (churn felé) vagy negatív irányban (megtartás felé).
@@ -1250,7 +1248,6 @@ plt.show()
     
 
 
----
 ## 10. Üzleti kiértékelés és Akciótervek
 
 A modell önmagában nem elegendő - az előrejelzéseket üzleti akciótervre kell lefordítani. Az alábbi szegmentáció a churn valószínűség és a monetary érték kombinációján alapul.
@@ -1819,11 +1816,11 @@ plt.show()
     
 
 
+#### 💡 Üzleti értelmezés: Hogyan használjuk a Threshold (Küszöbérték) eredményét?
+
 <div class="alert alert-success">
 <b>✅Üzleti Insight</b> Üzletileg sokkal kisebb baj, ha egy olyan ügyfélnek is adunk 10% kedvezményt, aki amúgy is maradt volna (fals pozitív), mint ha hagyunk elmenni egy amúgy megmenthető, sokat költő ügyfelet (fals negatív).
 </div>
-
-#### 💡 Üzleti értelmezés: Hogyan használjuk a Threshold (Küszöbérték) eredményét?
 
 Bár ez a lépés új adatot nem állít elő a notebook további kódjaihoz, **az üzleti döntéshozatal és a marketing kampányok tervezése szempontjából ez az egyik legfontosabb eredmény**.
 
@@ -1841,7 +1838,6 @@ Ezt a kiszámolt optimális küszöbértéket a projekt **Streamlit Dashboardjá
 * 🟡 **Közepes kockázat** (A Threshold környékén): Figyelmet igénylő ügyfelek (pl. hírlevél, enyhe emlékeztető).
 * 🟢 **Biztonságos** (Jóval a Threshold alatt): Hűséges, stabil ügyfelek.
 
----
 ## 11. Export - A modell és az előrejelzések mentése
 
 
@@ -1956,11 +1952,11 @@ print("="*60)
 *Az ugrás gomb nem minden környezetben működik!
 
 # Dokumentáció frissítése README.md-ben és docs mappában
+🚨 **Ctrl+S szükséges az alábbi cella futtatása előtt, mivel az nbconvert lemezről olvas!**
 
 
 ```python
 # 03-as notebook docs generálása/frissítése
-# ⚠️ Ctrl+S a cella futtatása előtt — az nbconvert lemezről olvas!
 !python update_docs.py --notebook 03_churn_prediction.ipynb
 ```
 
