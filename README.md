@@ -100,27 +100,27 @@ jupyter notebook
 ```
 ecommerce-customer-segmentation/
 ├── data/
-│   ├── raw/                  # nyers, tisztítatlan adatfájlok
-│   └── processed/            # tisztított, Parquet formátumú adatok
-├── docs/                     # 🚀 LEFUTOTT EREDMÉNYEK (Markdown portfólió nézet)
-│   ├── images/               # notebookonként generált almappák (az update_docs.py hozza létre automatikusan a notebookok végén)
+│   ├── raw/                        # nyers, tisztítatlan adatfájlok
+│   └── processed/                  # tisztított, Parquet formátumú adatfájlok
+├── docs/                           # 🚀 LEFUTOTT EREDMÉNYEK (Markdown portfólió nézet)
+│   ├── images/                     # notebookonként generált almappák update_docs.py által
 │   │   ├── 01_data_preparation/
 │   │   ├── 02_customer_segmentation/
 │   │   └── 03_churn_prediction/
 │   ├── 01_data_preparation.md
 │   ├── 02_customer_segmentation.md
 │   └── 03_churn_prediction.md
-├── pages/                    # .py fájlok Streamlitnek (többoldalas dashboard alkalmazás)
-├── sql/                      # SQL szkriptek az adatok feltérképezéséhez
+├── pages/                          # .py fájlok Streamlitnek (többoldalas dashboard alkalmazás)
+├── sql/                            # SQL szkriptek az adatok feltérképezéséhez
 │   └── eda_exploratory_analysis.sql
-├── config.py                 # közös útvonal-konstansok és pipeline paraméterek
-├── 01_data_preparation.ipynb # adattisztítás
-├── 02_customer_segmentation.ipynb # RFM feature engineering és K-means klaszterezés
-├── 03_churn_prediction.ipynb # XGBoost predikció
-├── app.py                    # Streamlit dashboard főfájl
+├── config.py                       # közös útvonal-konstansok és pipeline paraméterek
+├── 01_data_preparation.ipynb       # adattisztítás
+├── 02_customer_segmentation.ipynb  # RFM feature engineering és K-means klaszterezés
+├── 03_churn_prediction.ipynb       # XGBoost predikció
+├── app.py                          # Streamlit dashboard főfájl
 ├── .gitignore
 ├── requirements.txt
-└── models/                   # szerializált modell- és transzformátor-objektumok (joblib)
+└── models/                         # szerializált modell- és transzformátor-objektumok (joblib)
 ```
 
 ## Architektúra-diagram
