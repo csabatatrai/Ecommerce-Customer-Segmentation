@@ -97,42 +97,40 @@ jupyter notebook
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
-
-```
+<pre>
 ecommerce-customer-segmentation/
 │
-├── config.py                         # közös útvonal-konstansok és pipeline paraméterek
-├── requirements.txt
+├── <a href="config.py">config.py</a>                         # közös útvonal-konstansok és pipeline paraméterek
+├── <a href="requirements.txt">requirements.txt</a>
 ├── .gitignore
 │
-├── data/
-│   ├── raw/                          # 💾 nyers, tisztítatlan adatfájlok
-│   └── processed/                    # 💾 tisztított, Parquet formátumú adatfájlok
+├── <a href="data/">data/</a>
+│   ├── <a href="data/raw/">raw/</a>                          # 💾 nyers, tisztítatlan adatfájlok
+│   └── <a href="data/processed/">processed/</a>                    # 💾 tisztított, Parquet formátumú adatfájlok
 │
-├── sql/                            
-│   └── eda_exploratory_analysis.sql  # SQL szkriptek az adatok feltérképezéséhez
+├── <a href="sql/">sql/</a>
+│   └── <a href="sql/eda_exploratory_analysis.sql">eda_exploratory_analysis.sql</a>  # SQL szkriptek
 │
-├── 01_data_preparation.ipynb         # adattisztítás
-├── 02_customer_segmentation.ipynb    # RFM feature engineering és K-means klaszterezés
-├── 03_churn_prediction.ipynb         # XGBoost predikció
+├── <a href="01_data_preparation.ipynb">01_data_preparation.ipynb</a>         # adattisztítás
+├── <a href="02_customer_segmentation.ipynb">02_customer_segmentation.ipynb</a>    # RFM feature engineering és K-means klaszterezés
+├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost predikció
 │
-├── models/                           # szerializált modell- és transzformátor-objektumok (joblib)
+├── <a href="models/">models/</a>                           # szerializált modell- és transzformátor-objektumok (joblib)
 │
-├── app.py                            # Streamlit dashboard főfájl
-├── pages/                            # Streamlitnek dashboardok
+├── <a href="app.py">app.py</a>                            # Streamlit dashboard főfájl
+├── <a href="pages/">pages/</a>                            # Streamlitnek dashboardok
 │
-├── docs/                             # 🟢 Lefuttatott notebookok markdownban és adatvizualizációk
-│   ├── images/
-│   │   ├── 01_data_preparation/
-│   │   ├── 02_customer_segmentation/
-│   │   └── 03_churn_prediction/
-│   ├── 01_data_preparation.md
-│   ├── 02_customer_segmentation.md
-│   └── 03_churn_prediction.md
+├── <a href="docs/">docs/</a>                             # 🟢 Lefuttatott notebookok markdownban
+│   ├── <a href="docs/images/">images/</a>
+│   │   ├── <a href="docs/images/01_data_preparation/">01_data_preparation/</a>
+│   │   ├── <a href="docs/images/02_customer_segmentation/">02_customer_segmentation/</a>
+│   │   └── <a href="docs/images/03_churn_prediction/">03_churn_prediction/</a>
+│   ├── <a href="docs/01_data_preparation.md">01_data_preparation.md</a>
+│   ├── <a href="docs/02_customer_segmentation.md">02_customer_segmentation.md</a>
+│   └── <a href="docs/03_churn_prediction.md">03_churn_prediction.md</a>
 │
-└── update_docs.py                    # 💡 dokumentáció-automatizáló szkript
-
-```
+└── <a href="update_docs.py">update_docs.py</a>                    # 💡 dokumentáció-automatizáló szkript
+</pre>
 
 ## Architektúra-diagram
 
