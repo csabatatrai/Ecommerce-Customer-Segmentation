@@ -29,14 +29,13 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from config import (
-    PROJECT_ROOT, RAW_DIR, PROCESSED_DIR, IMAGES_DIR, MODELS_DIR,
+    PROJECT_ROOT, RAW_DIR, PROCESSED_DIR, MODELS_DIR,
     RAW_FILE, PARQUET_OUT, CLEANED_PARQUET, READY_FOR_RFM_PARQUET
 )
 
 # Mappastruktúra létrehozása
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 print(f"PROJECT_ROOT:  {PROJECT_ROOT}")
@@ -446,11 +445,6 @@ plt.ylabel("Nettó Bevétel (GBP)")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
-# Mentés az assets/images mappába
-fig_path = IMAGES_DIR / "daily_revenue_check.png"
-plt.savefig(fig_path, bbox_inches="tight")
-print(f"Ábra sikeresen mentve ide: {fig_path}")
-
 # Mennyi adat (bevétel és tranzakció) esik a célablakba?
 target_window = df[df['InvoiceDate'] >= cutoff_date]
 
@@ -459,7 +453,6 @@ print(f"A célablakba eső nettó bevétel: £ {target_window['LineTotal'].sum()
 print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique():,}")
 ```
 
-    Ábra sikeresen mentve ide: D:\Workspace\ecommerce-customer-segmentation\assets\images\daily_revenue_check.png
     A célablakba eső tranzakciósorok száma: 162,563
     A célablakba eső nettó bevétel: £ 3,148,306.49
     Egyedi vásárlók a célablakban: 2,920
@@ -471,10 +464,12 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     
 
 
-<div style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 30px 0;">
-    <a href="#teteje" style="display: inline-flex; align-items: center; justify-content: center; background-color: #c0253f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
-        ⬆ Visszaugrás a notebook elejére
-    </a>
+<div align="center">
+  <br>
+  <a href="#teteje">
+    <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére" width="250">
+  </a>
+  <br>
 </div>
 
 *Az ugrás gomb nem minden környezetben működik!
@@ -500,15 +495,9 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     
 
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
-    [NbConvertApp] Support files will be in 01_data_preparation_files\
-    [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 22103 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 15354 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
-    [NbConvertApp] Support files will be in 02_customer_segmentation_files\
-    [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 40443 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 27135 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Support files will be in 03_churn_prediction_files\
-    [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59329 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 33004 bytes to docs\03_churn_prediction.md
     

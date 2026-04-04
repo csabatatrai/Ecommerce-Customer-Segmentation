@@ -52,7 +52,7 @@ import shap
 
 from config import (
     READY_FOR_RFM_PARQUET, CUSTOMER_SEGMENTS_PARQUET,
-    MODELS_DIR, IMAGES_DIR, CUTOFF_DATE
+    MODELS_DIR, CUTOFF_DATE
 )
 
 # Reprodukálhatóság
@@ -721,18 +721,13 @@ for ax, metric, label in zip(axes, metrics, metric_labels):
     ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
-fig_path = IMAGES_DIR / "cv_comparison_boxplot.png"
-plt.savefig(fig_path, bbox_inches='tight', dpi=150)
-print(f"Ábra mentve: {fig_path}")
+
 plt.show()
 ```
 
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\cv_comparison_boxplot.png
-    
-
 
     
-![png](images/03_churn_prediction_03_churn_prediction_17_1.png)
+![png](images/03_churn_prediction_03_churn_prediction_17_0.png)
     
 
 
@@ -847,9 +842,9 @@ print("  ⚠️  Különböző fold-szám miatt a számok nem közvetlenül öss
 
 # Ha a hangolt modell jobb: opcionálisan felülírjuk a winner_pipeline-t
 # Commented out by default – uncomment if you want to replace:
-# winner_pipeline = rscv.best_estimator_
-# winner_name    += ' (RSCV hangolt)'
-# print("\n✔️ winner_pipeline frissítve a hangolt modellre.")
+winner_pipeline = rscv.best_estimator_
+winner_name    += ' (RSCV hangolt)'
+print("\n✔️ winner_pipeline frissítve a hangolt modellre.")
 print("\n💡 A winner_pipeline csere ki van kommentezve.")
 print("   Ha a RSCV eredménye jobb, töröld a kommentet a két sor elől fent.")
 
@@ -874,6 +869,8 @@ print("   Ha a RSCV eredménye jobb, töröld a kommentet a két sor elől fent.
       Eredeti winner PR-AUC (5-fold): nan
       RSCV legjobb PR-AUC  (3-fold):  0.8167
       ⚠️  Különböző fold-szám miatt a számok nem közvetlenül összehasonlíthatók.
+    
+    ✔️ winner_pipeline frissítve a hangolt modellre.
     
     💡 A winner_pipeline csere ki van kommentezve.
        Ha a RSCV eredménye jobb, töröld a kommentet a két sor elől fent.
@@ -936,7 +933,7 @@ print(f"Feature nevek: {feature_names_transformed}")
 
 ```
 
-    ExactExplainer explainer: 5244it [00:53, 97.55it/s]                                                                    
+    ExactExplainer explainer: 5244it [00:42, 124.66it/s]                                                                   
     
 
     ✔️ SHAP értékek kiszámítva: (5243, 5, 2)
@@ -964,9 +961,6 @@ shap.summary_plot(
 plt.title('SHAP Summary Plot – Globális Feature Fontosság (Churn előrejelzés)', pad=20)
 plt.tight_layout()
 
-fig_path = IMAGES_DIR / "shap_summary_plot.png"
-plt.savefig(fig_path, bbox_inches='tight', dpi=150)
-print(f"Ábra mentve: {fig_path}")
 plt.show()
 
 print("\n📊 Értelmezés:")
@@ -977,7 +971,6 @@ print("  • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)")
 ```
 
     SHAP Summary Plot generálása...
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\shap_summary_plot.png
     
 
 
@@ -1036,11 +1029,11 @@ shap.plots.waterfall(
     max_display=10,
     show=False
 )
+
 plt.title(f'SHAP Waterfall Plot – VIP lemorzsolódó ügyfél (ID: {selected_idx})', pad=15)
+
 plt.tight_layout()
-fig_path = IMAGES_DIR / "shap_waterfall_vip_churn.png"
-plt.savefig(fig_path, bbox_inches='tight', dpi=150)
-print(f"\nÁbra mentve: {fig_path}")
+
 plt.show()
 ```
 
@@ -1093,13 +1086,9 @@ plt.show()
 </div>
 
 
-    
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\shap_waterfall_vip_churn.png
-    
-
 
     
-![png](images/03_churn_prediction_03_churn_prediction_28_3.png)
+![png](images/03_churn_prediction_03_churn_prediction_28_2.png)
     
 
 
@@ -1367,91 +1356,91 @@ print("   4. NPS felmérés küldése (proaktív panaszkezelés)")
 
 
 <style type="text/css">
-#T_be4c6_row0_col3 {
+#T_70f0e_row0_col3 {
   background-color: #67000d;
   color: #f1f1f1;
 }
-#T_be4c6_row1_col3, #T_be4c6_row2_col3 {
+#T_70f0e_row1_col3, #T_70f0e_row2_col3 {
   background-color: #920a13;
   color: #f1f1f1;
 }
-#T_be4c6_row3_col3 {
+#T_70f0e_row3_col3 {
   background-color: #ce1a1e;
   color: #f1f1f1;
 }
-#T_be4c6_row4_col3 {
+#T_70f0e_row4_col3 {
   background-color: #d52221;
   color: #f1f1f1;
 }
-#T_be4c6_row5_col3 {
+#T_70f0e_row5_col3 {
   background-color: #e12d26;
   color: #f1f1f1;
 }
-#T_be4c6_row6_col3 {
+#T_70f0e_row6_col3 {
   background-color: #eb372a;
   color: #f1f1f1;
 }
-#T_be4c6_row7_col3 {
+#T_70f0e_row7_col3 {
   background-color: #ed392b;
   color: #f1f1f1;
 }
-#T_be4c6_row8_col3 {
+#T_70f0e_row8_col3 {
   background-color: #f0402f;
   color: #f1f1f1;
 }
-#T_be4c6_row9_col3 {
+#T_70f0e_row9_col3 {
   background-color: #f5523a;
   color: #f1f1f1;
 }
-#T_be4c6_row10_col3 {
+#T_70f0e_row10_col3 {
   background-color: #f6563d;
   color: #f1f1f1;
 }
-#T_be4c6_row11_col3 {
+#T_70f0e_row11_col3 {
   background-color: #fc8565;
   color: #f1f1f1;
 }
-#T_be4c6_row12_col3 {
+#T_70f0e_row12_col3 {
   background-color: #fc8f6f;
   color: #000000;
 }
-#T_be4c6_row13_col3 {
+#T_70f0e_row13_col3 {
   background-color: #fca689;
   color: #000000;
 }
-#T_be4c6_row14_col3 {
+#T_70f0e_row14_col3 {
   background-color: #fcab8f;
   color: #000000;
 }
-#T_be4c6_row15_col3 {
+#T_70f0e_row15_col3 {
   background-color: #fcb79c;
   color: #000000;
 }
-#T_be4c6_row16_col3 {
+#T_70f0e_row16_col3 {
   background-color: #fee1d3;
   color: #000000;
 }
-#T_be4c6_row17_col3 {
+#T_70f0e_row17_col3 {
   background-color: #fee2d5;
   color: #000000;
 }
-#T_be4c6_row18_col3 {
+#T_70f0e_row18_col3 {
   background-color: #fff2ec;
   color: #000000;
 }
-#T_be4c6_row19_col3 {
+#T_70f0e_row19_col3 {
   background-color: #fff5f0;
   color: #000000;
 }
 </style>
-<table id="T_be4c6">
+<table id="T_70f0e">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_be4c6_level0_col0" class="col_heading level0 col0" >monetary_total</th>
-      <th id="T_be4c6_level0_col1" class="col_heading level0 col1" >frequency</th>
-      <th id="T_be4c6_level0_col2" class="col_heading level0 col2" >recency_days</th>
-      <th id="T_be4c6_level0_col3" class="col_heading level0 col3" >churn_proba</th>
+      <th id="T_70f0e_level0_col0" class="col_heading level0 col0" >monetary_total</th>
+      <th id="T_70f0e_level0_col1" class="col_heading level0 col1" >frequency</th>
+      <th id="T_70f0e_level0_col2" class="col_heading level0 col2" >recency_days</th>
+      <th id="T_70f0e_level0_col3" class="col_heading level0 col3" >churn_proba</th>
     </tr>
     <tr>
       <th class="index_name level0" >Customer ID</th>
@@ -1463,144 +1452,144 @@ print("   4. NPS felmérés küldése (proaktív panaszkezelés)")
   </thead>
   <tbody>
     <tr>
-      <th id="T_be4c6_level0_row0" class="row_heading level0 row0" >17305</th>
-      <td id="T_be4c6_row0_col0" class="data row0 col0" >£2,135</td>
-      <td id="T_be4c6_row0_col1" class="data row0 col1" >1</td>
-      <td id="T_be4c6_row0_col2" class="data row0 col2" >556 nap</td>
-      <td id="T_be4c6_row0_col3" class="data row0 col3" >96.98%</td>
+      <th id="T_70f0e_level0_row0" class="row_heading level0 row0" >17305</th>
+      <td id="T_70f0e_row0_col0" class="data row0 col0" >£2,135</td>
+      <td id="T_70f0e_row0_col1" class="data row0 col1" >1</td>
+      <td id="T_70f0e_row0_col2" class="data row0 col2" >556 nap</td>
+      <td id="T_70f0e_row0_col3" class="data row0 col3" >96.98%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row1" class="row_heading level0 row1" >14091</th>
-      <td id="T_be4c6_row1_col0" class="data row1 col0" >£9,530</td>
-      <td id="T_be4c6_row1_col1" class="data row1 col1" >2</td>
-      <td id="T_be4c6_row1_col2" class="data row1 col2" >562 nap</td>
-      <td id="T_be4c6_row1_col3" class="data row1 col3" >96.61%</td>
+      <th id="T_70f0e_level0_row1" class="row_heading level0 row1" >14091</th>
+      <td id="T_70f0e_row1_col0" class="data row1 col0" >£9,530</td>
+      <td id="T_70f0e_row1_col1" class="data row1 col1" >2</td>
+      <td id="T_70f0e_row1_col2" class="data row1 col2" >562 nap</td>
+      <td id="T_70f0e_row1_col3" class="data row1 col3" >96.61%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row2" class="row_heading level0 row2" >12396</th>
-      <td id="T_be4c6_row2_col0" class="data row2 col0" >£931</td>
-      <td id="T_be4c6_row2_col1" class="data row2 col1" >1</td>
-      <td id="T_be4c6_row2_col2" class="data row2 col2" >582 nap</td>
-      <td id="T_be4c6_row2_col3" class="data row2 col3" >96.61%</td>
+      <th id="T_70f0e_level0_row2" class="row_heading level0 row2" >12396</th>
+      <td id="T_70f0e_row2_col0" class="data row2 col0" >£931</td>
+      <td id="T_70f0e_row2_col1" class="data row2 col1" >1</td>
+      <td id="T_70f0e_row2_col2" class="data row2 col2" >582 nap</td>
+      <td id="T_70f0e_row2_col3" class="data row2 col3" >96.61%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row3" class="row_heading level0 row3" >16118</th>
-      <td id="T_be4c6_row3_col0" class="data row3 col0" >£4,255</td>
-      <td id="T_be4c6_row3_col1" class="data row3 col1" >1</td>
-      <td id="T_be4c6_row3_col2" class="data row3 col2" >560 nap</td>
-      <td id="T_be4c6_row3_col3" class="data row3 col3" >95.90%</td>
+      <th id="T_70f0e_level0_row3" class="row_heading level0 row3" >16118</th>
+      <td id="T_70f0e_row3_col0" class="data row3 col0" >£4,255</td>
+      <td id="T_70f0e_row3_col1" class="data row3 col1" >1</td>
+      <td id="T_70f0e_row3_col2" class="data row3 col2" >560 nap</td>
+      <td id="T_70f0e_row3_col3" class="data row3 col3" >95.90%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row4" class="row_heading level0 row4" >14969</th>
-      <td id="T_be4c6_row4_col0" class="data row4 col0" >£906</td>
-      <td id="T_be4c6_row4_col1" class="data row4 col1" >1</td>
-      <td id="T_be4c6_row4_col2" class="data row4 col2" >611 nap</td>
-      <td id="T_be4c6_row4_col3" class="data row4 col3" >95.78%</td>
+      <th id="T_70f0e_level0_row4" class="row_heading level0 row4" >14969</th>
+      <td id="T_70f0e_row4_col0" class="data row4 col0" >£906</td>
+      <td id="T_70f0e_row4_col1" class="data row4 col1" >1</td>
+      <td id="T_70f0e_row4_col2" class="data row4 col2" >611 nap</td>
+      <td id="T_70f0e_row4_col3" class="data row4 col3" >95.78%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row5" class="row_heading level0 row5" >13204</th>
-      <td id="T_be4c6_row5_col0" class="data row5 col0" >£967</td>
-      <td id="T_be4c6_row5_col1" class="data row5 col1" >1</td>
-      <td id="T_be4c6_row5_col2" class="data row5 col2" >639 nap</td>
-      <td id="T_be4c6_row5_col3" class="data row5 col3" >95.62%</td>
+      <th id="T_70f0e_level0_row5" class="row_heading level0 row5" >13204</th>
+      <td id="T_70f0e_row5_col0" class="data row5 col0" >£967</td>
+      <td id="T_70f0e_row5_col1" class="data row5 col1" >1</td>
+      <td id="T_70f0e_row5_col2" class="data row5 col2" >639 nap</td>
+      <td id="T_70f0e_row5_col3" class="data row5 col3" >95.62%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row6" class="row_heading level0 row6" >16749</th>
-      <td id="T_be4c6_row6_col0" class="data row6 col0" >£4,158</td>
-      <td id="T_be4c6_row6_col1" class="data row6 col1" >2</td>
-      <td id="T_be4c6_row6_col2" class="data row6 col2" >499 nap</td>
-      <td id="T_be4c6_row6_col3" class="data row6 col3" >95.47%</td>
+      <th id="T_70f0e_level0_row6" class="row_heading level0 row6" >16749</th>
+      <td id="T_70f0e_row6_col0" class="data row6 col0" >£4,158</td>
+      <td id="T_70f0e_row6_col1" class="data row6 col1" >2</td>
+      <td id="T_70f0e_row6_col2" class="data row6 col2" >499 nap</td>
+      <td id="T_70f0e_row6_col3" class="data row6 col3" >95.47%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row7" class="row_heading level0 row7" >15823</th>
-      <td id="T_be4c6_row7_col0" class="data row7 col0" >£3,048</td>
-      <td id="T_be4c6_row7_col1" class="data row7 col1" >2</td>
-      <td id="T_be4c6_row7_col2" class="data row7 col2" >637 nap</td>
-      <td id="T_be4c6_row7_col3" class="data row7 col3" >95.44%</td>
+      <th id="T_70f0e_level0_row7" class="row_heading level0 row7" >15823</th>
+      <td id="T_70f0e_row7_col0" class="data row7 col0" >£3,048</td>
+      <td id="T_70f0e_row7_col1" class="data row7 col1" >2</td>
+      <td id="T_70f0e_row7_col2" class="data row7 col2" >637 nap</td>
+      <td id="T_70f0e_row7_col3" class="data row7 col3" >95.44%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row8" class="row_heading level0 row8" >12482</th>
-      <td id="T_be4c6_row8_col0" class="data row8 col0" >£21,942</td>
-      <td id="T_be4c6_row8_col1" class="data row8 col1" >27</td>
-      <td id="T_be4c6_row8_col2" class="data row8 col2" >484 nap</td>
-      <td id="T_be4c6_row8_col3" class="data row8 col3" >95.36%</td>
+      <th id="T_70f0e_level0_row8" class="row_heading level0 row8" >12482</th>
+      <td id="T_70f0e_row8_col0" class="data row8 col0" >£21,942</td>
+      <td id="T_70f0e_row8_col1" class="data row8 col1" >27</td>
+      <td id="T_70f0e_row8_col2" class="data row8 col2" >484 nap</td>
+      <td id="T_70f0e_row8_col3" class="data row8 col3" >95.36%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row9" class="row_heading level0 row9" >14063</th>
-      <td id="T_be4c6_row9_col0" class="data row9 col0" >£9,472</td>
-      <td id="T_be4c6_row9_col1" class="data row9 col1" >7</td>
-      <td id="T_be4c6_row9_col2" class="data row9 col2" >594 nap</td>
-      <td id="T_be4c6_row9_col3" class="data row9 col3" >95.16%</td>
+      <th id="T_70f0e_level0_row9" class="row_heading level0 row9" >14063</th>
+      <td id="T_70f0e_row9_col0" class="data row9 col0" >£9,472</td>
+      <td id="T_70f0e_row9_col1" class="data row9 col1" >7</td>
+      <td id="T_70f0e_row9_col2" class="data row9 col2" >594 nap</td>
+      <td id="T_70f0e_row9_col3" class="data row9 col3" >95.16%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row10" class="row_heading level0 row10" >15633</th>
-      <td id="T_be4c6_row10_col0" class="data row10 col0" >£4,157</td>
-      <td id="T_be4c6_row10_col1" class="data row10 col1" >13</td>
-      <td id="T_be4c6_row10_col2" class="data row10 col2" >417 nap</td>
-      <td id="T_be4c6_row10_col3" class="data row10 col3" >95.11%</td>
+      <th id="T_70f0e_level0_row10" class="row_heading level0 row10" >15633</th>
+      <td id="T_70f0e_row10_col0" class="data row10 col0" >£4,157</td>
+      <td id="T_70f0e_row10_col1" class="data row10 col1" >13</td>
+      <td id="T_70f0e_row10_col2" class="data row10 col2" >417 nap</td>
+      <td id="T_70f0e_row10_col3" class="data row10 col3" >95.11%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row11" class="row_heading level0 row11" >12368</th>
-      <td id="T_be4c6_row11_col0" class="data row11 col0" >£918</td>
-      <td id="T_be4c6_row11_col1" class="data row11 col1" >1</td>
-      <td id="T_be4c6_row11_col2" class="data row11 col2" >536 nap</td>
-      <td id="T_be4c6_row11_col3" class="data row11 col3" >94.55%</td>
+      <th id="T_70f0e_level0_row11" class="row_heading level0 row11" >12368</th>
+      <td id="T_70f0e_row11_col0" class="data row11 col0" >£918</td>
+      <td id="T_70f0e_row11_col1" class="data row11 col1" >1</td>
+      <td id="T_70f0e_row11_col2" class="data row11 col2" >536 nap</td>
+      <td id="T_70f0e_row11_col3" class="data row11 col3" >94.55%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row12" class="row_heading level0 row12" >13734</th>
-      <td id="T_be4c6_row12_col0" class="data row12 col0" >£3,445</td>
-      <td id="T_be4c6_row12_col1" class="data row12 col1" >4</td>
-      <td id="T_be4c6_row12_col2" class="data row12 col2" >416 nap</td>
-      <td id="T_be4c6_row12_col3" class="data row12 col3" >94.42%</td>
+      <th id="T_70f0e_level0_row12" class="row_heading level0 row12" >13734</th>
+      <td id="T_70f0e_row12_col0" class="data row12 col0" >£3,445</td>
+      <td id="T_70f0e_row12_col1" class="data row12 col1" >4</td>
+      <td id="T_70f0e_row12_col2" class="data row12 col2" >416 nap</td>
+      <td id="T_70f0e_row12_col3" class="data row12 col3" >94.42%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row13" class="row_heading level0 row13" >15413</th>
-      <td id="T_be4c6_row13_col0" class="data row13 col0" >£6,799</td>
-      <td id="T_be4c6_row13_col1" class="data row13 col1" >5</td>
-      <td id="T_be4c6_row13_col2" class="data row13 col2" >599 nap</td>
-      <td id="T_be4c6_row13_col3" class="data row13 col3" >94.11%</td>
+      <th id="T_70f0e_level0_row13" class="row_heading level0 row13" >15413</th>
+      <td id="T_70f0e_row13_col0" class="data row13 col0" >£6,799</td>
+      <td id="T_70f0e_row13_col1" class="data row13 col1" >5</td>
+      <td id="T_70f0e_row13_col2" class="data row13 col2" >599 nap</td>
+      <td id="T_70f0e_row13_col3" class="data row13 col3" >94.11%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row14" class="row_heading level0 row14" >15015</th>
-      <td id="T_be4c6_row14_col0" class="data row14 col0" >£2,255</td>
-      <td id="T_be4c6_row14_col1" class="data row14 col1" >13</td>
-      <td id="T_be4c6_row14_col2" class="data row14 col2" >409 nap</td>
-      <td id="T_be4c6_row14_col3" class="data row14 col3" >94.05%</td>
+      <th id="T_70f0e_level0_row14" class="row_heading level0 row14" >15015</th>
+      <td id="T_70f0e_row14_col0" class="data row14 col0" >£2,255</td>
+      <td id="T_70f0e_row14_col1" class="data row14 col1" >13</td>
+      <td id="T_70f0e_row14_col2" class="data row14 col2" >409 nap</td>
+      <td id="T_70f0e_row14_col3" class="data row14 col3" >94.05%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row15" class="row_heading level0 row15" >17039</th>
-      <td id="T_be4c6_row15_col0" class="data row15 col0" >£1,955</td>
-      <td id="T_be4c6_row15_col1" class="data row15 col1" >1</td>
-      <td id="T_be4c6_row15_col2" class="data row15 col2" >512 nap</td>
-      <td id="T_be4c6_row15_col3" class="data row15 col3" >93.90%</td>
+      <th id="T_70f0e_level0_row15" class="row_heading level0 row15" >17039</th>
+      <td id="T_70f0e_row15_col0" class="data row15 col0" >£1,955</td>
+      <td id="T_70f0e_row15_col1" class="data row15 col1" >1</td>
+      <td id="T_70f0e_row15_col2" class="data row15 col2" >512 nap</td>
+      <td id="T_70f0e_row15_col3" class="data row15 col3" >93.90%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row16" class="row_heading level0 row16" >12671</th>
-      <td id="T_be4c6_row16_col0" class="data row16 col0" >£2,622</td>
-      <td id="T_be4c6_row16_col1" class="data row16 col1" >1</td>
-      <td id="T_be4c6_row16_col2" class="data row16 col2" >514 nap</td>
-      <td id="T_be4c6_row16_col3" class="data row16 col3" >93.31%</td>
+      <th id="T_70f0e_level0_row16" class="row_heading level0 row16" >12671</th>
+      <td id="T_70f0e_row16_col0" class="data row16 col0" >£2,622</td>
+      <td id="T_70f0e_row16_col1" class="data row16 col1" >1</td>
+      <td id="T_70f0e_row16_col2" class="data row16 col2" >514 nap</td>
+      <td id="T_70f0e_row16_col3" class="data row16 col3" >93.31%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row17" class="row_heading level0 row17" >16736</th>
-      <td id="T_be4c6_row17_col0" class="data row17 col0" >£2,905</td>
-      <td id="T_be4c6_row17_col1" class="data row17 col1" >5</td>
-      <td id="T_be4c6_row17_col2" class="data row17 col2" >413 nap</td>
-      <td id="T_be4c6_row17_col3" class="data row17 col3" >93.27%</td>
+      <th id="T_70f0e_level0_row17" class="row_heading level0 row17" >16736</th>
+      <td id="T_70f0e_row17_col0" class="data row17 col0" >£2,905</td>
+      <td id="T_70f0e_row17_col1" class="data row17 col1" >5</td>
+      <td id="T_70f0e_row17_col2" class="data row17 col2" >413 nap</td>
+      <td id="T_70f0e_row17_col3" class="data row17 col3" >93.27%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row18" class="row_heading level0 row18" >13902</th>
-      <td id="T_be4c6_row18_col0" class="data row18 col0" >£23,346</td>
-      <td id="T_be4c6_row18_col1" class="data row18 col1" >5</td>
-      <td id="T_be4c6_row18_col2" class="data row18 col2" >540 nap</td>
-      <td id="T_be4c6_row18_col3" class="data row18 col3" >92.88%</td>
+      <th id="T_70f0e_level0_row18" class="row_heading level0 row18" >13902</th>
+      <td id="T_70f0e_row18_col0" class="data row18 col0" >£23,346</td>
+      <td id="T_70f0e_row18_col1" class="data row18 col1" >5</td>
+      <td id="T_70f0e_row18_col2" class="data row18 col2" >540 nap</td>
+      <td id="T_70f0e_row18_col3" class="data row18 col3" >92.88%</td>
     </tr>
     <tr>
-      <th id="T_be4c6_level0_row19" class="row_heading level0 row19" >18051</th>
-      <td id="T_be4c6_row19_col0" class="data row19 col0" >£2,276</td>
-      <td id="T_be4c6_row19_col1" class="data row19 col1" >7</td>
-      <td id="T_be4c6_row19_col2" class="data row19 col2" >542 nap</td>
-      <td id="T_be4c6_row19_col3" class="data row19 col3" >92.80%</td>
+      <th id="T_70f0e_level0_row19" class="row_heading level0 row19" >18051</th>
+      <td id="T_70f0e_row19_col0" class="data row19 col0" >£2,276</td>
+      <td id="T_70f0e_row19_col1" class="data row19 col1" >7</td>
+      <td id="T_70f0e_row19_col2" class="data row19 col2" >542 nap</td>
+      <td id="T_70f0e_row19_col3" class="data row19 col3" >92.80%</td>
     </tr>
   </tbody>
 </table>
@@ -1638,18 +1627,16 @@ ax.set_ylabel('Precision (Pontosság)')
 ax.set_title('Precision-Recall Görbe – Churn Előrejelzés')
 ax.legend(loc='lower left')
 ax.grid(True, alpha=0.3)
+
 plt.tight_layout()
 
-fig_path = IMAGES_DIR / "precision_recall_curve.png"
-plt.savefig(fig_path, bbox_inches='tight', dpi=150)
-print(f"Ábra mentve: {fig_path}")
 print(f"\n🎯 F1-t maximalizáló threshold: {best_threshold:.3f}")
 print(f"   Ha az üzleti cél a RECALL maximalizálása (nem akarunk egyetlen lemorzsolódót sem kihagyni),")
 print(f"   érdemes a threshold-ot lejjebb venni (pl. 0.3-ra).")
+
 plt.show()
 ```
 
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\precision_recall_curve.png
     
     🎯 F1-t maximalizáló threshold: 0.354
        Ha az üzleti cél a RECALL maximalizálása (nem akarunk egyetlen lemorzsolódót sem kihagyni),
@@ -1724,15 +1711,12 @@ print("="*60)
     ============================================================
     
 
-
-```python
-
-```
-
-<div style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 30px 0;">
-    <a href="#teteje" style="display: inline-flex; align-items: center; justify-content: center; background-color: #c0253f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
-        ⬆ Visszaugrás a notebook elejére
-    </a>
+<div align="center">
+  <br>
+  <a href="#teteje">
+    <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére" width="250">
+  </a>
+  <br>
 </div>
 
 *Az ugrás gomb nem minden környezetben működik!
@@ -1741,3 +1725,32 @@ print("="*60)
 ```python
 !python update_docs.py
 ```
+
+    Dokumentáció frissítése elindult...
+    ========================================
+    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
+    [01_data_preparation.ipynb] Kész! [OK]
+    
+    [02_customer_segmentation.ipynb] Konvertálás Markdown-ná...
+    [02_customer_segmentation.ipynb] Kész! [OK]
+    
+    [03_churn_prediction.ipynb] Konvertálás Markdown-ná...
+    [03_churn_prediction.ipynb] Kész! [OK]
+    
+    ========================================
+    Minden markdown és képhivatkozás sikeresen generálva!
+    
+
+    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
+    [NbConvertApp] Support files will be in 01_data_preparation_files\
+    [NbConvertApp] Making directory docs\01_data_preparation_files
+    [NbConvertApp] Writing 21081 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
+    [NbConvertApp] Support files will be in 02_customer_segmentation_files\
+    [NbConvertApp] Making directory docs\02_customer_segmentation_files
+    [NbConvertApp] Writing 38887 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
+    [NbConvertApp] Support files will be in 03_churn_prediction_files\
+    [NbConvertApp] Making directory docs\03_churn_prediction_files
+    [NbConvertApp] Writing 56671 bytes to docs\03_churn_prediction.md
+    

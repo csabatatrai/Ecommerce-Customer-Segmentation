@@ -99,13 +99,11 @@ jupyter notebook
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
 ```text
 ecommerce-customer-segmentation/
-├── assets/
-│   └── images/               # mentett ábrák és vizualizációk (auto-generált)
 ├── data/
 │   ├── raw/                  # nyers, eredeti adatfájlok
 │   └── processed/            # tisztított, Parquet formátumú adatok
 ├── docs/                     # 🚀 LEFUTOTT EREDMÉNYEK (Markdown portfólió nézet)
-│   ├── images/               # Jupyter által generált inline ábrák
+│   ├── images/               # Jupyter által generált inline ábrák markdown fájlok számára
 │   ├── 01_data_preparation.md
 │   ├── 02_customer_segmentation.md
 │   └── 03_churn_prediction.md

@@ -14,10 +14,10 @@ DATA_DIR      = PROJECT_ROOT / "data"
 RAW_DIR       = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 MODELS_DIR    = PROJECT_ROOT / "models"
-IMAGES_DIR    = PROJECT_ROOT / "assets" / "images"
+# IMAGES_DIR    = PROJECT_ROOT / "assets" / "images" # szükségtelenné vált, mert végül a docs-ba generáltattam a grafikonokat
 
 # --- Adatfájlok és kimenetek ---
-# data/
+#* data/
 RAW_FILE              = RAW_DIR       / "online_retail_II.csv"
 PARQUET_OUT           = RAW_DIR       / "online_retail_raw.parquet" #! <-- Most már a raw mappába mentem, hogy elkülönüljön a feldolgozott adatoktól!
 CLEANED_PARQUET       = PROCESSED_DIR / "online_retail_cleaned.parquet"
@@ -25,7 +25,7 @@ READY_FOR_RFM_PARQUET = PROCESSED_DIR / "online_retail_ready_for_rfm.parquet"
 RFM_FEATURES_PARQUET  = PROCESSED_DIR / "rfm_features.parquet"
 
 # --- Modell fájlok ---
-# models/
+#* models/
 SCALER_PATH       = MODELS_DIR / "scaler_rfm.joblib"    # 01-es notebook exportja
 KMEANS_MODEL_PATH = MODELS_DIR / "kmeans_rfm.joblib"   # 02-es notebook exportja
 XGB_MODEL_PATH = MODELS_DIR / "xgboost_churn.joblib"  # 03-as notebook exportja
@@ -64,5 +64,7 @@ GAMMA_GAMMA_MODEL_PATH  = MODELS_DIR    / "gamma_gamma_model.joblib"
 CLV_HORIZON_MONTHS = 12
 
 # --- Kimeneti mappák automatikus létrehozása ---
-for _dir in [PROCESSED_DIR, MODELS_DIR, IMAGES_DIR]:
+# [..., IMAGES_DIR] törölve lett, mert a grafikonokat végül a docs/images könyvtárba generáltatom, így nincs rá szükség
+for _dir in [PROCESSED_DIR, MODELS_DIR]:
     _dir.mkdir(parents=True, exist_ok=True)
+

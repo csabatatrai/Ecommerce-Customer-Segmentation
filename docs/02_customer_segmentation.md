@@ -25,11 +25,10 @@ import pandas as pd
 import numpy as np
 from config import (
     READY_FOR_RFM_PARQUET, RFM_FEATURES_PARQUET,
-    IMAGES_DIR, MODELS_DIR, SCALER_PATH, CUTOFF_DATE
+    MODELS_DIR, SCALER_PATH, CUTOFF_DATE
 )
 
 # Mappastruktúra biztosítása
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Előző notebook kimenetének betöltése
@@ -276,10 +275,6 @@ for i, col in enumerate(features_to_plot):
 
 plt.tight_layout()
 
-# Kép mentése dokumentációs céllal
-fig_path_rfm = IMAGES_DIR / "rfm_raw_distributions.png"
-plt.savefig(fig_path_rfm, bbox_inches="tight")
-print(f"Ábra mentve: {fig_path_rfm}")
 plt.show()
 
 # Gyors statisztika a ferdeségről (Skewness)
@@ -289,7 +284,6 @@ display(rfm[features_to_plot].skew().to_frame(name='Skewness').round(2))
 ```
 
     RFM változók eloszlásának vizualizálása...
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\rfm_raw_distributions.png
     
 
 
@@ -542,7 +536,7 @@ from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 
 # Beimportáljuk a szükséges útvonalakat a config.py-ból
-from config import RFM_FEATURES_PARQUET, IMAGES_DIR
+from config import RFM_FEATURES_PARQUET
 
 print("K-means futtatása 2-10 klaszterre az optimális K megtalálásához...\n")
 
@@ -587,10 +581,6 @@ axes[1].grid(True, alpha=0.3)
 
 plt.tight_layout()
 
-# Ábra mentése
-fig_path_kmeans = IMAGES_DIR / "kmeans_optimal_k.png"
-plt.savefig(fig_path_kmeans, bbox_inches="tight")
-print(f"Ábra mentve: {fig_path_kmeans}\n")
 plt.show()
 
 # ============================================================
@@ -606,8 +596,6 @@ print(f"Maximális Sziluett-pontszám: {best_score:.4f}\n")
 ```
 
     K-means futtatása 2-10 klaszterre az optimális K megtalálásához...
-    
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\kmeans_optimal_k.png
     
     
 
@@ -1024,10 +1012,6 @@ fig.update_layout(
 )
 
 fig.show()
-
-fig_path_3d_html = IMAGES_DIR / "kmeans_3d_clusters_interactive.html"
-fig.write_html(str(fig_path_3d_html))
-print(f"✔️ Interaktív HTML ábra mentve ide: {fig_path_3d_html}")
 ```
 
     Klaszterek és centroidok interaktív 3D vizualizálása...
@@ -1038,9 +1022,6 @@ print(f"✔️ Interaktív HTML ábra mentve ide: {fig_path_3d_html}")
 ![png](images/02_customer_segmentation_02_customer_segmentation_23_1.png)
     
 
-
-    ✔️ Interaktív HTML ábra mentve ide: D:\Workspace\ecommerce-customer-segmentation\assets\images\kmeans_3d_clusters_interactive.html
-    
 
 ## <a id="Fejezet_5"></a>5. Kiterjesztett EDA
 A "Snake Plot" (kígyó ábra) a marketing analitika klasszikus eszköze a klaszterek profilozására. Ez megmutatja, hogy az egyes csoportok az átlagtól milyen irányba (pozitív/negatív) és milyen mértékben térnek el a standardizált RFM skálán.
@@ -1087,9 +1068,6 @@ plt.title('Ügyfélszegmensek profilja (Snake Plot)', fontsize=14)
 plt.legend(title='Szegmens', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.grid(True, alpha=0.3)
 
-fig_path_snake = IMAGES_DIR / "kmeans_snake_plot.png"
-plt.savefig(fig_path_snake, bbox_inches="tight")
-print(f"Ábra mentve: {fig_path_snake}")
 plt.show()
 
 # Címkézzük fel az eredeti adatokat is!
@@ -1101,7 +1079,6 @@ display(cluster_profile)
 ```
 
     Klaszterek profilozása Snake Plot segítségével...
-    Ábra mentve: D:\Workspace\ecommerce-customer-segmentation\assets\images\kmeans_snake_plot.png
     
 
 
@@ -1206,10 +1183,12 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
        Dimenziók: 5,243 ügyfél, 11 oszlop
     
 
-<div style="display: flex; justify-content: center; align-items: center; width: 100%; padding: 30px 0;">
-    <a href="#teteje" style="display: inline-flex; align-items: center; justify-content: center; background-color: #c0253f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1);">
-        ⬆ Visszaugrás a notebook elejére
-    </a>
+<div align="center">
+  <br>
+  <a href="#teteje">
+    <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére" width="250">
+  </a>
+  <br>
 </div>
 
 *Az ugrás gomb nem minden környezetben működik!
@@ -1237,13 +1216,11 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 22103 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 20099 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 40443 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 32685 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Support files will be in 03_churn_prediction_files\
-    [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 59329 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Writing 33004 bytes to docs\03_churn_prediction.md
     
