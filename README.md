@@ -97,6 +97,7 @@ jupyter notebook
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
+```
 ecommerce-customer-segmentation/
 ├── data/
 │   ├── raw/                  # nyers, tisztítatlan adatfájlok
@@ -120,6 +121,8 @@ ecommerce-customer-segmentation/
 ├── .gitignore
 ├── requirements.txt
 └── models/                   # szerializált modell- és transzformátor-objektumok (joblib)
+```
+
 ## Architektúra-diagram
 
 ```mermaid
