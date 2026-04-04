@@ -12,14 +12,12 @@
 - `data/processed/online_retail_ready_for_rfm.parquet` **(Végső kimenet a következő fázishoz)**
 
 ---
-
 <a id="0-adatbetöltés-és-parquet-konverzió"></a>
 ## 0. Adatbetöltés és Parquet-konverzió
 
 A nyers adathalmaz betöltése során elsődlegesen az automatizált megoldásra törekszünk. Mivel azonban a specifikus UCI API korlátokba ütközött, a kód egy robusztus ellenőrző logikát használ: ha a nyers adatok hiányoznak, pontos instrukciókat ad a manuális beszerzéshez, majd elvégzi a Parquet konverziót az optimális további feldolgozáshoz.
 
 A `0.2` cella idempotens: ha a tisztított Parquet fájl már létezik, automatikusan kihagyja az ismételt letöltést és konverziót.
-
 
 ```python
 # ============================================================
@@ -241,6 +239,7 @@ A tisztítási lépések befejeztével elengedhetetlen ellenőrizni az adathalma
 # ============================================================
 # 1.2 "QA" ellenőrzés 1/2
 # ============================================================
+# Azt validálja, hogy az anonimok és érvénytelen árak ki letek-e dobva, és a típusok helyesek-e
 df.info()
 ```
 
@@ -261,102 +260,7 @@ df.info()
     memory usage: 54.5+ MB
     
 
-### 1.3. Ellenőrzés 2: Statisztikai érvényesség és üzleti logika
-Míg a kezdeti EDA során a `describe()` a hibák felfedezését szolgálta, itt már **minőségbiztosítási (QA)** szerepe van. Az alábbi kimenet bizonyítja, hogy a tisztítási logikánk sikeres volt:
-* **Érvényes árak:** A `Price` oszlop minimum értéke szigorúan **> 0** (nincsenek ingyenes vagy negatív árú, adminisztratív tételek).
-* **Reális mennyiségek:** A `Quantity` oszlop extrém, rendszerhibából fakadó kilengései (pl. +/- 80 000 darab) eltűntek, a maximum és minimum értékek a beállított küszöbértéken belül maradtak.
-* **Adatszivárgás megelőzése:** Nincsenek olyan anomáliák, amik a későbbi aggregált RFM metrikákat (pl. átlagos kosárérték) irreális irányba torzítanák.
-
-
-```python
-# ============================================================
-# 1.3 "QA" ellenőrzés 2/2
-# ============================================================
-df.describe()
-```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Quantity</th>
-      <th>InvoiceDate</th>
-      <th>Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>count</th>
-      <td>794168.000000</td>
-      <td>794168</td>
-      <td>794168.000000</td>
-    </tr>
-    <tr>
-      <th>mean</th>
-      <td>12.635172</td>
-      <td>2011-01-02 12:53:56.273458688</td>
-      <td>2.972324</td>
-    </tr>
-    <tr>
-      <th>min</th>
-      <td>-80995.000000</td>
-      <td>2009-12-01 07:45:00</td>
-      <td>0.030000</td>
-    </tr>
-    <tr>
-      <th>25%</th>
-      <td>2.000000</td>
-      <td>2010-07-02 09:47:00</td>
-      <td>1.250000</td>
-    </tr>
-    <tr>
-      <th>50%</th>
-      <td>5.000000</td>
-      <td>2010-12-02 12:17:00</td>
-      <td>1.950000</td>
-    </tr>
-    <tr>
-      <th>75%</th>
-      <td>12.000000</td>
-      <td>2011-07-31 15:50:00</td>
-      <td>3.750000</td>
-    </tr>
-    <tr>
-      <th>max</th>
-      <td>80995.000000</td>
-      <td>2011-12-09 12:50:00</td>
-      <td>649.500000</td>
-    </tr>
-    <tr>
-      <th>std</th>
-      <td>191.568600</td>
-      <td>NaN</td>
-      <td>4.505783</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### 1.4. Technikai outlierek és anomáliák szűrése (Feature Engineering előtt)
+### 1.3. Technikai outlierek és anomáliák szűrése (Feature Engineering előtt)
 
 Mielőtt rátérnénk a vásárlói érték (RFM és CLV) kiszámítására, el kell távolítanunk a rendszerben maradt **technikai anomáliákat**. Fontos: itt még nem a statisztikai outliereket (pl. a kiugróan sokat költő VIP vevőket) kezeljük, hanem azokat a tranzakciókat, amelyek **torzítanák vagy logikailag ellehetetlenítenék** a vásárlói profilalkotást.
 
@@ -367,7 +271,7 @@ Ebben a lépésben az alábbi "zajokat" szűrjük:
 
 ```python
 # ============================================================
-# 1.4. - Technikai outlierek, "árva" sztornók és hibák szűrése
+# 1.3 - Technikai outlierek, "árva" sztornók és hibák szűrése
 # ============================================================
 from config import Q_THRESHOLD
 
@@ -411,7 +315,112 @@ print(f"Adathalmaz mentve a következő fázishoz: {READY_FOR_RFM_PARQUET}")
     Adathalmaz mentve a következő fázishoz: D:\Workspace\ecommerce-customer-segmentation\data\processed\online_retail_ready_for_rfm.parquet
     
 
-### 1.5. Cutoff validáció: elegendő adat van-e a célablakban?
+### 1.4 Ellenőrzés 2: Statisztikai érvényesség és üzleti logika
+Míg a kezdeti EDA során a `describe()` a hibák felfedezését szolgálta, itt már **minőségbiztosítási (QA)** szerepe van. Az alábbi kimenet bizonyítja, hogy a tisztítási logikánk sikeres volt:
+* **Érvényes árak:** A `Price` oszlop minimum értéke szigorúan **> 0** (nincsenek ingyenes vagy negatív árú, adminisztratív tételek).
+* **Reális mennyiségek:** A `Quantity` oszlop extrém, rendszerhibából fakadó kilengései (pl. +/- 80 000 darab) eltűntek, a maximum és minimum értékek a beállított küszöbértéken belül maradtak.
+* **Adatszivárgás megelőzése:** Nincsenek olyan anomáliák, amik a későbbi aggregált RFM metrikákat (pl. átlagos kosárérték) irreális irányba torzítanák.
+
+
+```python
+# ============================================================
+# 1.4 "QA" ellenőrzés 2/2
+# ============================================================
+df.describe()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Quantity</th>
+      <th>InvoiceDate</th>
+      <th>Price</th>
+      <th>LineTotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>793900.000000</td>
+      <td>793900</td>
+      <td>793900.000000</td>
+      <td>793900.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>12.553191</td>
+      <td>2011-01-02 14:58:41.339463168</td>
+      <td>2.971550</td>
+      <td>20.600271</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>-9360.000000</td>
+      <td>2009-12-01 07:45:00</td>
+      <td>0.030000</td>
+      <td>-6539.400000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>2.000000</td>
+      <td>2010-07-02 11:44:00</td>
+      <td>1.250000</td>
+      <td>4.350000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>5.000000</td>
+      <td>2010-12-02 12:40:00</td>
+      <td>1.950000</td>
+      <td>11.700000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>12.000000</td>
+      <td>2011-08-01 10:03:00</td>
+      <td>3.750000</td>
+      <td>19.500000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>10000.000000</td>
+      <td>2011-12-09 12:50:00</td>
+      <td>649.500000</td>
+      <td>38970.000000</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>70.885955</td>
+      <td>NaN</td>
+      <td>4.475521</td>
+      <td>84.086346</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### 1.5. Cutoff validáció
+**Elegendő adat van-e a célablakban?**
 
 Mielőtt a `config.py`-ban rögzített `CUTOFF_DATE` értékét véglegesnek tekintjük,
 ellenőrizzük, hogy a vágási pont után marad-e elegendő tranzakció és ügyfél
@@ -419,7 +428,7 @@ a célváltozó (y) majdani legyártásához.
 
 Az ábra a teljes időszak napi bevételét mutatja; a piros szaggatott vonal jelöli
 a tervezett cutoff-ot. Ha utána az adatok sűrűsége és volumene elegendőnek tűnik,
-a `CUTOFF_DATE` értéke végleges, a `03_clv_prediction.ipynb` notebook már ezt
+a `CUTOFF_DATE` értéke végleges, a `03_churn_prediction.ipynb` notebook már ezt
 az értéket veszi alapul.
 
 
@@ -460,7 +469,7 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 
 
     
-![png](images/01_data_preparation_01_data_preparation_13_1.png)
+![png](images/01_data_preparation/01_1.5._Cutoff_validáció.png)
     
 
 
@@ -476,28 +485,15 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 
 
 ```python
-!python update_docs.py
+# 01-es notebook docs generálása/frissítése argumentum megadásával
+!python update_docs.py --notebook 01_data_preparation.ipynb
 ```
 
-    Dokumentáció frissítése elindult...
-    ========================================
-    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
-    [01_data_preparation.ipynb] Kész! [OK]
+    DokumentĂˇciĂł frissĂ­tĂ©se...
+    ==================================================
+    [01_data_preparation.ipynb] KonvertĂˇlĂˇs Markdown-nĂˇ...
+    [01_data_preparation.ipynb] âś… KĂ©sz! (1 kĂ©p)
     
-    [02_customer_segmentation.ipynb] Konvertálás Markdown-ná...
-    [02_customer_segmentation.ipynb] Kész! [OK]
-    
-    [03_churn_prediction.ipynb] Konvertálás Markdown-ná...
-    [03_churn_prediction.ipynb] Kész! [OK]
-    
-    ========================================
-    Minden markdown és képhivatkozás sikeresen generálva!
-    
-
-    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
-    [NbConvertApp] Writing 15354 bytes to docs\01_data_preparation.md
-    [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
-    [NbConvertApp] Writing 27135 bytes to docs\02_customer_segmentation.md
-    [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Writing 33004 bytes to docs\03_churn_prediction.md
+    ==================================================
+    KĂ©sz!
     

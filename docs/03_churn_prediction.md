@@ -395,6 +395,8 @@ display(X.head())
 
 A Modell B-ben a K-Means klaszterező **nem előre futtatott**, hanem a scikit-learn `Pipeline` belső lépéseként kerül be. Ez garantálja, hogy a keresztvalidáció során a K-Means **minden foldban kizárólag a tréningadatokon** tanul - a validációs halmazon csak `predict` (`transform`) fut.
 
+**OHE - one hot encoding**
+
 A pipeline felépítése:
 ```
 X (RFM) ──▶ StandardScaler ──┬──▶ KMeans (4 klaszter) ──▶ Klasztercímke (OHE) ──┐
@@ -582,7 +584,7 @@ print("      a 02-es notebook üzleti szegmenseivel (VIP Bajnokok stb.).")
 
 Az imbalanced osztályeloszlás miatt **PR-AUC** (Precision-Recall AUC) a fő metrika - ez sokkal informatívabb, mint az ROC-AUC, ha az egyik osztály ritkább. Mellette F1-score és Recall is szerepel a teljes kép kedvéért.
 
-### 8.1 – Keresztvalidáció mindkét modellre
+### 8.1 Keresztvalidáció mindkét modellre
 
 
 ```python
@@ -613,7 +615,7 @@ print("✔️ Modell B kész.")
     ✔️ Modell B kész.
     
 
-### 8.2 – Eredmények összehasonlítása
+### 8.2 Eredmények összehasonlítása
 
 
 ```python
@@ -722,12 +724,12 @@ else:
     🏆 Nyertes modell: B: RFM + K-Means OHE (PR-AUC: 0.8192 vs 0.8184)
     
 
-### 8.3 – CV eredmények vizualizálása
+### 8.3 CV eredmények vizualizálása
 
 
 ```python
 # ============================================================
-# 8.3 – CV eredmények vizualizálása
+# 8.3 CV eredmények vizualizálása
 # ============================================================
 
 metrics = ['test_pr_auc', 'test_f1', 'test_recall']
@@ -752,16 +754,31 @@ plt.show()
 
 
     
-![png](images/03_churn_prediction_03_churn_prediction_17_0.png)
+![png](images/03_churn_prediction/03_8.3_CV_eredmények_vizualizálása.png)
     
 
 
-### 8.4 – A nyertes modell betanítása a TELJES adathalmazon
+**A boxplot értelmezése:**
+
+Minden doboz egy modell 5-fold keresztvalidációs eredményeinek eloszlását mutatja:
+- A **doboz közepe (narancssárga vonal)** a medián score — ez a legreprezentatívabb egyedi szám.
+- A **doboz szélessége (IQR)** az eredmények stabilitását jelzi: minél keskenyebb, annál konzisztensebben teljesít a modell különböző adatrészleteken.
+- A **bajusz (whisker)** a min/max értékeket mutatja, a **körök** kiugró (outlier) foldokat jelölnek.
+
+**Mit látunk itt?**
+
+- **PR-AUC:** A két modell dobozai szinte teljesen fedik egymást (~0.810–0.830). A B modell mediánja minimálisan magasabb, de a különbség elhanyagolható.
+- **F1-Score:** Az A modell mediánja (~0.750) és a B modellé (~0.758) közel azonos, a dobozok IQR-ja is hasonló — a K-Means klasztercímkék nem adnak érdemi F1-javulást.
+- **Recall:** Szintén szoros verseny (~0.745 vs ~0.752). A B modell whisker-je valamivel hosszabb, ami nagyobb variabilitást jelez.
+
+> **Következtetés:** Egyik metrikában sem mutatkozik szignifikáns különbség — a boxplotok átfedő IQR-dobozai azt jelzik, hogy a két modell teljesítménye statisztikailag nem különböztethető meg megbízhatóan. A K-Means klasztercímkék hozzáadása nem hoz érdemi előnyt, mert az XGBoost fa-alapú struktúrája önállóan is képes feltárni ezeket a mintázatokat az RFM feature-ökből.
+
+### 8.4 A nyertes modell betanítása a TELJES adathalmazon
 
 
 ```python
 # ============================================================
-# 8.4 – A nyertes modell betanítása a TELJES adathalmazon
+# 8.4 A nyertes modell betanítása a TELJES adathalmazon
 # ============================================================
 print(f"A nyertes modell ({winner_name}) betanítása az összes adaton...")
 winner_pipeline.fit(X, y)
@@ -788,7 +805,7 @@ print("\n⚠️ A tréning metrikák mindig optimistábban néznek ki, mint a CV
     
 
 ---
-### 8.5 Hiperparaméter-hangolás – `RandomizedSearchCV` segítségével
+### 8.5 Hiperparaméter-hangolás `RandomizedSearchCV` segítségével
 
 Az alábbi cella futtatható, de **nem kötelező** a notebook többi részéhez - az eredmény automatikusan felülírja a `winner_pipeline`-t, ha a keresés jobb paramétert talál.
 
@@ -797,7 +814,7 @@ Az alábbi cella futtatható, de **nem kötelező** a notebook többi részéhez
 **Miért `RandomizedSearchCV` és nem `GridSearchCV`?**  
 A keresési tér nagy (~10k kombináció), és a randomizált keresés általában közel azonos eredményt ad töredéknyi idő alatt, *Bergstra & Bengio (2012)* empirikusan igazolta.
 
-#### 🎯 Miért pont 100 iterációt használtam a kereséshez?
+#### Miért pont 100 iterációt használtam a kereséshez?
 
 A `RandomizedSearchCV` beállításánál az `n_iter = 100` egy tudatosan választott "arany középút" az időráfordítás és a modell pontossága között.
 
@@ -815,7 +832,7 @@ A `RandomizedSearchCV` beállításánál az `n_iter = 100` egy tudatosan válas
 
 ```python
 # ============================================================
-# 8.5 – Hiperparaméter-hangolás RandomizedSearchCV-vel
+# 8.5 Hiperparaméter-hangolás RandomizedSearchCV-vel
 # ============================================================
 # OPCIONÁLIS CELLA – a notebook többi része a 8.4-ben betanított
 # winner_pipeline-t használja, de ez a cella felülírja, ha jobb
@@ -879,13 +896,21 @@ print(f"\n  Eredeti winner PR-AUC (5-fold): {original_pr_auc:.4f}")
 print(f"  RSCV legjobb PR-AUC  (3-fold):  {rscv.best_score_:.4f}")
 print("  ⚠️  Különböző fold-szám miatt a számok nem közvetlenül összehasonlíthatók.")
 
-# Ha a hangolt modell jobb: opcionálisan felülírjuk a winner_pipeline-t
-# Commented out by default – uncomment if you want to replace:
-winner_pipeline = rscv.best_estimator_
-winner_name    += ' (RSCV hangolt)'
-print("\n✔️ winner_pipeline frissítve a hangolt modellre.")
-print("\n💡 A winner_pipeline felülírásra került az RSCV legjobb modelljével.")
-print("   Ha az eredeti modellt szeretnéd megtartani, kommentezd ki a fenti két sort.")
+# Feltételes felülírás: csak akkor cseréljük a winner_pipeline-t,
+# ha az RSCV best score jobb, mint az eredeti CV átlag.
+# (Az RSCV 3-fold, az eredeti CV 5-fold volt — eltérő fold-szám
+# miatt nem közvetlenül összehasonlítható, de ha az RSCV 100
+# iteráció után sem éri el az eredeti szintet, a hangolás
+# valószínűleg nem hozott érdemi javulást.)
+if rscv.best_score_ > original_pr_auc:
+    winner_pipeline = rscv.best_estimator_
+    winner_name    += ' (RSCV hangolt)'
+    print('\n✔️ winner_pipeline frissítve a hangolt modellre (RSCV jobb volt az eredetinél).')
+    print('\n💡 A winner_pipeline felülírásra került az RSCV legjobb modelljével.')
+    print('   Ha az eredeti modellt szeretnéd megtartani, kommentezd ki a feltételt.')
+else:
+    print(f'\n💡 Az RSCV nem javított az eredeti modellen (RSCV: {rscv.best_score_:.4f} vs eredeti: {original_pr_auc:.4f}).')
+    print('   A winner_pipeline változatlan marad. (Eltérő fold-szám miatt ez várható lehet.)')
 
 ```
 
@@ -909,10 +934,8 @@ print("   Ha az eredeti modellt szeretnéd megtartani, kommentezd ki a fenti ké
       RSCV legjobb PR-AUC  (3-fold):  0.8166
       ⚠️  Különböző fold-szám miatt a számok nem közvetlenül összehasonlíthatók.
     
-    ✔️ winner_pipeline frissítve a hangolt modellre.
-    
-    💡 A winner_pipeline felülírásra került az RSCV legjobb modelljével.
-       Ha az eredeti modellt szeretnéd megtartani, kommentezd ki a fenti két sort.
+    💡 Az RSCV nem javított az eredeti modellen (RSCV: 0.8166 vs eredeti: 0.8192).
+       A winner_pipeline változatlan marad. (Eltérő fold-szám miatt ez várható lehet.)
     
 
 ---
@@ -920,7 +943,7 @@ print("   Ha az eredeti modellt szeretnéd megtartani, kommentezd ki a fenti ké
 
 A SHAP (SHapley Additive exPlanations) értékek megmutatják, hogy az egyes feature-ök mennyivel "tolják" a modell kimenetét az átlagtól el - pozitív irányban (churn felé) vagy negatív irányban (megtartás felé).
 
-### 9.1 – SHAP adatok előkészítése
+### 9.1 SHAP adatok előkészítése
 
 
 ```python
@@ -986,7 +1009,7 @@ print(f"Feature nevek: {feature_names_transformed}")
        X_transformed shape: (5243, 9)
     
 
-    ExactExplainer explainer: 5244it [01:16, 68.96it/s]                                                                    
+    ExactExplainer explainer: 5244it [01:59, 43.86it/s]                                                                    
     
 
     ✔️ SHAP értékek kiszámítva: (5243, 9, 2)
@@ -994,7 +1017,7 @@ print(f"Feature nevek: {feature_names_transformed}")
     Feature nevek: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio', 'cluster_0', 'cluster_1', 'cluster_2', 'cluster_3']
     
 
-### 9.2 – Churn valószínűségek eloszlása
+### 9.2 Churn valószínűségek eloszlása
 
 Mielőtt a SHAP-magyarázatokba merülnénk, érdemes megvizsgálni a modell
 **nyers kimenetének eloszlását** – vagyis azt, hogy a valószínűségi becslések
@@ -1045,7 +1068,28 @@ else:
     print(f"\n✅ Átlagos churn-valószínűség: {mean_churn:.1%}")
 ```
 
-### 9.3 – SHAP Summary Plot (Globális feature fontosság)
+
+    
+![png](images/03_churn_prediction/03_9.2_Churn_valószínűségek_eloszlása.png)
+    
+
+
+    
+    --- Valószínűségek statisztikája ---
+    count    5243.000000
+    mean        0.519442
+    std         0.274335
+    min         0.007397
+    25%         0.307905
+    50%         0.542737
+    75%         0.753874
+    max         0.974866
+    dtype: float64
+    
+    ⚠️  Figyelem: az átlagos churn-valószínűség 51.9% – a bázis több mint fele lemorzsolódás felé hajlik!
+    
+
+### 9.3 SHAP Summary Plot (Globális feature fontosság)
 
 **Hogyan olvassuk le a grafikont?**
 * **Vízszintes tengely (SHAP érték):** Mennyivel tolja el a modellt a döntésben. A **0-tól jobbra** lévő pontok *növelik a lemorzsolódás (churn) esélyét*, a **balra** lévők pedig *hűségre* utalnak (az ügyfél marad).
@@ -1084,7 +1128,23 @@ print("  • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)")
 
 ```
 
-### 9.4 – SHAP Waterfall Plot: Egy VIP, lemorzsolódó ügyfél magyarázata
+    SHAP Summary Plot generálása...
+    
+
+
+    
+![png](images/03_churn_prediction/03_9.3_SHAP_Summary_Plot_(Globális_feature_fontosság).png)
+    
+
+
+    
+    📊 Értelmezés:
+      • Magasabb recency → nagyobb churn valószínűség (logikus: aki rég vásárolt, lemorzsolódik)
+      • Alacsony frequency → nagyobb churn kockázat
+      • Magas monetary → alacsonyabb churn (a VIP-ek lojálisabbak)
+    
+
+### 9.4 SHAP Waterfall Plot: Egy VIP, lemorzsolódó ügyfél magyarázata
 
 
 ```python
@@ -1135,12 +1195,67 @@ plt.tight_layout()
 plt.show()
 ```
 
+    Elemzett VIP lemorzsolódó ügyfél: 14091
+    
+    Az elemzett ügyfél profilja:
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>recency_days</th>
+      <th>frequency</th>
+      <th>monetary_total</th>
+      <th>monetary_avg</th>
+      <th>return_ratio</th>
+      <th>churn</th>
+      <th>churn_proba</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>14091</th>
+      <td>562.0</td>
+      <td>2.0</td>
+      <td>9530.08</td>
+      <td>4765.04</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.964923</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+    
+![png](images/03_churn_prediction/03_9.4_SHAP_Waterfall_Plot_Egy_VIP,_lemorzsolódó_ügyfél_magyarázata.png)
+    
+
+
 ---
 ## 10. Üzleti kiértékelés és Akciótervek
 
 A modell önmagában nem elegendő - az előrejelzéseket üzleti akciótervre kell lefordítani. Az alábbi szegmentáció a churn valószínűség és a monetary érték kombinációján alapul.
 
-### 10.1 – Prioritizált akciólista generálása + szegmenscímkék becsatolása a 02-es notebookból
+### 10.1 Prioritizált akciólista generálása + szegmenscímkék becsatolása a 02-es notebookból
 
 
 ```python
@@ -1216,7 +1331,151 @@ display(cross_tab)
 
 ```
 
-### 10.2 – VIP Veszélyben lista (TOP 20 legértékesebb, leginkább lemorzsolódó ügyfél)
+    ✔️ Szegmenscímkék becsatolva ('Segment' oszlopból)
+       Egyedi szegmensek: ['Elvesztett / Inaktív', 'Lemorzsolódó / Alvó', 'VIP Bajnokok', 'Új / Ígéretes']
+    
+    Üzleti akció-szegmensek összefoglalása:
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Akció kategória</th>
+      <th>Ügyfelek száma</th>
+      <th>Arány (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>⚠️  Alacsony Értékű, Lemorzsolódó – Win-Back</td>
+      <td>2146</td>
+      <td>40.9</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>💎 VIP Stabil – Lojalitás Program</td>
+      <td>1891</td>
+      <td>36.1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>🚨 VIP Veszélyben – Azonnali Retenció</td>
+      <td>729</td>
+      <td>13.9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>✅ Alacsony Értékű, Stabil – Standard Kommunikáció</td>
+      <td>477</td>
+      <td>9.1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    
+    RFM-szegmens × Churn-kockázat kereszttábla:
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>action</th>
+      <th>⚠️  Alacsony Értékű, Lemorzsolódó – Win-Back</th>
+      <th>✅ Alacsony Értékű, Stabil – Standard Kommunikáció</th>
+      <th>💎 VIP Stabil – Lojalitás Program</th>
+      <th>🚨 VIP Veszélyben – Azonnali Retenció</th>
+      <th>Összesen</th>
+    </tr>
+    <tr>
+      <th>rfm_segment</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Elvesztett / Inaktív</th>
+      <td>1933</td>
+      <td>54</td>
+      <td>4</td>
+      <td>107</td>
+      <td>2098</td>
+    </tr>
+    <tr>
+      <th>Lemorzsolódó / Alvó</th>
+      <td>150</td>
+      <td>75</td>
+      <td>816</td>
+      <td>583</td>
+      <td>1624</td>
+    </tr>
+    <tr>
+      <th>VIP Bajnokok</th>
+      <td>0</td>
+      <td>0</td>
+      <td>840</td>
+      <td>21</td>
+      <td>861</td>
+    </tr>
+    <tr>
+      <th>Új / Ígéretes</th>
+      <td>63</td>
+      <td>348</td>
+      <td>231</td>
+      <td>18</td>
+      <td>660</td>
+    </tr>
+    <tr>
+      <th>Összesen</th>
+      <td>2146</td>
+      <td>477</td>
+      <td>1891</td>
+      <td>729</td>
+      <td>5243</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### 10.2 VIP Veszélyben lista (TOP 20 legértékesebb, leginkább lemorzsolódó ügyfél)
 
 
 ```python
@@ -1247,6 +1506,273 @@ print("   2. Exkluzív visszatérési kupon (pl. 15-20% kedvezmény)")
 print("   3. Win-back email sorozat (3 üzenet, 2 hetes intervallummal)")
 print("   4. NPS felmérés küldése (proaktív panaszkezelés)")
 ```
+
+    VIP Veszélyben ügyfelek száma: 729
+    
+    Top 20 legmagasabb kockázatú VIP ügyfél (azonnali intézkedés javasolt):
+    
+
+
+<style type="text/css">
+#T_58f2e_row0_col3 {
+  background-color: #67000d;
+  color: #f1f1f1;
+}
+#T_58f2e_row1_col3, #T_58f2e_row2_col3 {
+  background-color: #9a0c14;
+  color: #f1f1f1;
+}
+#T_58f2e_row3_col3 {
+  background-color: #b01217;
+  color: #f1f1f1;
+}
+#T_58f2e_row4_col3 {
+  background-color: #c9181d;
+  color: #f1f1f1;
+}
+#T_58f2e_row5_col3 {
+  background-color: #d32020;
+  color: #f1f1f1;
+}
+#T_58f2e_row6_col3 {
+  background-color: #d82422;
+  color: #f1f1f1;
+}
+#T_58f2e_row7_col3 {
+  background-color: #f14432;
+  color: #f1f1f1;
+}
+#T_58f2e_row8_col3 {
+  background-color: #f5533b;
+  color: #f1f1f1;
+}
+#T_58f2e_row9_col3 {
+  background-color: #fb6c4c;
+  color: #f1f1f1;
+}
+#T_58f2e_row10_col3 {
+  background-color: #fb7050;
+  color: #f1f1f1;
+}
+#T_58f2e_row11_col3 {
+  background-color: #fc8f6f;
+  color: #000000;
+}
+#T_58f2e_row12_col3 {
+  background-color: #fc9474;
+  color: #000000;
+}
+#T_58f2e_row13_col3 {
+  background-color: #fca486;
+  color: #000000;
+}
+#T_58f2e_row14_col3 {
+  background-color: #fdd0bc;
+  color: #000000;
+}
+#T_58f2e_row15_col3 {
+  background-color: #fdd2bf;
+  color: #000000;
+}
+#T_58f2e_row16_col3 {
+  background-color: #fedccd;
+  color: #000000;
+}
+#T_58f2e_row17_col3 {
+  background-color: #fee4d8;
+  color: #000000;
+}
+#T_58f2e_row18_col3 {
+  background-color: #ffede5;
+  color: #000000;
+}
+#T_58f2e_row19_col3 {
+  background-color: #fff5f0;
+  color: #000000;
+}
+</style>
+<table id="T_58f2e">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_58f2e_level0_col0" class="col_heading level0 col0" >monetary_total</th>
+      <th id="T_58f2e_level0_col1" class="col_heading level0 col1" >frequency</th>
+      <th id="T_58f2e_level0_col2" class="col_heading level0 col2" >recency_days</th>
+      <th id="T_58f2e_level0_col3" class="col_heading level0 col3" >churn_proba</th>
+    </tr>
+    <tr>
+      <th class="index_name level0" >Customer ID</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_58f2e_level0_row0" class="row_heading level0 row0" >12396</th>
+      <td id="T_58f2e_row0_col0" class="data row0 col0" >£931</td>
+      <td id="T_58f2e_row0_col1" class="data row0 col1" >1</td>
+      <td id="T_58f2e_row0_col2" class="data row0 col2" >582 nap</td>
+      <td id="T_58f2e_row0_col3" class="data row0 col3" >96.88%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row1" class="row_heading level0 row1" >14091</th>
+      <td id="T_58f2e_row1_col0" class="data row1 col0" >£9,530</td>
+      <td id="T_58f2e_row1_col1" class="data row1 col1" >2</td>
+      <td id="T_58f2e_row1_col2" class="data row1 col2" >562 nap</td>
+      <td id="T_58f2e_row1_col3" class="data row1 col3" >96.49%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row2" class="row_heading level0 row2" >13204</th>
+      <td id="T_58f2e_row2_col0" class="data row2 col0" >£967</td>
+      <td id="T_58f2e_row2_col1" class="data row2 col1" >1</td>
+      <td id="T_58f2e_row2_col2" class="data row2 col2" >639 nap</td>
+      <td id="T_58f2e_row2_col3" class="data row2 col3" >96.48%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row3" class="row_heading level0 row3" >17305</th>
+      <td id="T_58f2e_row3_col0" class="data row3 col0" >£2,135</td>
+      <td id="T_58f2e_row3_col1" class="data row3 col1" >1</td>
+      <td id="T_58f2e_row3_col2" class="data row3 col2" >556 nap</td>
+      <td id="T_58f2e_row3_col3" class="data row3 col3" >96.27%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row4" class="row_heading level0 row4" >14969</th>
+      <td id="T_58f2e_row4_col0" class="data row4 col0" >£906</td>
+      <td id="T_58f2e_row4_col1" class="data row4 col1" >1</td>
+      <td id="T_58f2e_row4_col2" class="data row4 col2" >611 nap</td>
+      <td id="T_58f2e_row4_col3" class="data row4 col3" >95.96%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row5" class="row_heading level0 row5" >16118</th>
+      <td id="T_58f2e_row5_col0" class="data row5 col0" >£4,255</td>
+      <td id="T_58f2e_row5_col1" class="data row5 col1" >1</td>
+      <td id="T_58f2e_row5_col2" class="data row5 col2" >560 nap</td>
+      <td id="T_58f2e_row5_col3" class="data row5 col3" >95.83%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row6" class="row_heading level0 row6" >12368</th>
+      <td id="T_58f2e_row6_col0" class="data row6 col0" >£918</td>
+      <td id="T_58f2e_row6_col1" class="data row6 col1" >1</td>
+      <td id="T_58f2e_row6_col2" class="data row6 col2" >536 nap</td>
+      <td id="T_58f2e_row6_col3" class="data row6 col3" >95.78%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row7" class="row_heading level0 row7" >15823</th>
+      <td id="T_58f2e_row7_col0" class="data row7 col0" >£3,048</td>
+      <td id="T_58f2e_row7_col1" class="data row7 col1" >2</td>
+      <td id="T_58f2e_row7_col2" class="data row7 col2" >637 nap</td>
+      <td id="T_58f2e_row7_col3" class="data row7 col3" >95.38%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row8" class="row_heading level0 row8" >15015</th>
+      <td id="T_58f2e_row8_col0" class="data row8 col0" >£2,255</td>
+      <td id="T_58f2e_row8_col1" class="data row8 col1" >13</td>
+      <td id="T_58f2e_row8_col2" class="data row8 col2" >409 nap</td>
+      <td id="T_58f2e_row8_col3" class="data row8 col3" >95.24%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row9" class="row_heading level0 row9" >12482</th>
+      <td id="T_58f2e_row9_col0" class="data row9 col0" >£21,942</td>
+      <td id="T_58f2e_row9_col1" class="data row9 col1" >27</td>
+      <td id="T_58f2e_row9_col2" class="data row9 col2" >484 nap</td>
+      <td id="T_58f2e_row9_col3" class="data row9 col3" >94.98%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row10" class="row_heading level0 row10" >15633</th>
+      <td id="T_58f2e_row10_col0" class="data row10 col0" >£4,157</td>
+      <td id="T_58f2e_row10_col1" class="data row10 col1" >13</td>
+      <td id="T_58f2e_row10_col2" class="data row10 col2" >417 nap</td>
+      <td id="T_58f2e_row10_col3" class="data row10 col3" >94.94%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row11" class="row_heading level0 row11" >12533</th>
+      <td id="T_58f2e_row11_col0" class="data row11 col0" >£1,006</td>
+      <td id="T_58f2e_row11_col1" class="data row11 col1" >2</td>
+      <td id="T_58f2e_row11_col2" class="data row11 col2" >535 nap</td>
+      <td id="T_58f2e_row11_col3" class="data row11 col3" >94.58%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row12" class="row_heading level0 row12" >16749</th>
+      <td id="T_58f2e_row12_col0" class="data row12 col0" >£4,158</td>
+      <td id="T_58f2e_row12_col1" class="data row12 col1" >2</td>
+      <td id="T_58f2e_row12_col2" class="data row12 col2" >499 nap</td>
+      <td id="T_58f2e_row12_col3" class="data row12 col3" >94.52%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row13" class="row_heading level0 row13" >14063</th>
+      <td id="T_58f2e_row13_col0" class="data row13 col0" >£9,472</td>
+      <td id="T_58f2e_row13_col1" class="data row13 col1" >7</td>
+      <td id="T_58f2e_row13_col2" class="data row13 col2" >594 nap</td>
+      <td id="T_58f2e_row13_col3" class="data row13 col3" >94.35%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row14" class="row_heading level0 row14" >14831</th>
+      <td id="T_58f2e_row14_col0" class="data row14 col0" >£1,624</td>
+      <td id="T_58f2e_row14_col1" class="data row14 col1" >3</td>
+      <td id="T_58f2e_row14_col2" class="data row14 col2" >588 nap</td>
+      <td id="T_58f2e_row14_col3" class="data row14 col3" >93.81%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row15" class="row_heading level0 row15" >17039</th>
+      <td id="T_58f2e_row15_col0" class="data row15 col0" >£1,955</td>
+      <td id="T_58f2e_row15_col1" class="data row15 col1" >1</td>
+      <td id="T_58f2e_row15_col2" class="data row15 col2" >512 nap</td>
+      <td id="T_58f2e_row15_col3" class="data row15 col3" >93.79%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row16" class="row_heading level0 row16" >17539</th>
+      <td id="T_58f2e_row16_col0" class="data row16 col0" >£997</td>
+      <td id="T_58f2e_row16_col1" class="data row16 col1" >3</td>
+      <td id="T_58f2e_row16_col2" class="data row16 col2" >536 nap</td>
+      <td id="T_58f2e_row16_col3" class="data row16 col3" >93.65%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row17" class="row_heading level0 row17" >16736</th>
+      <td id="T_58f2e_row17_col0" class="data row17 col0" >£2,905</td>
+      <td id="T_58f2e_row17_col1" class="data row17 col1" >5</td>
+      <td id="T_58f2e_row17_col2" class="data row17 col2" >413 nap</td>
+      <td id="T_58f2e_row17_col3" class="data row17 col3" >93.53%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row18" class="row_heading level0 row18" >15413</th>
+      <td id="T_58f2e_row18_col0" class="data row18 col0" >£6,799</td>
+      <td id="T_58f2e_row18_col1" class="data row18 col1" >5</td>
+      <td id="T_58f2e_row18_col2" class="data row18 col2" >599 nap</td>
+      <td id="T_58f2e_row18_col3" class="data row18 col3" >93.32%</td>
+    </tr>
+    <tr>
+      <th id="T_58f2e_level0_row19" class="row_heading level0 row19" >12439</th>
+      <td id="T_58f2e_row19_col0" class="data row19 col0" >£1,089</td>
+      <td id="T_58f2e_row19_col1" class="data row19 col1" >2</td>
+      <td id="T_58f2e_row19_col2" class="data row19 col2" >590 nap</td>
+      <td id="T_58f2e_row19_col3" class="data row19 col3" >93.14%</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+    
+    💡 Javasolt akciók a VIP Veszélyben szegmensre:
+       1. Személyes account manager megkeresés (ha B2B ügyfél)
+       2. Exkluzív visszatérési kupon (pl. 15-20% kedvezmény)
+       3. Win-back email sorozat (3 üzenet, 2 hetes intervallummal)
+       4. NPS felmérés küldése (proaktív panaszkezelés)
+    
+
+### 10.3 – Döntési küszöb (Threshold) optimalizálása a Precision-Recall görbe alapján
+
+A klasszifikációs modellek (mint a használt XGBoost) alapértelmezetten valószínűségeket adnak vissza (0.0 és 1.0 között), amiket egy **döntési küszöb (threshold)** – tipikusan $0.5$ – mentén alakítunk bináris predikcióvá (0 = marad, 1 = lemorzsolódik). Lemorzsolódás (churn) előrejelzésénél azonban a 0.5-ös küszöb szinte sosem optimális az osztályok kiegyensúlyozatlansága miatt.
+
+Ebben a lépésben a **Precision-Recall (PR) görbét** vizsgáljuk meg, hogy megtaláljuk az adathalmazunkhoz illő ideális küszöbértéket:
+* **Precision (Pontosság):** Ha a modell azt mondja egy ügyfélre, hogy lemorzsolódik, az milyen arányban igaz a valóságban? (Cél: a **fals pozitívok** minimalizálása).
+* **Recall (Lefedettség):** Az összes *ténylegesen* lemorzsolódó ügyfél hány százalékát sikerült a modellnek elcsípnie? (Cél: a **fals negatívok** minimalizálása).
+
+A lenti kód automatikusan megkeresi azt a thresholdot, amely maximalizálja az **F1-score**-t. Az F1-score a Precision és a Recall harmonikus átlaga ($F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$), így egyfajta matematikai "arany középutat" jelent.
+
+> 💡 **Üzleti mérlegelés (Trade-off):** > Nem kell feltétlenül a matematikai optimumot
 
 
 ```python
@@ -1281,8 +1807,20 @@ print(f"   érdemes a threshold-ot lejjebb venni (pl. 0.3-ra).")
 plt.show()
 ```
 
+    
+    🎯 F1-t maximalizáló threshold: 0.348
+       Ha az üzleti cél a RECALL maximalizálása (nem akarunk egyetlen lemorzsolódót sem kihagyni),
+       érdemes a threshold-ot lejjebb venni (pl. 0.3-ra).
+    
+
+
+    
+![png](images/03_churn_prediction/03_10.3_Döntési_küszöb_(Threshold)_optimalizálása_a_Precision-Recall_görbe_alapján.png)
+    
+
+
 ---
-## 11. Export – A modell és az előrejelzések mentése
+## 11. Export - A modell és az előrejelzések mentése
 
 
 ```python
@@ -1329,6 +1867,12 @@ print(f"   Modell: {winner_name}")
 print(f"   Fájlméret: {MODEL_PATH.stat().st_size / 1024:.1f} KB")
 ```
 
+    ✔️ Pickle-kompatibilitás OK – közvetlen mentés.
+    ✔️ Nyertes Pipeline mentve: D:\Workspace\ecommerce-customer-segmentation\models\xgboost_churn.joblib
+       Modell: B: RFM + K-Means OHE
+       Fájlméret: 451.1 KB
+    
+
 
 ```python
 # ============================================================
@@ -1364,6 +1908,21 @@ print(f"  Előrejelzések mentve:    {PREDICTIONS_PATH}")
 print("="*60)
 ```
 
+    ✔️ Előrejelzések mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
+       Dimenziók: 5,243 ügyfél × 10 oszlop
+    
+    Oszlopok: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio', 'churn_proba', 'churn_pred', 'actual_churn', 'rfm_segment', 'action']
+    
+    ============================================================
+    03_churn_prediction.ipynb – KÉSZ
+    ============================================================
+      Modell:                  B: RFM + K-Means OHE
+      CV PR-AUC (átlag):       0.8192
+      Modell mentve:           D:\Workspace\ecommerce-customer-segmentation\models\xgboost_churn.joblib
+      Előrejelzések mentve:    D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
+    ============================================================
+    
+
 <div align="center">
   <br>
   <a href="#teteje">
@@ -1376,5 +1935,15 @@ print("="*60)
 
 
 ```python
-!python update_docs.py
+# 03-as notebook docs generálása/frissítése argumentum megadásával
+!python update_docs.py --notebook 03_churn_prediction.ipynb
 ```
+
+    Docs frissitese...
+    ==================================================
+    [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
+    [03_churn_prediction.ipynb] [OK] Kesz! (5 kep)
+    
+    ==================================================
+    Kesz!
+    

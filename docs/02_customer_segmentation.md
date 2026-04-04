@@ -288,7 +288,7 @@ display(rfm[features_to_plot].skew().to_frame(name='Skewness').round(2))
 
 
     
-![png](images/02_customer_segmentation_02_customer_segmentation_9_1.png)
+![png](images/02_customer_segmentation/02_3.1_Az_eloszlások_vizuális_diagnosztikája.png)
     
 
 
@@ -601,7 +601,7 @@ print(f"Maximális Sziluett-pontszám: {best_score:.4f}\n")
 
 
     
-![png](images/02_customer_segmentation_02_customer_segmentation_15_1.png)
+![png](images/02_customer_segmentation/02_4.1_Klaszterszám_vizuális_meghatározása.png)
     
 
 
@@ -618,10 +618,10 @@ A fenti automatikus kiértékelés alapján az algoritmus a **K=2** értéket ja
 Egy webáruház vagy nagykereskedés számára két ügyfélszegmens (vélhetően "sokat költők" és "keveset költők") túlságosan homogén. Nem ad elég finom felbontást ahhoz, hogy személyre szabott marketingstratégiát építsünk rá (pl. nem tudjuk megkülönböztetni a lemorzsolódó VIP ügyfeleket a friss, de ígéretes vásárlóktól).
 
 **Kompromisszum: K=4**
-Ha vizuálisan megvizsgáljuk az ábrákat, azt látjuk, hogy a statisztikának van egy nagyon erős másodlagos optimuma:
-1. **Sziluett-elemzés:** K=3-nál visszaesik a pontszám, de **K=4-nél egyértelmű lokális maximum (púp)** rajzolódik ki, ami azt jelzi, hogy itt ismét egy természetes, jól elkülönülő csoportosulást találtunk.
+Ha vizuálisan megvizsgáljuk az ábrákat, azt látjuk, hogy a statisztikának van egy másodlagos optimuma is:
+1. **Sziluett-elemzés:** K=3-nál visszaesik a pontszám, de **K=4-nél egy enyhe „visszakapaszkodás”, lokális maximum (púp)** rajzolódik ki, ami azt jelzi, hogy itt ismét egy természetes, jól elkülönülő csoportosulást találtunk.
 2. **Könyök-módszer:** A WCSS hibagörbe esése a K=4 és K=5 környékén kezd el kisimulni (itt található a valódi "könyök").
-3. **Domain Knowledge (Iparági sztenderd):** A 4 szegmens tökéletesen megfeleltethető a klasszikus RFM kategóriáknak (pl. *1. VIP/Bajnokok, 2. Hűséges átlagos, 3. Új/Ígéretes, 4. Lemorzsolódott*).
+3. **Domain Knowledge (Iparági sztenderd):** A 4 szegmens tökéletesen megfeleltethető a klasszikus RFM kategóriáknak (pl. 1. VIP/Bajnokok, 2. Lemorzsolódó/Alvó, 3. Új/Ígéretes, 4. Elvesztett/Inaktív).
 
 Fentiek alapján: **felülbíráljuk a kód K=2-es javaslatát, és a végleges modellt K=4 szegmensre tanítjuk be, hiszen 2 szegmens üzletileg használhatatlan lenne ráadásul a K=4 mindkét diagramon matematikailag igazolhatóan elfogadható másodlagos optimumnak.**
 
@@ -832,11 +832,13 @@ cluster_profile_raw = rfm_export.groupby('cluster')[
 ].mean()
 
 # Rangsor-szemantika:
-#   VIP Bajnokok      → legmagasabb monetary_total ÉS frequency
-#   Új / Ígéretes     → legalacsonyabb recency_days (frissen vásárolt),
-#                       de alacsony frequency (kevés vásárlás)
+#   VIP Bajnokok         → legmagasabb monetary_total ÉS frequency (összesített rangsor)
 #   Elvesztett / Inaktív → legmagasabb recency_days (legtávolabb vásárolt)
-#   Lemorzsolódó / Alvó  → maradék klaszter
+#   Új / Ígéretes        → a maradék klaszterek közül a legalacsonyabb frequency
+#                          (NEM recency alapján! A VIP és Új/Ígéretes recency-je
+#                          közel azonos lehet, a frequency-ben van az igazi különbség:
+#                          VIP ~19 vásárlás vs Új/Ígéretes ~3 vásárlás)
+#   Lemorzsolódó / Alvó  → egyetlen maradék klaszter
 
 rank_monetary  = cluster_profile_raw['monetary_total'].rank(ascending=False)
 rank_frequency = cluster_profile_raw['frequency'].rank(ascending=False)
@@ -848,9 +850,12 @@ vip_idx      = (rank_monetary + rank_frequency).idxmin()
 # Elvesztett: legtávolabbi recency (legnagyobb recency_days)
 lost_idx     = cluster_profile_raw['recency_days'].idxmax()
 
-# Új/Ígéretes: legfrissebb recency a maradék klaszterek közül (VIP és Elvesztett nélkül)
+# Új/Ígéretes: a maradék klaszterek közül a legalacsonyabb frequency-jű
+# (A recency alapú elkülönítés törékeny, mert az Új/Ígéretes és VIP Bajnokok
+# recency-je szinte azonos lehet — az igazi különbség a frequency-ben van:
+# VIP ~19 vásárlás vs Új/Ígéretes ~3 vásárlás)
 remaining    = [c for c in cluster_profile_raw.index if c not in [vip_idx, lost_idx]]
-new_idx      = cluster_profile_raw.loc[remaining, 'recency_days'].idxmin()
+new_idx      = cluster_profile_raw.loc[remaining, 'frequency'].idxmin()
 
 # Lemorzsolódó/Alvó: egyetlen maradék
 sleep_idx    = [c for c in remaining if c != new_idx][0]
@@ -1019,7 +1024,7 @@ fig.show()
 
 
     
-![png](images/02_customer_segmentation_02_customer_segmentation_23_1.png)
+![png](images/02_customer_segmentation/02_4.5_Klaszterek_3D_térbeli_vizualizációja.png)
     
 
 
@@ -1083,7 +1088,7 @@ display(cluster_profile)
 
 
     
-![png](images/02_customer_segmentation_02_customer_segmentation_26_1.png)
+![png](images/02_customer_segmentation/02_5.1_Klaszterek_vizualizálása_Snake_Plot-tal.png)
     
 
 
@@ -1195,7 +1200,8 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 
 
 ```python
-!python update_docs.py
+# 02-es notebook docs generálása/frissítése argumentum megadásával
+!python update_docs.py --notebook 02_customer_segmentation.ipynb
 ```
 
     Dokumentáció frissítése elindult...
@@ -1216,11 +1222,13 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
     [NbConvertApp] Support files will be in 01_data_preparation_files\
     [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 20099 bytes to docs\01_data_preparation.md
+    [NbConvertApp] Writing 21451 bytes to docs\01_data_preparation.md
     [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
     [NbConvertApp] Support files will be in 02_customer_segmentation_files\
     [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 32685 bytes to docs\02_customer_segmentation.md
+    [NbConvertApp] Writing 38033 bytes to docs\02_customer_segmentation.md
     [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Writing 33004 bytes to docs\03_churn_prediction.md
+    [NbConvertApp] Support files will be in 03_churn_prediction_files\
+    [NbConvertApp] Making directory docs\03_churn_prediction_files
+    [NbConvertApp] Writing 68613 bytes to docs\03_churn_prediction.md
     
