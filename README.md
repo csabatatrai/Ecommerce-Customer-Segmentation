@@ -1,5 +1,5 @@
 <a id="teteje"></a>
-# Ecommerce Customer Segmentation & Churn Prediction
+# Ekereskedelmi vásárlói szegmentáció és Churn-elemzés
 
 ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
 
