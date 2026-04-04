@@ -1,5 +1,5 @@
 <a id="teteje"></a>
-# Ekereskedelmi vásárlói szegmentáció és Churn-elemzés
+# E-kereskedelmi vásárlói szegmentáció és churn-elemzés
 
 ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
 
