@@ -110,23 +110,7 @@ else:
     print(f"\nSéma:\n{df_raw.dtypes}")
 ```
 
-    CSV fájl betöltése innen: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.csv ... (ez eltarthat egy percig)
-    Összesített sorok (nyers): 1,067,371
-    
-    Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
-    Fájlméret:      6.9 MB
-    Sorok:          1,067,371 | Oszlopok: 8
-    
-    Séma:
-    Invoice        string[python]
-    StockCode      string[python]
-    Description    string[python]
-    Quantity              float64
-    InvoiceDate    datetime64[ns]
-    Price                 float64
-    Customer ID             Int64
-    Country        string[python]
-    dtype: object
+    Parquet már létezik, kihagyjuk a konverziót: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
 
 ## <a id="Fejezet_1"></a>1. Adattisztítás
@@ -228,7 +212,7 @@ print(f"Tisztított adatok mentve: {CLEANED_PARQUET}")
     Tisztított adatok mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\online_retail_cleaned.parquet
     
 
-### 1.2. Ellenőrzés 1: Adatszerkezet és típusok
+### 1.2. Adatszerkezet és típusok ellenőrzése
 A tisztítási lépések befejeztével elengedhetetlen ellenőrizni az adathalmaz technikai állapotát. A `df.info()` kimenetével az alábbiakat validáljuk a Feature Engineering megkezdése előtt:
 * **Nincsenek hiányzó értékek:** Minden oszlopban hiánytalan a `Non-Null Count` (az "anonim" vásárlásokat sikeresen kidobtuk).
 * **Megfelelő adattípusok:** Az `InvoiceDate` helyesen `datetime` típusú, a `Customer ID` pedig konzisztens szöveges (string/object) formátumú.
@@ -315,7 +299,7 @@ print(f"Adathalmaz mentve a következő fázishoz: {READY_FOR_RFM_PARQUET}")
     Adathalmaz mentve a következő fázishoz: D:\Workspace\ecommerce-customer-segmentation\data\processed\online_retail_ready_for_rfm.parquet
     
 
-### 1.4 Ellenőrzés 2: Statisztikai érvényesség és üzleti logika
+### 1.4 Statisztikai érvényesség és üzleti logika ellenőrzése
 Míg a kezdeti EDA során a `describe()` a hibák felfedezését szolgálta, itt már **minőségbiztosítási (QA)** szerepe van. Az alábbi kimenet bizonyítja, hogy a tisztítási logikánk sikeres volt:
 * **Érvényes árak:** A `Price` oszlop minimum értéke szigorúan **> 0** (nincsenek ingyenes vagy negatív árú, adminisztratív tételek).
 * **Reális mennyiségek:** A `Quantity` oszlop extrém, rendszerhibából fakadó kilengései (pl. +/- 80 000 darab) eltűntek, a maximum és minimum értékek a beállított küszöbértéken belül maradtak.
@@ -483,17 +467,30 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 
 *Az ugrás gomb nem minden környezetben működik!
 
+# Dokumentáció frissítése README.md-ben és docs mappában
+
 
 ```python
 # 01-es notebook docs generálása/frissítése argumentum megadásával
+
+# Notebook mentése lemezre nbconvert előtt
+from IPython.display import display, Javascript
+display(Javascript('IPython.notebook.save_checkpoint()'))
+
+import time
+time.sleep(1)  # adjunk egy pillanatot az aszinkron mentésnek
+
 !python update_docs.py --notebook 01_data_preparation.ipynb
 ```
 
-    DokumentĂˇciĂł frissĂ­tĂ©se...
+    Docs frissitese...
     ==================================================
-    [01_data_preparation.ipynb] KonvertĂˇlĂˇs Markdown-nĂˇ...
-    [01_data_preparation.ipynb] âś… KĂ©sz! (1 kĂ©p)
+    [01_data_preparation.ipynb] Konvertalas Markdown-ra...
+    [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
+    
+    [README] Elemzés főbb lépései táblázat frissítése...
+    [README] Táblázat frissítve: 1 sor, 1 csere.
     
     ==================================================
-    KĂ©sz!
+    Kesz!
     

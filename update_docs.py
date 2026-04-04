@@ -10,6 +10,11 @@ Teljes dokimentacio ujraepites (ha abraat toroltel, vagy a script logikajat modo
 A --clean flag torli a teljes docs/ mappat, majd nullarol ujrageneralja.
 Normal fejlesztes kozben nem szukseges — csak akkor, ha elavult fajlokat
 kell eltavolitani a docs/-bol.
+
+A script a docs/ mappa frissitese utan automatikusan ujraepiti a README.md-ben
+az 'Elemzes fobb lepései' tablazatot is: vegigolvassa az osszes docs/*.md fajl
+## szintu fejleceit, es ervenyes GitHub anchor linkekkel frissiti a sorokat, így Github-on kattinthato hivatkozasok keletkeznek a README-ben,
+automatikusan amik a docs/ megfelelő szekcióira mutatnak.
 """
 
 import os
@@ -26,6 +31,7 @@ import subprocess
 NOTEBOOKS_DIR = '.'
 DOCS_DIR      = 'docs'
 IMAGES_BASE   = os.path.join(DOCS_DIR, 'images')
+README_PATH   = 'README.md'
 
 # Opcionális kézi elnevezések.
 # Kulcs:  "{notebook_alap_neve}/{jupyter_stem}"
@@ -197,6 +203,135 @@ def safe_dst(path: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# README táblázat frissítése
+# ---------------------------------------------------------------------------
+
+def github_anchor(heading_text: str) -> str:
+    """
+    GitHub-kompatibilis anchor linket generál egy fejlécszövegből.
+
+    GitHub algoritmusa:
+      1. Kisbetűsítés
+      2. Minden karakter törlése, ami nem Unicode betű/szám, szóköz vagy kötőjel
+      3. Szóközök → kötőjel
+
+    Példák:
+      "0. Adatbetöltés és Parquet-konverzió"  →  "#0-adatbetöltés-és-parquet-konverzió"
+      "7. A/B Modellezés: Pipeline-ok felépítése"  →  "#7-ab-modellezés-pipeline-ok-felépítése"
+    """
+    text = heading_text.strip().lower()
+    # Csak Unicode word-karakterek (\w = betű/szám/aláhúzás), szóköz és kötőjel marad
+    text = re.sub(r'[^\w\s\-]', '', text, flags=re.UNICODE)
+    # Aláhúzás is maradhat (\w része), de szóközöket kötőjellé alakítjuk
+    text = re.sub(r'\s+', '-', text.strip())
+    return '#' + text
+
+
+def extract_h2_headings(md_path: str) -> list[str]:
+    """
+    ## szintű fejléceket gyűjt ki egy Markdown fájlból.
+    Csak azokat adja vissza, amelyek számmal kezdődnek (pl. "0. Cím", "11. Cím"),
+    mivel ezek felelnek meg a README táblázat sorainak.
+    """
+    headings = []
+    with open(md_path, encoding='utf-8') as f:
+        for line in f:
+            stripped = line.strip()
+            if re.match(r'^## \d+', stripped):
+                heading_text = re.sub(r'^## ', '', stripped).strip()
+                headings.append(heading_text)
+    return headings
+
+
+def build_steps_table(docs_dir: str) -> str:
+    """
+    Az összes docs/*.md fájlból (névsorrendben) kinyeri a számozott ## fejléceket,
+    és visszaadja a teljes README táblázat szövegét (fejléc + elválasztó + sorok).
+
+    Sor formátuma:
+      | {szám} | {cím} | `{notebook.ipynb}` | [📊 Megtekintés](docs/{md_fájl}#{anchor}) |
+    """
+    header_row = (
+        "| # | Lépés | Notebook | Lefutott eredmények megtekintése"
+        " (ugrás adott részhez) |\n"
+        "|---|-------|----------|----------------------------------|\n"
+    )
+
+    rows: list[str] = []
+
+    md_files = sorted(
+        f for f in os.listdir(docs_dir)
+        if f.endswith('.md') and not f.startswith('.')
+    )
+
+    for md_file in md_files:
+        nb_name = md_file.replace('.md', '.ipynb')
+        md_path = os.path.join(docs_dir, md_file)
+        headings = extract_h2_headings(md_path)
+
+        for heading in headings:
+            # Szám + cím szétválasztása: "0. Adatbetöltés..." → num="0", title="Adatbetöltés..."
+            m = re.match(r'^(\d+)\.\s+(.*)', heading)
+            if not m:
+                continue
+            num   = m.group(1)
+            title = m.group(2).strip()
+
+            anchor = github_anchor(heading)
+            link   = f"docs/{md_file}{anchor}"
+            rows.append(f"| {num} | {title} | `{nb_name}` | [📊 Megtekintés]({link}) |")
+
+    return header_row + '\n'.join(rows) + '\n'
+
+
+def update_readme_steps_table(readme_path: str, docs_dir: str) -> None:
+    """
+    Megkeresi az 'Elemzés főbb lépései' táblázatot a README.md-ben,
+    és lecseréli az aktuális docs/*.md fájlok ## fejlécei alapján újragenerált verzióra.
+
+    A táblázatot a fejléc-sor alapján azonosítja (`| # | Lépés |...`),
+    így a README többi tartalmát nem érinti.
+
+    Csak akkor fut le, ha a docs mappa és a README is létezik.
+    """
+    if not os.path.exists(readme_path):
+        print(f"[README] Nem található: '{readme_path}' – táblázat frissítés kihagyva.")
+        return
+
+    if not os.path.exists(docs_dir):
+        print(f"[README] A docs/ mappa még nem létezik – táblázat frissítés kihagyva.")
+        return
+
+    with open(readme_path, encoding='utf-8') as f:
+        content = f.read()
+
+    # A teljes táblázat blokk: fejléc sor + elválasztó sor + adatsorok.
+    # Az utolsó adatsor (?:\n|$) mintával zárul, hogy fájl végi \n hiányában
+    # se maradjon bent az utolsó régi sor a csere után.
+    table_pattern = re.compile(
+        r'(\| # \| Lépés \|[^\n]*\n'       # fejléc sor
+        r'\|[-| :]+\n'                      # elválasztó sor (pl. |---|---|...)
+        r'(?:\|[^\n]*(?:\n|$))*)',          # adatsorok — utolsó sor \n nélkül is elfogva
+        re.MULTILINE,
+    )
+
+    new_table = build_steps_table(docs_dir)
+
+    new_content, substitutions = table_pattern.subn(new_table, content)
+
+    if substitutions == 0:
+        print("[README] Nem találtam táblázatot a README.md-ben – frissítés kihagyva.")
+        return
+
+    with open(readme_path, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+
+    # Megszámoljuk a frissített sorokat a visszajelzéshez
+    row_count = new_table.count('\n') - 2  # fejléc + elválasztó nem számít
+    print(f"[README] Táblázat frissítve: {row_count} sor, {substitutions} csere.\n")
+
+
+# ---------------------------------------------------------------------------
 # Fő logika
 # ---------------------------------------------------------------------------
 
@@ -208,6 +343,9 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
 
     only: ha meg van adva, csak ezt az egy notebookot dolgozza fel
           (pl. "03_churn_prediction.ipynb") — a tobbi erintetlen marad.
+
+    A notebookok feldolgozasa utan automatikusan frissul a README.md
+    'Elemzes foobb lepései' tablazata is.
     """
     if clean and os.path.exists(DOCS_DIR):
         shutil.rmtree(DOCS_DIR)
@@ -298,6 +436,12 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
         if fallback_count:
             status += f", {fallback_count} db fallback [!]"
         print(f"[{notebook}] [OK] Kesz! ({status})\n")
+
+    # 5. README.md táblázat frissítése az összes aktuális docs/*.md alapján
+    #    (--notebook módban is: a többi doc fájl érintetlen maradt, de a táblázat
+    #    így is szinkronban marad az összes elérhető szekcióval)
+    print("[README] Elemzés főbb lépései táblázat frissítése...")
+    update_readme_steps_table(README_PATH, DOCS_DIR)
 
 
 # ---------------------------------------------------------------------------

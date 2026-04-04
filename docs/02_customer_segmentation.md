@@ -1198,37 +1198,30 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 
 *Az ugrás gomb nem minden környezetben működik!
 
+# Dokumentáció frissítése README.md-ben és docs mappában
+
 
 ```python
 # 02-es notebook docs generálása/frissítése argumentum megadásával
+
+# Notebook mentése lemezre nbconvert előtt
+from IPython.display import display, Javascript
+display(Javascript('IPython.notebook.save_checkpoint()'))
+
+import time
+time.sleep(1)  # adjunk egy pillanatot az aszinkron mentésnek
+
 !python update_docs.py --notebook 02_customer_segmentation.ipynb
 ```
 
-    Dokumentáció frissítése elindult...
-    ========================================
-    [01_data_preparation.ipynb] Konvertálás Markdown-ná...
-    [01_data_preparation.ipynb] Kész! [OK]
+    Docs frissitese...
+    ==================================================
+    [02_customer_segmentation.ipynb] Konvertalas Markdown-ra...
+    [02_customer_segmentation.ipynb] [OK] Kesz! (2 kep)
     
-    [02_customer_segmentation.ipynb] Konvertálás Markdown-ná...
-    [02_customer_segmentation.ipynb] Kész! [OK]
+    [README] Elemzés főbb lépései táblázat frissítése...
+    [README] Táblázat frissítve: 4 sor, 1 csere.
     
-    [03_churn_prediction.ipynb] Konvertálás Markdown-ná...
-    [03_churn_prediction.ipynb] Kész! [OK]
-    
-    ========================================
-    Minden markdown és képhivatkozás sikeresen generálva!
-    
-
-    [NbConvertApp] Converting notebook 01_data_preparation.ipynb to markdown
-    [NbConvertApp] Support files will be in 01_data_preparation_files\
-    [NbConvertApp] Making directory docs\01_data_preparation_files
-    [NbConvertApp] Writing 21451 bytes to docs\01_data_preparation.md
-    [NbConvertApp] Converting notebook 02_customer_segmentation.ipynb to markdown
-    [NbConvertApp] Support files will be in 02_customer_segmentation_files\
-    [NbConvertApp] Making directory docs\02_customer_segmentation_files
-    [NbConvertApp] Writing 38033 bytes to docs\02_customer_segmentation.md
-    [NbConvertApp] Converting notebook 03_churn_prediction.ipynb to markdown
-    [NbConvertApp] Support files will be in 03_churn_prediction_files\
-    [NbConvertApp] Making directory docs\03_churn_prediction_files
-    [NbConvertApp] Writing 68613 bytes to docs\03_churn_prediction.md
+    ==================================================
+    Kesz!
     
