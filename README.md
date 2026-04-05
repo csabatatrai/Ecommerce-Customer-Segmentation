@@ -52,9 +52,6 @@ Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykere
 
 > **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
 
-> [!TIP]
-> **Kódolvasás Visual Studio Code-ban:** Ha VSC-t használsz a projekt megtekintéséhez, erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
-
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
 1. Klónozd a repót és navigálj a mappába:
@@ -110,6 +107,14 @@ jupyter notebook
 <summary>💡 Hogyan valósítja meg a projekt, hogy a notebookok futtatott kimenetei ne szennyezzék a repot?</summary>
 
 > Verziókezelés **nbstripout** Git-filterre, így nem szemeteli tele a repo-t a notebook futtatási metaadatokkal. `nbstripout --install` parancs futtatása szükséges terminálból a lokális Git hook beállításához.
+</details>
+
+---
+
+<details>
+<summary>💡 Akartál ajánlani valami bővítményt Visual Studio Code-hoz, nem?</summary>
+
+> De! Kódolvasás Visual Studio Code-ban: a projekt megtekintéséhez erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
 </details>
 
 ---
