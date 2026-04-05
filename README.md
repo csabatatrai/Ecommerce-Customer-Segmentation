@@ -1,5 +1,5 @@
 <a id="teteje"></a>
-# 🛒 E-kereskedelmi vásárlói szegmentáció és churn-elemzés
+# E-kereskedelmi vásárlói szegmentáció és churn-elemzés 
 
 <div align="right">
   <strong>Magyar</strong> | <a href="README_en.md">English</a>
@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-End-to-end data product: RFM szegmentáció · Prediktív churn-modellezés · Interaktív dashboard
+🛒End-to-end data product: RFM szegmentáció · Prediktív churn-modellezés · Interaktív dashboard
 </p>
 
 [<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
