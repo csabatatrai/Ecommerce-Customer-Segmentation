@@ -109,7 +109,7 @@ ecommerce-customer-segmentation/
 ├── <a href="requirements.txt">requirements.txt</a>
 ├── .gitignore
 │
-├── data/                             # notebook hozza létre config.py segítségével
+├── data/                             # 🚨 notebook hozza létre config.py segítségével
 │   ├── raw/                          # 🚨 notebook hozza létre, ide tölti le a nyers datasetet
 │   └── processed/                    # 💾 notebook hozza létre, tisztított, parquet fájlok
 │
@@ -123,7 +123,7 @@ ecommerce-customer-segmentation/
 ├── models/                           # 🚨notebook hozza létre, szerializált modell- és transzformátor-objektumok (joblib)
 │
 ├── <a href="app.py">app.py</a>                            # Streamlit dashboard főfájl
-├── <a href="pages/">pages/</a>                            # Streamlitnek dashboardok
+├── <a href="pages/">pages/</a>                            # Streamlitnek további dashboardok
 │
 ├── <a href="docs/">docs/</a>                             # 🟢 Lefuttatott notebookok markdownban
 │   ├── <a href="docs/images/">images/</a>
@@ -174,10 +174,13 @@ Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hason
 ---
 
 <div align="center">
-  <br>
+  © 2026 Tátrai Csaba Attila · <a href="LICENSE">MIT License</a>
+  <br><br>
   <a href="#teteje">
     <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére" width="250">
   </a>
-  <br>
 </div>
+
+---
+
 
