@@ -1,10 +1,10 @@
 """
 Jupyter notebookok → Markdown dokumentacio, leiro kepnevekkel.
 
-Normal hasznalat (minden notebook vegen automatikusan fut):
+Normal hasznalat (minden notebook vegen automatikusan fut), pl.:
     python update_docs.py --notebook 03_churn_prediction.ipynb
 
-Teljes dokimentacio ujraepites (ha abraat toroltel, vagy a script logikajat modositottad):
+Teljes dokumentacio ujraepites (ha abraat toroltel, vagy a script logikajat modositottad):
     python update_docs.py --clean
 
 A --clean flag torli a teljes docs/ mappat, majd nullarol ujrageneralja.
@@ -12,8 +12,8 @@ Normal fejlesztes kozben nem szukseges — csak akkor, ha elavult fajlokat
 kell eltavolitani a docs/-bol.
 
 A script a docs/ mappa frissitese utan automatikusan ujraepiti a README.md-ben
-az 'Elemzes fobb lepései' tablazatot is: vegigolvassa az osszes docs/*.md fajl
-## szintu fejleceit, es ervenyes GitHub anchor linkekkel frissiti a sorokat, így Github-on kattinthato hivatkozasok keletkeznek a README-ben,
+az 'Elemzes fobb lepései' tablazatot is: vegigolvassa az eredeti notebookok H2 fejleceit (## szintu fejleceit),
+es ervenyes GitHub anchor linkekkel frissiti a sorokat, így Github-on kattinthato hivatkozasok keletkeznek a README-ben,
 automatikusan amik a docs/ megfelelő szekcióira mutatnak.
 """
 
