@@ -109,9 +109,11 @@ jupyter notebook
 ---
 
 <details>
-<summary>💡 Hogyan valósítja meg a projekt, hogy a notebookok futtatott kimenetei ne szennyezzék a repot?</summary>
+<summary>💡 Hogyan biztosítja a projekt a notebookok tiszta verziókövetését?</summary>
 
-> Verziókezelés **nbstripout** Git-filterre, így nem szemeteli tele a repo-t a notebook futtatási metaadatokkal. `nbstripout --install` parancs futtatása szükséges terminálból a lokális Git hook beállításához.
+> A projekt az **nbstripout** eszközt használja Git pre-commit hook formájában. Ez automatikusan megtisztítja a notebookok (`.ipynb`) JSON struktúráját a futtatási kimenetektől (output cellák) és a metaadatoktól, megelőzve a repo indokolatlan méretnövekedését és a felesleges merge konfliktusokat.
+>
+> **Használat:** A fejlesztői környezetben a terminálból kiadott `nbstripout --install` paranccsal konfigurálható a lokális hook.
 </details>
 
 ---
