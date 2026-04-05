@@ -88,16 +88,31 @@ jupyter notebook
 
 7. A Streamlit dashboardok lokális megnyitásához navigálj terminállal a gyökérkönyvtárba, és használd a `streamlit run app.py` parancsot!
 
-## Kiegészítő műszaki megoldások
+## GYIK
 
-> [!NOTE]
->Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
+<details>
+<summary>💡 Milyen módszerrel történt az adatfeltárás (EDA)?</summary>
 
-> [!NOTE]
-> Kimeneti adatformátum: **Parquet**
+> Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
+</details>
 
-> [!NOTE]
-> Verziókezelés **nbstripout** Git-filterre, így nem szemeteli tele a repo-t a notebook futtatási metaadatokkal, `nbstripout --install` parancs futtatása szükséges terminálból a lokális Git hook beállításához
+---
+
+<details>
+<summary>💡 Miért Parquet fájlokban van a kimenet?</summary>
+
+> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, amely rendkívül hatékony adattömörítést és sokkal gyorsabb lekérdezéseket tesz lehetővé, mivel a rendszernek csak a releváns oszlopokat kell beolvasnia a teljes adatsor helyett. Ez a felépítés drasztikusan csökkenti a tárolási költségeket és az I/O terhelést, emellett a formátum beépítve támogatja a komplex, beágyazott adatszerkezeteket is. Mindezek miatt a Parquet kiemelkedően optimális és elterjedt választás a Big Data és analitikai rendszerekben (például Apache Spark vagy Hadoop környezetben), ahol a masszív adatmennyiségek gyors, költséghatékony és nagy teljesítményű feldolgozása a fő cél.
+</details>
+
+---
+
+<details>
+<summary>💡 Hogyan valósítja meg a projekt, hogy a notebookok futtatott kimenetei ne szennyezzék a repot?</summary>
+
+> Verziókezelés **nbstripout** Git-filterre, így nem szemeteli tele a repo-t a notebook futtatási metaadatokkal. `nbstripout --install` parancs futtatása szükséges terminálból a lokális Git hook beállításához.
+</details>
+
+---
 
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
