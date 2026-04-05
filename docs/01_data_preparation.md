@@ -1,117 +1,195 @@
 <a id="teteje"></a>
-# 01 Adatelőkészítés: Data Preparation (tisztítás és transzformáció)
+# 01 Adatelőkészítés: Data Preparation (dataset beszerzés, tisztítás és transzformáció)
 ---
 **Függőség:** `config.py` (Útvonalak definíciója)
 
 ---
 
-**Bemenet:** `data/raw/online_retail_II.csv`  
+**Bemenet:** UCI ML Repository – Online Retail II (automatikus letöltés, nincs szükség kézi beavatkozásra)  
 **Kimenetek:** 
+- `data/raw/online_retail_II.xlsx` (letöltött nyers forrás, cache)
 - `data/raw/online_retail_raw.parquet` (Nyers adat gyorsítótárazva)
 - `data/processed/online_retail_cleaned.parquet` (Köztes tisztított állapot)
 - `data/processed/online_retail_ready_for_rfm.parquet` **(Végső kimenet a következő fázishoz)**
 
 ---
 
+
 ## 0. Adatbetöltés és Parquet-konverzió
 
-A nyers adathalmaz betöltése során elsődlegesen az automatizált megoldásra törekszünk. Mivel azonban a specifikus UCI API korlátokba ütközött, a kód egy robusztus ellenőrző logikát használ: ha a nyers adatok hiányoznak, pontos instrukciókat ad a manuális beszerzéshez, majd elvégzi a Parquet konverziót az optimális további feldolgozáshoz.
+A nyers adathalmaz betöltése teljesen automatizált: a `0.1` cella letölti az UCI ML Repository-ból
+az Online Retail II adathalmazt (id=502), kibontja a zip-ből az XLSX-et, majd a `0.2` cella
+mindkét sheetből (2009–2010, 2010–2011) összefűzve közvetlenül Parquet formátumba konvertálja —
+CSV közbenső lépés nélkül.
 
-A `0.2` cella idempotens: ha a tisztított Parquet fájl már létezik, automatikusan kihagyja az ismételt letöltést és konverziót.
+Mindkét cella **idempotens**: ha a fájl már létezik lemezen, a letöltés és a konverzió automatikusan
+kimarad. Kézi beavatkozásra csak akkor van szükség, ha az UCI szervere nem elérhető
+(ebben az esetben a cella részletes instrukciót ad a Kaggle-ről történő kézi letöltéshez).
+
 
 
 ```python
 # ============================================================
-# 0.1 – Konfiguráció és könyvtárak betöltése
+# 0.1 – Konfiguráció, könyvtárak és adathalmaz letöltése
 # ============================================================
+import io
+import zipfile
+import urllib.request
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from config import (
     PROJECT_ROOT, RAW_DIR, PROCESSED_DIR, MODELS_DIR,
-    RAW_FILE, PARQUET_OUT, CLEANED_PARQUET, READY_FOR_RFM_PARQUET
+    RAW_FILE, RAW_XLSX, PARQUET_OUT, CLEANED_PARQUET, READY_FOR_RFM_PARQUET
 )
 
-# Mappastruktúra létrehozása
+# Mappastruktúra létrehozása (config.py is megteszi importkor, de explicit is egyértelműbb)
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-print(f"PROJECT_ROOT:  {PROJECT_ROOT}")
-print(f"RAW_FILE:      {RAW_FILE}")
-print(f"PARQUET_OUT:   {PARQUET_OUT}\n")
+print(f"PROJECT_ROOT : {PROJECT_ROOT}")
+print(f"RAW_XLSX     : {RAW_XLSX}")
+print(f"PARQUET_OUT  : {PARQUET_OUT}\n")
 
-# --- Klónozás utáni állapot ellenőrzése ---
-if not PARQUET_OUT.exists() and not RAW_FILE.exists():
-    error_msg = (
-        "\n" + "="*80 + "\n"
-        "HIÁNYZÓ ADATHALMAZ!\n"
-        "A hivatalos UCI API nem támogatja ezt a specifikus adathalmazt, így manuális letöltés szükséges.\n\n"
-        "Kérlek, kövesd az alábbi lépéseket a folytatáshoz:\n"
-        "1. Töltsd le a zip fájlt a Kaggle-ről:\n"
-        "   https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data\n"
-        "2. Csomagold ki, és az 'online_retail_II.csv' fájlt helyezd el ide:\n"
-        f"   {RAW_FILE}\n"
-        "3. Futtasd újra ezt a cellát!\n"
-        + "="*80 + "\n"
-    )
-    print(error_msg)
-    raise FileNotFoundError("A nyers adathalmaz nem található. Kövesd a fenti utasításokat!")
+UCI_ZIP_URL = "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
+
+if PARQUET_OUT.exists():
+    print(f"✅ Parquet már létezik, nincs szükség letöltésre: {PARQUET_OUT}")
+elif RAW_XLSX.exists():
+    print(f"✅ Nyers XLSX megtalálható, konverzió következik: {RAW_XLSX}")
 else:
-    print("Fájlrendszer ellenőrizve: a szükséges adatfájlok rendelkezésre állnak!")
+    print(f"⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...")
+    print(f"   URL: {UCI_ZIP_URL}")
+    try:
+        with urllib.request.urlopen(UCI_ZIP_URL, timeout=120) as response:
+            zip_bytes = response.read()
+        print(f"   Letöltve: {len(zip_bytes) / 1e6:.1f} MB")
+
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+            xlsx_names = [n for n in zf.namelist() if n.lower().endswith(".xlsx")]
+            if not xlsx_names:
+                raise FileNotFoundError(
+                    f"Nem találtam XLSX-et a zip-ben. Tartalom: {zf.namelist()}"
+                )
+            target = max(xlsx_names, key=lambda n: zf.getinfo(n).file_size)
+            print(f"   Kibontás: {target} → {RAW_XLSX.name}")
+            RAW_XLSX.write_bytes(zf.read(target))
+
+        print(f"\n✅ Nyers XLSX mentve: {RAW_XLSX}  ({RAW_XLSX.stat().st_size / 1e6:.1f} MB)")
+
+    except Exception as exc:
+        print(f"\n❌ Automatikus letöltés sikertelen: {exc}")
+        print(
+            "\nKézi alternatíva (Kaggle):\n"
+            "  1. Töltsd le: https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data\n"
+            "  2. Csomagold ki az 'online_retail_II.xlsx'-et ide: " + str(RAW_XLSX) + "\n"
+            "  3. Futtasd újra ezt a cellát!"
+        )
+        raise
+
 ```
 
-    PROJECT_ROOT:  D:\Workspace\ecommerce-customer-segmentation
-    RAW_FILE:      D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.csv
-    PARQUET_OUT:   D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
+    PROJECT_ROOT : D:\Workspace\ecommerce-customer-segmentation
+    RAW_XLSX     : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
+    PARQUET_OUT  : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
-    Fájlrendszer ellenőrizve: a szükséges adatfájlok rendelkezésre állnak!
+    ⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...
+       URL: https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip
+       Letöltve: 45.6 MB
+       Kibontás: online_retail_II.xlsx → online_retail_II.xlsx
+    
+    ✅ Nyers XLSX mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx  (45.6 MB)
     
 
 
 ```python
 # ============================================================
-# 0.2 – Nyers CSV betöltése és Parquet-be konvertálása
+# 0.2 – XLSX → Parquet konverzió (python-calamine engine)
 # ============================================================
+# Az openpyxl pure Python cella-per-cella olvasás helyett a calamine
+# Rust-alapú parser 10-30x gyorsabb ugyanazon XLSX fájlon.
+# Telepítés: pip install python-calamine  (requirements.txt-be is felkerült)
 
 if PARQUET_OUT.exists():
-    print(f"Parquet már létezik, kihagyjuk a konverziót: {PARQUET_OUT}")
+    print(f"✅ Parquet már létezik, kihagyjuk a konverziót: {PARQUET_OUT}")
 else:
-    dtype_map = {
-        "Invoice":     "string",
-        "StockCode":   "string",
-        "Description": "string",
-        "Quantity":    "float64",
-        "Price":       "float64",
-        "Customer ID": "float64",
-        "Country":     "string",
-    }
-    parse_dates = ["InvoiceDate"]
+    if RAW_XLSX.exists():
+        import time
+        print(f"XLSX betöltése (calamine engine): {RAW_XLSX}")
+        t0 = time.time()
 
-    print(f"CSV fájl betöltése innen: {RAW_FILE} ... (ez eltarthat egy percig)")
-    df_raw = pd.read_csv(
-        RAW_FILE,
-        dtype=dtype_map,
-        parse_dates=parse_dates,
-        encoding="utf-8",
-    )
-    
-    print(f"Összesített sorok (nyers): {len(df_raw):,}")
+        # sheet_name=None → minden sheet dict-ként; calamine-nél dtype nem támogatott,
+        # a típusokat konverzió után állítjuk be
+        sheet_names = pd.ExcelFile(RAW_XLSX, engine="calamine").sheet_names
+        frames = []
+        for name in sheet_names:
+            df_sheet = pd.read_excel(RAW_XLSX, sheet_name=name, engine="calamine")
+            print(f"  • Sheet '{name}': {len(df_sheet):,} sor  ({time.time()-t0:.1f}s)")
+            frames.append(df_sheet)
+        df_raw = pd.concat(frames, ignore_index=True)
 
-    # Customer ID: float -> nullable Int64 (megőrzi a NaN-okat is)
-    df_raw["Customer ID"] = df_raw["Customer ID"].astype("Int64")
+        # --- Típusok beállítása betöltés után ---
+        df_raw["InvoiceDate"] = pd.to_datetime(df_raw["InvoiceDate"])
+        df_raw["Customer ID"] = df_raw["Customer ID"].astype("Int64")
+        for col in ("Invoice", "StockCode", "Description", "Country"):
+            df_raw[col] = df_raw[col].astype("string")
+        df_raw["Quantity"] = df_raw["Quantity"].astype("float64")
+        df_raw["Price"]    = df_raw["Price"].astype("float64")
 
-    # Parquet mentés
+    elif RAW_FILE.exists():
+        #! CSV fallback – visszafelé kompatibilitás kézi letöltésnél
+        import time; t0 = time.time()
+        print(f"CSV fallback betöltése: {RAW_FILE}")
+        df_raw = pd.read_csv(
+            RAW_FILE,
+            dtype={
+                "Invoice": "string", "StockCode": "string", "Description": "string",
+                "Quantity": "float64", "Price": "float64",
+                "Customer ID": "float64", "Country": "string",
+            },
+            parse_dates=["InvoiceDate"],
+            encoding="utf-8",
+        )
+        df_raw["Customer ID"] = df_raw["Customer ID"].astype("Int64")
+    else:
+        raise FileNotFoundError(
+            f"Sem XLSX ({RAW_XLSX}), sem CSV ({RAW_FILE}) nem található!\n"
+            "Futtasd újra a 0.1-es cellát a letöltéshez."
+        )
+
+    # --- Parquet mentés ---
     df_raw.to_parquet(PARQUET_OUT, compression="snappy", index=False)
 
-    size_mb = PARQUET_OUT.stat().st_size / 1_048_576
-    print(f"\nParquet mentve: {PARQUET_OUT}")
-    print(f"Fájlméret:      {size_mb:.1f} MB")
-    print(f"Sorok:          {len(df_raw):,} | Oszlopok: {df_raw.shape[1]}")
+    elapsed = time.time() - t0
+    size_mb  = PARQUET_OUT.stat().st_size / 1_048_576
+    print(f"\n✅ Parquet mentve: {PARQUET_OUT}")
+    print(f"   Fájlméret:  {size_mb:.1f} MB")
+    print(f"   Sorok:      {len(df_raw):,} | Oszlopok: {df_raw.shape[1]}")
+    print(f"   Futási idő: {elapsed:.1f}s")
     print(f"\nSéma:\n{df_raw.dtypes}")
+
 ```
 
-    Parquet már létezik, kihagyjuk a konverziót: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
+    XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
+      • Sheet 'Year 2009-2010': 525,461 sor  (15.4s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (31.7s)
+    
+    ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
+       Fájlméret:  6.9 MB
+       Sorok:      1,067,371 | Oszlopok: 8
+       Futási idő: 33.8s
+    
+    Séma:
+    Invoice        string[python]
+    StockCode      string[python]
+    Description    string[python]
+    Quantity              float64
+    InvoiceDate    datetime64[ns]
+    Price                 float64
+    Customer ID             Int64
+    Country        string[python]
+    dtype: object
     
 
 ## 1. Adattisztítás
@@ -474,17 +552,16 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 
 ```python
 # 03-as notebook docs generálása/frissítése
-# ⚠️ Ctrl+S a cella futtatása előtt — az nbconvert lemezről olvas!
-!python update_docs.py --01_data_preparation.ipynb
+!python update_docs.py --notebook 01_data_preparation.ipynb
 ```
 
     Docs frissitese...
     ==================================================
-    [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
-    [03_churn_prediction.ipynb] [OK] Kesz! (5 kep)
+    [01_data_preparation.ipynb] Konvertalas Markdown-ra...
+    [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 10 sor, 1 csere.
+    [README] Táblázat frissítve: 12 sor, 1 csere.
     
     ==================================================
     Kesz!

@@ -18,7 +18,8 @@ MODELS_DIR    = PROJECT_ROOT / "models"
 
 # --- Adatfájlok és kimenetek ---
 #* data/
-RAW_FILE              = RAW_DIR       / "online_retail_II.csv"
+RAW_FILE              = RAW_DIR       / "online_retail_II.csv"   # CSV fallback (kézi letöltésnél)
+RAW_XLSX              = RAW_DIR       / "online_retail_II.xlsx"  # UCI-ról automatikusan letöltött forrás
 PARQUET_OUT           = RAW_DIR       / "online_retail_raw.parquet" #! <-- Most már a raw mappába mentem, hogy elkülönüljön a feldolgozott adatoktól!
 CLEANED_PARQUET       = PROCESSED_DIR / "online_retail_cleaned.parquet"
 READY_FOR_RFM_PARQUET = PROCESSED_DIR / "online_retail_ready_for_rfm.parquet"
@@ -65,6 +66,7 @@ CLV_HORIZON_MONTHS = 12
 
 # --- Kimeneti mappák automatikus létrehozása ---
 # [..., IMAGES_DIR] törölve lett, mert a grafikonokat végül a docs/images könyvtárba generáltatom, így nincs rá szükség
-for _dir in [PROCESSED_DIR, MODELS_DIR]:
+# RAW_DIR is belekerült, hogy az első notebook futtatása előtt ne kelljen kézzel létrehozni
+for _dir in [RAW_DIR, PROCESSED_DIR, MODELS_DIR]:
     _dir.mkdir(parents=True, exist_ok=True)
 

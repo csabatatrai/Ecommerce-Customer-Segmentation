@@ -2,6 +2,8 @@
 numpy==2.2.6
 pandas==2.3.3
 pyarrow==23.0.1
+openpyxl==3.1.5 # XLSX olvasáshoz (Online Retail II forrás, UCI letöltés)
+python-calamine-0.6.2 # Rust-alapú XLSX parser – 10-30x gyorsabb az openpyxl-nél
 
 # --- Gépi Tanulás és Modellezés ---
 scikit-learn==1.7.2

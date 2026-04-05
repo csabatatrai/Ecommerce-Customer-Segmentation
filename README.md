@@ -106,8 +106,8 @@ ecommerce-customer-segmentation/
 ├── <a href="requirements.txt">requirements.txt</a>
 ├── .gitignore
 │
-├── data/
-│   ├── raw/                          # 🚨 ide kell menteni a kiinduló csv fájlt
+├── data/                             # notebook hozza létre config.py segítségével
+│   ├── raw/                          # 🚨 notebook hozza létre, ide tölti le a nyers datasetet
 │   └── processed/                    # 💾 notebook hozza létre, tisztított, parquet fájlok
 │
 ├── <a href="sql/">sql/</a>
@@ -115,7 +115,7 @@ ecommerce-customer-segmentation/
 │
 ├── <a href="01_data_preparation.ipynb">01_data_preparation.ipynb</a>         # adattisztítás
 ├── <a href="02_customer_segmentation.ipynb">02_customer_segmentation.ipynb</a>    # RFM feature engineering és K-means klaszterezés
-├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost predikció
+├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost churn predikció
 │
 ├── models/                           # 🚨notebook hozza létre, szerializált modell- és transzformátor-objektumok (joblib)
 │

@@ -1205,13 +1205,13 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 
 ```python
 # 03-as notebook docs generálása/frissítése
-!python update_docs.py --notebook 03_churn_prediction.ipynb
+!python update_docs.py --notebook 02_customer_segmentation.ipynb
 ```
 
     Docs frissitese...
     ==================================================
-    [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
-    [03_churn_prediction.ipynb] [OK] Kesz! (5 kep)
+    [02_customer_segmentation.ipynb] Konvertalas Markdown-ra...
+    [02_customer_segmentation.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
     [README] Táblázat frissítve: 12 sor, 1 csere.
