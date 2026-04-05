@@ -104,6 +104,7 @@ jupyter notebook
 <pre>
 ecommerce-customer-segmentation/
 │
+├── <a href="LICENSE">LICENSE</a>                           # MIT – szabadon tanulmányozható és futtatható
 ├── <a href="config.py">config.py</a>                         # közös útvonal-konstansok és pipeline paraméterek
 ├── <a href="requirements.txt">requirements.txt</a>
 ├── .gitignore
