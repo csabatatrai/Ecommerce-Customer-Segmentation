@@ -1028,7 +1028,8 @@ fig.show()
     
 
 
-## <a id="Fejezet_5"></a>5. Kiterjesztett EDA
+## 5. Kiterjesztett EDA
+
 A "Snake Plot" (kígyó ábra) a marketing analitika klasszikus eszköze a klaszterek profilozására. Ez megmutatja, hogy az egyes csoportok az átlagtól milyen irányba (pozitív/negatív) és milyen mértékben térnek el a standardizált RFM skálán.
 
 A Snake Plot és az alatta generált aggregált táblázat alapján egyértelműen azonosíthatók az egyes csoportok üzleti karakterisztikái. Ez alapján adtuk meg a klaszterek beszédes neveit (pl. a magas Frequency és Monetary, de alacsony Recency értékkel rendelkező csoport egyértelműen a "VIP Bajnokok" szegmense).
@@ -1199,28 +1200,21 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 *Az ugrás gomb nem minden környezetben működik!
 
 # Dokumentáció frissítése README.md-ben és docs mappában
+🚨 **Ctrl+S szükséges az alábbi cella futtatása előtt, mivel az nbconvert lemezről olvas!**
 
 
 ```python
-# 02-es notebook docs generálása/frissítése argumentum megadásával
-
-# Notebook mentése lemezre nbconvert előtt
-from IPython.display import display, Javascript
-display(Javascript('IPython.notebook.save_checkpoint()'))
-
-import time
-time.sleep(1)  # adjunk egy pillanatot az aszinkron mentésnek
-
-!python update_docs.py --notebook 02_customer_segmentation.ipynb
+# 03-as notebook docs generálása/frissítése
+!python update_docs.py --notebook 03_churn_prediction.ipynb
 ```
 
     Docs frissitese...
     ==================================================
-    [02_customer_segmentation.ipynb] Konvertalas Markdown-ra...
-    [02_customer_segmentation.ipynb] [OK] Kesz! (2 kep)
+    [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
+    [03_churn_prediction.ipynb] [OK] Kesz! (5 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 4 sor, 1 csere.
+    [README] Táblázat frissítve: 12 sor, 1 csere.
     
     ==================================================
     Kesz!

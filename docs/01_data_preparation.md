@@ -12,12 +12,13 @@
 - `data/processed/online_retail_ready_for_rfm.parquet` **(Végső kimenet a következő fázishoz)**
 
 ---
-<a id="0-adatbetöltés-és-parquet-konverzió"></a>
+
 ## 0. Adatbetöltés és Parquet-konverzió
 
 A nyers adathalmaz betöltése során elsődlegesen az automatizált megoldásra törekszünk. Mivel azonban a specifikus UCI API korlátokba ütközött, a kód egy robusztus ellenőrző logikát használ: ha a nyers adatok hiányoznak, pontos instrukciókat ad a manuális beszerzéshez, majd elvégzi a Parquet konverziót az optimális további feldolgozáshoz.
 
 A `0.2` cella idempotens: ha a tisztított Parquet fájl már létezik, automatikusan kihagyja az ismételt letöltést és konverziót.
+
 
 ```python
 # ============================================================
@@ -113,7 +114,7 @@ else:
     Parquet már létezik, kihagyjuk a konverziót: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
 
-## <a id="Fejezet_1"></a>1. Adattisztítás
+## 1. Adattisztítás
 
 ### 1.1. Első lépések
 
@@ -468,28 +469,22 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 *Az ugrás gomb nem minden környezetben működik!
 
 # Dokumentáció frissítése README.md-ben és docs mappában
+🚨 **Ctrl+S szükséges az alábbi cella futtatása előtt, mivel az nbconvert lemezről olvas!**
 
 
 ```python
-# 01-es notebook docs generálása/frissítése argumentum megadásával
-
-# Notebook mentése lemezre nbconvert előtt
-from IPython.display import display, Javascript
-display(Javascript('IPython.notebook.save_checkpoint()'))
-
-import time
-time.sleep(1)  # adjunk egy pillanatot az aszinkron mentésnek
-
-!python update_docs.py --notebook 01_data_preparation.ipynb
+# 03-as notebook docs generálása/frissítése
+# ⚠️ Ctrl+S a cella futtatása előtt — az nbconvert lemezről olvas!
+!python update_docs.py --01_data_preparation.ipynb
 ```
 
     Docs frissitese...
     ==================================================
-    [01_data_preparation.ipynb] Konvertalas Markdown-ra...
-    [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
+    [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
+    [03_churn_prediction.ipynb] [OK] Kesz! (5 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 1 sor, 1 csere.
+    [README] Táblázat frissítve: 10 sor, 1 csere.
     
     ==================================================
     Kesz!

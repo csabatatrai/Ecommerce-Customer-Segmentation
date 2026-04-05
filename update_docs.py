@@ -227,26 +227,38 @@ def github_anchor(heading_text: str) -> str:
     return '#' + text
 
 
-def extract_h2_headings(md_path: str) -> list[str]:
+def extract_h2_headings_from_notebook(nb_path: str) -> list[str]:
     """
-    ## szintű fejléceket gyűjt ki egy Markdown fájlból.
-    Csak azokat adja vissza, amelyek számmal kezdődnek (pl. "0. Cím", "11. Cím"),
-    mivel ezek felelnek meg a README táblázat sorainak.
+    ## szintű, számozott fejléceket olvas közvetlenül a .ipynb fájlból.
+
+    A docs/*.md helyett a notebookot olvassa, mert az a forrás mindig friss
+    és formátumfüggetlen — az nbconvert kimenet esetenként eltérhet attól,
+    amit a regex a .md fájlban elvárna.
+
+    Csak azokat adja vissza, amelyek számmal kezdődnek (pl. "0. Cím", "11. Cím").
     """
+    with open(nb_path, encoding='utf-8') as f:
+        nb = json.load(f)
+
     headings = []
-    with open(md_path, encoding='utf-8') as f:
-        for line in f:
+    for cell in nb.get('cells', []):
+        if cell.get('cell_type') != 'markdown':
+            continue
+        for line in ''.join(cell.get('source', [])).splitlines():
             stripped = line.strip()
             if re.match(r'^## \d+', stripped):
-                heading_text = re.sub(r'^## ', '', stripped).strip()
+                heading_text = re.sub(r'^##\s*', '', stripped).strip()
                 headings.append(heading_text)
     return headings
 
 
-def build_steps_table(docs_dir: str) -> str:
+def build_steps_table(notebooks_dir: str, docs_dir: str) -> str:
     """
-    Az összes docs/*.md fájlból (névsorrendben) kinyeri a számozott ## fejléceket,
+    Az összes .ipynb notebookból (névsorrendben) kinyeri a számozott ## fejléceket,
     és visszaadja a teljes README táblázat szövegét (fejléc + elválasztó + sorok).
+
+    A fejléceket közvetlenül a notebookokból olvassa (nem a generált docs/*.md-ből),
+    hogy mindig a valós, aktuális állapotot tükrözze.
 
     Sor formátuma:
       | {szám} | {cím} | `{notebook.ipynb}` | [📊 Megtekintés](docs/{md_fájl}#{anchor}) |
@@ -259,15 +271,15 @@ def build_steps_table(docs_dir: str) -> str:
 
     rows: list[str] = []
 
-    md_files = sorted(
-        f for f in os.listdir(docs_dir)
-        if f.endswith('.md') and not f.startswith('.')
+    notebooks = sorted(
+        f for f in os.listdir(notebooks_dir)
+        if f.endswith('.ipynb') and not f.startswith('.')
     )
 
-    for md_file in md_files:
-        nb_name = md_file.replace('.md', '.ipynb')
-        md_path = os.path.join(docs_dir, md_file)
-        headings = extract_h2_headings(md_path)
+    for nb_file in notebooks:
+        nb_path  = os.path.join(notebooks_dir, nb_file)
+        md_file  = nb_file.replace('.ipynb', '.md')
+        headings = extract_h2_headings_from_notebook(nb_path)
 
         for heading in headings:
             # Szám + cím szétválasztása: "0. Adatbetöltés..." → num="0", title="Adatbetöltés..."
@@ -279,27 +291,26 @@ def build_steps_table(docs_dir: str) -> str:
 
             anchor = github_anchor(heading)
             link   = f"docs/{md_file}{anchor}"
-            rows.append(f"| {num} | {title} | `{nb_name}` | [📊 Megtekintés]({link}) |")
+            rows.append(f"| {num} | {title} | `{nb_file}` | [📊 Megtekintés]({link}) |")
 
     return header_row + '\n'.join(rows) + '\n'
 
 
-def update_readme_steps_table(readme_path: str, docs_dir: str) -> None:
+def update_readme_steps_table(readme_path: str, notebooks_dir: str, docs_dir: str) -> None:
     """
     Megkeresi az 'Elemzés főbb lépései' táblázatot a README.md-ben,
-    és lecseréli az aktuális docs/*.md fájlok ## fejlécei alapján újragenerált verzióra.
+    és lecseréli a .ipynb notebookok ## fejlécei alapján újragenerált verzióra.
+
+    A fejléceket közvetlenül a notebookokból olvassa (nem a generált docs/*.md-ből),
+    így a táblázat mindig a notebookok valós, aktuális állapotát tükrözi.
 
     A táblázatot a fejléc-sor alapján azonosítja (`| # | Lépés |...`),
     így a README többi tartalmát nem érinti.
 
-    Csak akkor fut le, ha a docs mappa és a README is létezik.
+    Csak akkor fut le, ha a README létezik.
     """
     if not os.path.exists(readme_path):
         print(f"[README] Nem található: '{readme_path}' – táblázat frissítés kihagyva.")
-        return
-
-    if not os.path.exists(docs_dir):
-        print(f"[README] A docs/ mappa még nem létezik – táblázat frissítés kihagyva.")
         return
 
     with open(readme_path, encoding='utf-8') as f:
@@ -315,7 +326,7 @@ def update_readme_steps_table(readme_path: str, docs_dir: str) -> None:
         re.MULTILINE,
     )
 
-    new_table = build_steps_table(docs_dir)
+    new_table = build_steps_table(notebooks_dir, docs_dir)
 
     new_content, substitutions = table_pattern.subn(new_table, content)
 
@@ -441,7 +452,7 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
     #    (--notebook módban is: a többi doc fájl érintetlen maradt, de a táblázat
     #    így is szinkronban marad az összes elérhető szekcióval)
     print("[README] Elemzés főbb lépései táblázat frissítése...")
-    update_readme_steps_table(README_PATH, DOCS_DIR)
+    update_readme_steps_table(README_PATH, NOTEBOOKS_DIR, DOCS_DIR)
 
 
 # ---------------------------------------------------------------------------
