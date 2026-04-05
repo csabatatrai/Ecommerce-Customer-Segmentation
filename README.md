@@ -1,11 +1,16 @@
 <a id="teteje"></a>
 # E-kereskedelmi vásárlói szegmentáció és churn-elemzés
 
+<div align="right">
+  <strong>Magyar</strong> | <a href="README_en.md">English</a>
+</div>
+
 ![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
 
 **Végponttól végpontig tartó adattermék, amely az RFM alapú szegmentációt ötvözi prediktív churn-modellezéssel, SQL-alapú feltárással és interaktív Streamlit dashboarddal, data engineering és MLOps-közeli szemlélettel.**
 
 [<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
+
 
 <p align="center">
   <a href="https://csabatatrai.hu/">🌐 Látogasd meg a portfóliómat (külső weboldal)</a>
