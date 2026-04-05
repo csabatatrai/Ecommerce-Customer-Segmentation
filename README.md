@@ -1,13 +1,36 @@
 <a id="teteje"></a>
-# E-kereskedelmi vásárlói szegmentáció és churn-elemzés
+# 🛒 E-kereskedelmi vásárlói szegmentáció és churn-elemzés
 
 <div align="right">
   <strong>Magyar</strong> | <a href="README_en.md">English</a>
 </div>
 
-![Python](https://img.shields.io/badge/python-3.10-blue.svg) ![ML](https://img.shields.io/badge/focus-MLOps_&_Engineering-green)
+---
 
-**Végponttól végpontig tartó adattermék, amely az RFM alapú szegmentációt ötvözi prediktív churn-modellezéssel, SQL-alapú feltárással és interaktív Streamlit dashboarddal, data engineering és MLOps-közeli szemlélettel.**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Focus-MLOps_%26_Engineering-22c55e?style=flat-square" alt="Focus">
+  <img src="https://img.shields.io/badge/Model-XGBoost-f97316?style=flat-square" alt="XGBoost">
+  <img src="https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Storage-Parquet-50fa7b?style=flat-square" alt="Parquet">
+  <img src="https://img.shields.io/badge/License-MIT-06d6a0?style=flat-square" alt="License">
+</p>
+
+<p align="center">
+  <a href="#adathalmaz">Adathalmaz</a> &bull;
+  <a href="#elemzes-lepesek">Elemzési lépések</a> &bull;
+  <a href="#dashboard">Dashboard</a> &bull;
+  <a href="#setup">Setup</a> &bull;
+  <a href="#architektura">Architektúra</a> &bull;
+  <a href="#mappastruktura">Mappastruktúra</a> &bull;
+  <a href="#gyik">GYIK</a> &bull;
+  <a href="#kapcsolat">Kapcsolat</a>
+</p>
+
+<p align="center">
+End-to-end data product: RFM szegmentáció · Prediktív churn-modellezés · Interaktív dashboard
+</p>
 
 [<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
 
@@ -16,13 +39,23 @@
   <a href="https://csabatatrai.hu/">🌐 Látogasd meg a portfóliómat (külső weboldal)</a>
 </p>
 
-## Felhasznált adathalmaz
+<a id="adathalmaz"></a>
+## Adathalmaz
 
-A projekt alapjául szolgáló adathalmaz leírása és az elemzés ötlete a [Kaggle-ről származik](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti forrás: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)).
+Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi tranzakciós adathalmaz.
 
-Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykereskedő 2009–2011 közötti tranzakcióit tartalmazza, közel 1 millió sorban. Az ügyfelek viszonteladók (B2B) és magánszemélyek (B2C) vegyesen, ami indokolja az RFM-alapú szegmentációs megközelítést: a visszatérő, nagyértékű vásárlók azonosítása és a lemorzsolódás előrejelzése ebben a szegmensben különösen üzletileg releváns.
+|  |  |
+|---|---|
+| 📍 Forrás | Egyesült Királyságban működő ajándéktárgy-nagykereskedő |
+| 📅 Időszak | 2009–2011 |
+| 📊 Méret | ~1 millió sor |
+| 👥 Ügyféltípus | B2B viszonteladók + B2C magánszemélyek |
+| 🎯 Fókusz | Visszatérő, nagyértékű vásárlók azonosítása + lemorzsolódás előrejelzése |
 
-## Elemzés főbb lépései
+> Az adathalmazban B2B és B2C ügyfelek vegyesen szerepelnek — ez különösen indokolja az RFM-alapú szegmentációs megközelítést, ahol a visszatérő vásárlók azonosítása és a churn előrejelzése üzletileg kritikus..
+
+<a id="elemzes-lepesek"></a>
+## Elemzési lépések
 
 | # | Lépés | Notebook | Lefutott eredmények megtekintése (ugrás adott részhez) |
 |---|-------|----------|----------------------------------|
@@ -39,9 +72,10 @@ Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykere
 | 10 | Üzleti kiértékelés és Akciótervek | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#10-üzleti-kiértékelés-és-akciótervek) |
 | 11 | Export - A modell és az előrejelzések mentése | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#11-export---a-modell-és-az-előrejelzések-mentése) |
 
-### 📊 Interaktív Dashboard & Vizualizáció
+<a id="dashboard"></a>
+## Dashboard
 
-> **Ízelítő:** Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be.
+> Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be.
 
 <p align="center">
   <a href="https://csabatatrai.hu/">
@@ -53,6 +87,7 @@ Az adathalmaz egy Egyesült Királyságban található, ajándéktárgy-nagykere
   </a>
 </p>
 
+<a id="setup"></a>
 ## Lokális futtatás és környezet beállítása (Setup)
 
 > **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
@@ -90,42 +125,9 @@ jupyter notebook
 
 7. A Streamlit dashboardok lokális megnyitásához navigálj terminállal a gyökérkönyvtárba, és használd a `streamlit run app.py` parancsot!
 
-## GYIK
-
-<details>
-<summary>💡 Milyen módszerrel történt az adatfeltárás (EDA)?</summary>
-
-> Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
-</details>
-
 ---
 
-<details>
-<summary>💡 Miért Parquet fájlokban van a kimenet?</summary>
-
-> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, amely rendkívül hatékony adattömörítést és sokkal gyorsabb lekérdezéseket tesz lehetővé, mivel a rendszernek csak a releváns oszlopokat kell beolvasnia a teljes adatsor helyett. Ez a felépítés drasztikusan csökkenti a tárolási költségeket és az I/O terhelést, emellett a formátum beépítve támogatja a komplex, beágyazott adatszerkezeteket is. Mindezek miatt a Parquet kiemelkedően optimális és elterjedt választás a Big Data és analitikai rendszerekben (például Apache Spark vagy Hadoop környezetben), ahol a masszív adatmennyiségek gyors, költséghatékony és nagy teljesítményű feldolgozása a fő cél.
-</details>
-
----
-
-<details>
-<summary>💡 Hogyan biztosítja a projekt a notebookok tiszta verziókövetését?</summary>
-
-> A projekt az **nbstripout** eszközt használja Git pre-commit hook formájában. Ez automatikusan megtisztítja a notebookok (`.ipynb`) JSON struktúráját a futtatási kimenetektől (output cellák) és a metaadatoktól, megelőzve a repo indokolatlan méretnövekedését és a felesleges merge konfliktusokat.
->
-> **Használat:** A fejlesztői környezetben a terminálból kiadott `nbstripout --install` paranccsal konfigurálható a lokális hook.
-</details>
-
----
-
-<details>
-<summary>💡 Akartál ajánlani valami bővítményt Visual Studio Code-hoz, nem?</summary>
-
-> De! Kódolvasás Visual Studio Code-ban: a projekt megtekintéséhez erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
-</details>
-
----
-
+<a id="mappastruktura"></a>
 ## Mappastruktúra
 >A notebookok futtatásakor a kód automatikusan létrehozza a teljes szükséges mappastruktúrát.
 <pre>
@@ -164,7 +166,8 @@ ecommerce-customer-segmentation/
 └── <a href="update_docs.py">update_docs.py</a>                    # 💡 dokumentáció-automatizáló szkript (részben dokumentálja magát a kód)
 </pre>
 
-## Architektúra-diagram
+<a id="architektura"></a>
+## Architektúra
 
 ```mermaid
 flowchart TD
@@ -189,8 +192,45 @@ flowchart TD
     SEG  -.->|kimenet| M1[("🧩 Modellek × 2\nscaler · kmeans_rfm .joblib")]
     CHURN-.->|kimenet| P2[("📈 Előrejelzések\nxgboost.joblib · churn_pred.parquet")]
 ```
+<a id="gyik"></a>
+## GYIK
 
-## Kapcsolat a készítővel
+<details>
+<summary>💡 Milyen módszerrel történt az adatfeltárás (EDA)?</summary>
+
+> Az elsődleges adatfeltárás **(EDA)** ebben a projektben SQLite-ban történt ([DB Browser for SQLite](https://sqlitebrowser.org/)), nem közvetlenül Pandasban. A futtatott lekérdezések megtalálhatók a `sql/eda_exploratory_analysis.sql` fájlban; az itt szerzett felismerések épültek be a Python pipeline tisztítási és szegmentációs logikájába.
+</details>
+
+---
+
+<details>
+<summary>💡 Miért Parquet fájlokban van a kimenet?</summary>
+
+> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, amely rendkívül hatékony adattömörítést és sokkal gyorsabb lekérdezéseket tesz lehetővé, mivel a rendszernek csak a releváns oszlopokat kell beolvasnia a teljes adatsor helyett. Ez a felépítés drasztikusan csökkenti a tárolási költségeket és az I/O terhelést, emellett a formátum beépítve támogatja a komplex, beágyazott adatszerkezeteket is. Mindezek miatt a Parquet kiemelkedően optimális és elterjedt választás a Big Data és analitikai rendszerekben (például Apache Spark vagy Hadoop környezetben), ahol a masszív adatmennyiségek gyors, költséghatékony és nagy teljesítményű feldolgozása a fő cél.
+</details>
+
+---
+
+<details>
+<summary>💡 Hogyan biztosítja a projekt a notebookok tiszta verziókövetését?</summary>
+
+> A projekt az **nbstripout** eszközt használja Git pre-commit hook formájában. Ez automatikusan megtisztítja a notebookok (`.ipynb`) JSON struktúráját a futtatási kimenetektől (output cellák) és a metaadatoktól, megelőzve a repo indokolatlan méretnövekedését és a felesleges merge konfliktusokat.
+>
+> **Használat:** A fejlesztői környezetben a terminálból kiadott `nbstripout --install` paranccsal konfigurálható a lokális hook.
+</details>
+
+---
+
+<details>
+<summary>💡 Akartál ajánlani valami bővítményt Visual Studio Code-hoz, nem?</summary>
+
+> De! Kódolvasás Visual Studio Code-ban: a projekt megtekintéséhez erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
+</details>
+
+---
+
+<a id="kapcsolat"></a>
+## Kapcsolat
 
 Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hasonló témákról, keress bátran az alábbi elérhetőségeken:
 
