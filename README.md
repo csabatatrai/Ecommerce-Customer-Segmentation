@@ -74,7 +74,7 @@ conda activate ecommerce_env
 pip install -r requirements.txt
 ```
 
-4. A nyers adathalmazt a 01_data_preparation.ipynb notebook automatikusan letölti, de beszerezhető innen is: [online-retail-II letöltése](https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip) a `data/raw/` mappában lesz megtalálható az első notebook futtatása után!  
+4. A nyers adathalmazt a 01_data_preparation.ipynb notebook automatikusan letölti, de beszerezhető innen is: [online-retail-II letöltése](https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip) . A `data/raw/` mappában lesz megtalálható az első notebook futtatása után!  
 
 5. Indítsd el a Jupytert:
 ```bash
