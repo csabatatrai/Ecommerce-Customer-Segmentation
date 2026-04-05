@@ -174,7 +174,7 @@ Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hason
 ---
 
 <div align="center">
-  © 2026 Tátrai Csaba Attila · <a href="LICENSE">MIT License</a>
+  © 2026 Tátrai Csaba Attila · <a href="LICENSE">MIT licensz</a>
   <br><br>
   <a href="#teteje">
     <img src="https://img.shields.io/badge/%E2%AC%86%20Vissza%20a%20tetej%C3%A9re-c0253f?style=for-the-badge" alt="Vissza a tetejére" width="250">
