@@ -3,7 +3,7 @@
 ---
 **Függőség:** `config.py` · `03_churn_prediction.ipynb` (előtte kell lefuttatni)
 
----
+--- 
 
 **Bemenetek:**
 - `models/xgboost_churn.joblib` (a 03-as notebook végső, teljes adathalmazon betanított modellje)
@@ -932,7 +932,7 @@ else:
       ✅ A két módszer erősen egyezik – a SHAP eredmények megbízhatóak.
     
 
-## 13. Üzleti kiértékelés és Akciótervek
+## 13. Üzleti kiértékelés és akciótervek
 
 A modell önmagában nem elegendő – az előrejelzéseket üzleti akciótervre kell lefordítani.
 
@@ -1447,7 +1447,7 @@ display(
 
 
 
-## 14. Export – Előrejelzések mentése
+## 14. Export, előrejelzések mentése
 
 A `churn_predictions.parquet` az összes downstream felhasználás bemenete:
 Streamlit dashboard, BI eszközök, marketing automatizáció.
