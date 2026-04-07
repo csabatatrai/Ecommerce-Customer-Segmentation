@@ -43,17 +43,65 @@
 
 ## Adathalmaz
 
-Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi tranzakciós adathalmaz.
-
-|  |  |
-|---|---|
-| 📍 Forrás | Egyesült Királyságban működő ajándéktárgy-nagykereskedő |
-| 📅 Időszak | 2009–2011 |
-| 📊 Méret | ~1 millió sor |
-| 👥 Ügyféltípus | B2B viszonteladók + B2C magánszemélyek |
-| 🎯 Fókusz | Visszatérő, nagyértékű vásárlók azonosítása + lemorzsolódás előrejelzése |
+Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi, ~1 millió soros tranzakciós adathalmaz 2009 és 2011 közti, Egyesült Királyságban működő kereskedő tranzakcióival.
 
 > Az adathalmazban B2B és B2C ügyfelek vegyesen szerepelnek — ez különösen indokolja az RFM-alapú szegmentációs megközelítést, ahol a visszatérő vásárlók azonosítása és a churn előrejelzése üzletileg kritikus..
+
+## Eredmények
+
+### Adattisztítás
+
+Az 1 067 371 nyers sorból 5 lépéses pipeline után **793 900 sor** maradt elemzésre kész állapotban (az eredeti adathalmaz **74,4%-a**):
+
+| Szűrési lépés | Eldobott sorok |
+|---|---|
+| Anonim tranzakciók (hiányzó Customer ID) | −243 007 |
+| Adminisztratív kódok (BANK CHARGES, C2, stb.) | −3 709 |
+| Duplikátumok | −26 402 |
+| Érvénytelen ár (≤ 0) | −71 |
+| Fejlesztői tesztkódok | −14 |
+| Technikai outlierek (>10 000 db-os tételek) | ~−268 |
+| **Elemzésre kész sorok** | **793 900** |
+
+> A visszáru/sztornó sorok (`C` prefix az Invoice oszlopban) szándékosan megmaradtak — `return_ratio` feature-ként épültek be a modellbe.
+
+---
+
+### Ügyfélszegmentáció (K-means, K=4)
+
+5 243 ügyfelet sorolt 4 szegmensbe a modell:
+
+| Szegmens | Ügyfelek | Átl. vásárlások | Átl. bevétel / fő | Utolsó vásárlás |
+|---|---|---|---|---|
+| 🏆 VIP Bajnokok | 861 (16%) | 19,5 alkalom | £10 391 | 30 napja |
+| 💤 Lemorzsolódó / Alvó | 1 624 (31%) | 5,1 alkalom | £1 888 | 195 napja |
+| 👻 Elvesztett / Inaktív | 2 098 (40%) | 1,4 alkalom | £330 | 340 napja |
+| 🌱 Új / Ígéretes | 660 (13%) | 2,8 alkalom | £758 | 30 napja |
+
+A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~16%) — ez tipikus B2B viselkedés, nem lemorzsolódási jel.
+
+> ℹ️ A szegmensenkénti teljes bevételarány a notebookokból közvetlenül nem olvasható ki — a dashboard tartalmaz erre vonatkozó aggregált nézetet.
+
+---
+
+### Churn-előrejelzés (XGBoost + A/B pipeline)
+
+Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után, ami erősen imbalanced osztályeloszlást jelent. Ezért a fő metrika a **PR-AUC**, nem az Accuracy (és nem a ROC-AUC, amely imbalanced esetben félrevezető lehet).
+
+**5-fold keresztvalidáció eredményei:**
+
+| Pipeline | PR-AUC | F1-Score | Recall |
+|---|---|---|---|
+| A – Csak RFM | 0,818 | 0,750 | 0,745 |
+| **B – RFM + K-Means** | **0,819** | **0,758** | **0,752** |
+
+A két modell teljesítménye szorosan egyforma, a klasztercímkék marginális javulást adnak, ezért az **A pipeline** az ajánlottabb produkciós megoldás (kisebb komplexitás, azonos teljesítmény). A tréning PR-AUC 0,882, ami minimális overfittingre utal.
+
+Az optimális döntési küszöb **0,35** (az alapértelmezett 0,5 helyett), ahol a modell **Recall = 0,92**-t ér el 0,73-as Precision mellett, azaz a valóban lemorzsolódó ügyfelek 92%-át elkapja, 27%-os hamis riasztás árán.
+
+A legfontosabb feature mindkét modellben: `recency_days` (SHAP-hatás ~+0,4), ezt követi a `monetary_total` és a `frequency`.
+
+> ℹ️ Explicit baseline összehasonlítás nem szerepel a notebookokban, a PR-AUC random baseline értéke imbalanced adatnál az osztályok arányával egyenlő (~0,557), tehát a modell (~0,819) közel **1,47×-es javulást** jelent a véletlenszerű osztályozóhoz képest.
 
 <a id="elemzes-lepesek"></a>
 ## Elemzési lépések
@@ -260,6 +308,5 @@ Ha kérdésed van a projekttel kapcsolatban, vagy szívesen beszélgetnél hason
   </a>
 </div>
 
----
 
 
