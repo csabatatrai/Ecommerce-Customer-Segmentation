@@ -50,73 +50,96 @@ Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/onl
 <a id="eredmenyek"></a>
 ## Eredmények
 
+<a id="eredmenyek"></a>
+## Eredmények
+
 ### Adattisztítás
 
-Az 1 067 371 nyers sorból 5 lépéses pipeline után **793 900 sor** maradt elemzésre kész állapotban (az eredeti adathalmaz **74,4%-a**):
+Az 1 067 371 nyers sorból 6 lépéses pipeline után **793 900 sor** maradt elemzésre kész állapotban (az eredeti adathalmaz **74,4%-a**):
 
 | Szűrési lépés | Eldobott sorok |
 |---|---|
 | Anonim tranzakciók (hiányzó Customer ID) | −243 007 |
-| Adminisztratív kódok (BANK CHARGES, C2, stb.) | −3 709 |
-| Duplikátumok | −26 402 |
 | Érvénytelen ár (≤ 0) | −71 |
+| Adminisztratív kódok (BANK CHARGES, C2, stb.) | −3 709 |
 | Fejlesztői tesztkódok | −14 |
+| Duplikátumok | −26 402 |
 | Technikai outlierek (>10 000 db-os tételek) | ~−268 |
 | **Elemzésre kész sorok** | **793 900** |
 
-> A visszáru/sztornó sorok (`C` prefix az Invoice oszlopban) szándékosan megmaradtak, `return_ratio` feature-ként épültek be a modellbe.
+> A visszáru/sztornó sorok (`C` prefix az Invoice oszlopban) szándékosan megmaradtak – `return_ratio` feature-ként épültek be a modellbe.
 
 ---
 
 ### Ügyfélszegmentáció (K-means, K=4)
 
+>Bár matematikailag 2 klaszter lett volna indokolt, üzletileg a 4 jobban szegmentálja a vásárlókat és meg tudtam indokolni mint másodlagos optimum (lásd 02-es notebook).
+
 5 243 ügyfelet sorolt 4 szegmensbe a modell:
 
-| Szegmens | Ügyfelek | Átl. vásárlások | Átl. bevétel / fő | Utolsó vásárlás |
-|---|---|---|---|---|
-| 🏆 VIP Bajnokok | 861 (16%) | 19,5 alkalom | £10 391 | 30 napja |
-| 💤 Lemorzsolódó / Alvó | 1 624 (31%) | 5,1 alkalom | £1 888 | 195 napja |
-| 👻 Elvesztett / Inaktív | 2 098 (40%) | 1,4 alkalom | £330 | 340 napja |
-| 🌱 Új / Ígéretes | 660 (13%) | 2,8 alkalom | £758 | 30 napja |
+| Szegmens | Ügyfelek | Átl. vásárlások | Átl. bevétel / fő | Utolsó vásárlás | Return ratio |
+|---|---|---|---|---|---|
+| 🏆 VIP Bajnokok | 861 (16%) | 19,5 alkalom | £10 391 | 30 napja | ~15,9% |
+| 💤 Lemorzsolódó / Alvó | 1 624 (31%) | 5,1 alkalom | £1 888 | 195 napja | ~14,3% |
+| 👻 Elvesztett / Inaktív | 2 098 (40%) | 1,4 alkalom | £330 | 340 napja | ~8,0% |
+| 🌱 Új / Ígéretes | 660 (13%) | 2,8 alkalom | £758 | 30 napja | ~8,8% |
 
-A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~15,9%), ez tipikus B2B viselkedés, nem lemorzsolódási jel.
+A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest. A legmagasabb visszaküldési aránnyal (~15,9%) szintén a VIP-ek rendelkeznek – ez tipikus B2B viselkedés, nem lemorzsolódási jel, amit a SHAP-elemzés is megerősít.
 
-> ℹ️ A szegmensenkénti teljes bevételarány a notebookokból közvetlenül nem olvasható ki, a dashboard tartalmaz erre vonatkozó aggregált nézetet.
+> ℹ️ A szegmensenkénti teljes bevételarány a dashboard aggregált nézetében olvasható.
 
 ---
 
 ### Churn-előrejelzés (XGBoost + A/B pipeline)
 
-Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után (44,3% maradt aktív) – az osztályok közel kiegyensúlyozottak, de a **PR-AUC** így is informatívabb metrika, mint az Accuracy vagy a ROC-AUC, mivel érzékenyebb a pozitív osztályon nyújtott teljesítményre.
+Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után – az osztályok közel kiegyensúlyozottak, de a **PR-AUC** így is informatívabb, mint az Accuracy vagy ROC-AUC.
 
-**5-fold keresztvalidáció eredményei (X_train-en):**
+**A/B modellválasztás** – 5-fold CV (X_train-en):
 
-| Pipeline | PR-AUC | F1-Score | Recall |
+| Pipeline | PR-AUC | F1 | Recall |
 |---|---|---|---|
 | A – Csak RFM (5 feature) | 0,8098 | 0,740 | 0,734 |
 | B – RFM + K-Means OHE (9 feature) | 0,8098 | 0,743 | 0,738 |
 
-A két modell CV PR-AUC-ja **negyedik tizedesjegyig azonos** – a K-Means klasztercímkék nem adnak hozzá prediktív erőt az 5 RFM feature mellé. Az **Occam borotvája** elve alapján az **A pipeline** a nyertes: kisebb komplexitás, azonos teljesítmény. Ezt a SHAP-elemzés is megerősíti: a klaszter feature-ök (`cluster_0–3`) elhanyagolható fontossággal szerepelnek.
+A két pipeline CV PR-AUC-ja negyedik tizedesjegyig azonos – a klasztercímkék nem adnak hozzá prediktív erőt. Az **A pipeline** a nyertes: nemcsak egyszerűbb, hanem **stabilabb is**, a B pipeline PR-AUC szórása fold-ok között lényegesen nagyobb, ami élesben kiszámíthatatlanabb teljesítményt jelent.
 
-**RandomizedSearchCV hangolás után** (100 iteráció, X_train-en): CV PR-AUC → **0,8121**, holdout teszt PR-AUC → **0,8253**, overfitting rés → **0,0017** (a hangolás előtti 0,0504-ről).
+**RandomizedSearchCV hangolás után** (100 iteráció, X_train-en): CV PR-AUC → **0,8121**, holdout teszt PR-AUC → **0,8253**, overfitting rés → **0,0017** (hangolás előtt: 0,0504).
 
-**Végső teljesítmény – holdout teszt szett (1 049 ügyfél, soha nem látott adat):**
+**Teljesítményértékelés:**
+
+A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolgálnak:
+
+| | PR-AUC | Mire vonatkozik |
+|---|---|---|
+| **Fejlesztési modell** (X_train-en tanult) | **0,8253** | Konzervatív holdout becslés – a modell valódi általánosítási képessége |
+| **Produkciós modell** (teljes X+y-on retanítva) | **0,8322** | Visszaellenőrzési szám – a végleges exportált modellé |
+
+> Az iparági best practice szerint a hiperparaméterek és az architektúra validálása után a produkciós modell a teljes adathalmazon kerül betanításra a maximális prediktív erő érdekében. A konzervatív holdout becslés (0,8253) az érvényes generalizációs metrika; a 0,8322 a retanított modell visszaellenőrzési értéke.
+
+**Produkciós modell metrikái** (threshold-optimalizálás a holdout szetten):
 
 | Metrika | Érték |
 |---|---|
-| PR-AUC | **0,8322** |
 | F1-score (opt. threshold) | 0,785 |
-| Recall (opt. threshold) | 0,856 |
-| Precision (opt. threshold) | 0,724 |
-| Brier-score (kalibráció) | 0,1824 *(elfogadható)* |
-| Optimális döntési küszöb | **0,419** *(F1-maximalizáló, nem hardcoded 0,5)* |
+| Recall | 0,856 |
+| Precision | 0,724 |
+| Brier-score | 0,1824 |
+| Optimális küszöb | **0,419** *(F1-maximalizáló, nem hardcoded 0,5)* |
 
-> ℹ️ **Módszertani megjegyzés:** A threshold és az összes kiértékelési metrika a holdout teszt szetten számolódott – nem a tréningadaton. Tréningadaton mérve a threshold 0,35-re és a csúcsvalószínűség ~97%-ra adódott volna, ami **kiértékelési adatszivárgásból** fakadó torzítás. A 04-es notebook részletezi ezt a különbséget.
+**Threshold trade-off:** a 0,5 → 0,419 váltás csökkenti az elszalasztott churnöket (FN: 149 → 84), de növeli a téves riasztásokat (FP: 111 → 191) – churn-megelőzési kontextusban szándékos döntés.
 
-A legfontosabb feature mindkét modellben: `recency_days` (SHAP-fontosság ~55,7%), ezt követi a `frequency` (~20,8%) és a `monetary_total` (~19,2%). A SHAP és az XGBoost natív Gain-fontosság sorrendje Spearman ρ = 0,900-as egyezést mutat – az eredmények megbízhatóak.
+**Kalibráció:** a Brier-score elfogadható, de a reliability diagram jelzi, hogy **0,6 feletti becsléseknél a modell alábecsüli a tényleges churn-arányt** (0,60-os becslésnél ~78%, 0,75-ösnél ~90% a tényleges arány). A szürke zónában (0,30–0,70) elhelyezkedő ügyfelekre érdemes kiegészítő üzleti szabályokat alkalmazni.
 
-> ℹ️ **Baseline összehasonlítás:** PR-AUC véletlen alapvonal imbalanced adatnál az osztályok arányával egyenlő (~0,557); a modell (0,8322) közel **1,49×-es javulást** jelent ehhez képest.
+**Feature fontosság** – SHAP és XGBoost Gain Spearman ρ = 0,900 egyezéssel:
 
+| Feature | SHAP-fontosság |
+|---|---|
+| `recency_days` | ~55,7% |
+| `frequency` | ~20,8% |
+| `monetary_total` | ~19,2% |
+| `return_ratio`, `monetary_avg` | ~4,3% |
+
+> ℹ️ **Baseline:** PR-AUC véletlen alapvonal ~0,557 (osztályarány); a fejlesztési modell (0,8253) közel **1,48×-es javulást** jelent.
 <a id="elemzes-lepesek"></a>
 ## Elemzési lépések 
 >A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export – Előrejelzések mentése`) — csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók GitHub-on.
