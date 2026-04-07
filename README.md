@@ -266,7 +266,7 @@ flowchart TD
 <details>
 <summary>💡 Miért Parquet fájlokban van a kimenet?</summary>
 
-> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, amely rendkívül hatékony adattömörítést és sokkal gyorsabb lekérdezéseket tesz lehetővé, mivel a rendszernek csak a releváns oszlopokat kell beolvasnia a teljes adatsor helyett. Ez a felépítés drasztikusan csökkenti a tárolási költségeket és az I/O terhelést, emellett a formátum beépítve támogatja a komplex, beágyazott adatszerkezeteket is. Mindezek miatt a Parquet kiemelkedően optimális és elterjedt választás a Big Data és analitikai rendszerekben (például Apache Spark vagy Hadoop környezetben), ahol a masszív adatmennyiségek gyors, költséghatékony és nagy teljesítményű feldolgozása a fő cél.
+> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, gyorsabb I/O, típusbiztos séma, kisebb méret — ezért ez az iparági standard analitikai pipeline-okban
 </details>
 
 ---
