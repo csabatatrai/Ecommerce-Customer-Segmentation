@@ -216,10 +216,15 @@ def github_anchor(heading_text: str) -> str:
       3. Szóközök → kötőjel
 
     Példák:
-      "0. Adatbetöltés és Parquet-konverzió"  →  "#0-adatbetöltés-és-parquet-konverzió"
+      "0. Adatbetöltés és Parquet-konverzió"   →  "#0-adatbetöltés-és-parquet-konverzió"
       "7. A/B Modellezés: Pipeline-ok felépítése"  →  "#7-ab-modellezés-pipeline-ok-felépítése"
+      "14. Export – Előrejelzések mentése"      →  "#14-export-előrejelzések-mentése"
     """
     text = heading_text.strip().lower()
+    # Em-dash (–) és em-dash (—) explicit szóközzé alakítása, mielőtt a többi
+    # speciális karakter törlődne — így nem keletkezik dupla szóköz a környező
+    # szóközökkel, ami dupla kötőjelet adna az anchorban
+    text = re.sub(r'[\u2013\u2014]', ' ', text)
     # Csak Unicode word-karakterek (\w = betű/szám/aláhúzás), szóköz és kötőjel marad
     text = re.sub(r'[^\w\s\-]', '', text, flags=re.UNICODE)
     # Aláhúzás is maradhat (\w része), de szóközöket kötőjellé alakítjuk

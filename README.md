@@ -119,7 +119,7 @@ A legfontosabb feature mindkét modellben: `recency_days` (SHAP-fontosság ~55,7
 
 <a id="elemzes-lepesek"></a>
 ## Elemzési lépések 
->A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export, előrejelzések mentése`), csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók!
+>A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export – Előrejelzések mentése`) — csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók GitHub-on.
 
 | # | Lépés | Notebook | Lefutott eredmények megtekintése (ugrás adott részhez) |
 |---|-------|----------|----------------------------------|
@@ -135,7 +135,7 @@ A legfontosabb feature mindkét modellben: `recency_days` (SHAP-fontosság ~55,7
 | 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#9-végleges-modell-exportja) |
 | 10 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#10-modell-betöltése-és-adatok-előkészítése) |
 | 11 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#11-modell-kiértékelése) |
-| 12 | Modell magyarázata – SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
+| 12 | Modell magyarázata, SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
 | 13 | Üzleti kiértékelés és akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#13-üzleti-kiértékelés-és-akciótervek) |
 | 14 | Export, előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#14-export-előrejelzések-mentése) |
 

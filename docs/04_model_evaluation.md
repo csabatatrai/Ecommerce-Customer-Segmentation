@@ -3,7 +3,7 @@
 ---
 **Függőség:** `config.py` · `03_churn_prediction.ipynb` (előtte kell lefuttatni)
 
---- 
+---
 
 **Bemenetek:**
 - `models/xgboost_churn.joblib` (a 03-as notebook végső, teljes adathalmazon betanított modellje)
@@ -560,7 +560,7 @@ print(classification_report(y_test, y_pred_opt,
     
     
 
-## 12. Modell magyarázata – SHAP elemzés
+## 12. Modell magyarázata, SHAP elemzés
 
 A SHAP (SHapley Additive exPlanations) játékelméleti alapon magyarázza az egyes feature-ök
 hozzájárulását minden egyes predikciónál. Három kérdésre válaszol:
