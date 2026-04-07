@@ -50,9 +50,6 @@ Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/onl
 <a id="eredmenyek"></a>
 ## Eredmények
 
-<a id="eredmenyek"></a>
-## Eredmények
-
 ### Adattisztítás
 
 Az 1 067 371 nyers sorból 6 lépéses pipeline után **793 900 sor** maradt elemzésre kész állapotban (az eredeti adathalmaz **74,4%-a**):
