@@ -45,7 +45,7 @@
 
 Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi, ~1 millió soros tranzakciós adathalmaz 2009 és 2011 közti, Egyesült Királyságban működő kereskedő tranzakcióival.
 
-> Az adathalmazban B2B és B2C ügyfelek vegyesen szerepelnek — ez különösen indokolja az RFM-alapú szegmentációs megközelítést, ahol a visszatérő vásárlók azonosítása és a churn előrejelzése üzletileg kritikus..
+> Az adathalmazban B2B és B2C ügyfelek vegyesen szerepelnek. Ez különösen indokolja az RFM-alapú szegmentációs megközelítést, ahol a visszatérő vásárlók azonosítása és a churn előrejelzése üzletileg kritikus..
 
 ## Eredmények
 
@@ -63,7 +63,7 @@ Az 1 067 371 nyers sorból 5 lépéses pipeline után **793 900 sor** maradt ele
 | Technikai outlierek (>10 000 db-os tételek) | ~−268 |
 | **Elemzésre kész sorok** | **793 900** |
 
-> A visszáru/sztornó sorok (`C` prefix az Invoice oszlopban) szándékosan megmaradtak — `return_ratio` feature-ként épültek be a modellbe.
+> A visszáru/sztornó sorok (`C` prefix az Invoice oszlopban) szándékosan megmaradtak, `return_ratio` feature-ként épültek be a modellbe.
 
 ---
 
@@ -78,9 +78,9 @@ Az 1 067 371 nyers sorból 5 lépéses pipeline után **793 900 sor** maradt ele
 | 👻 Elvesztett / Inaktív | 2 098 (40%) | 1,4 alkalom | £330 | 340 napja |
 | 🌱 Új / Ígéretes | 660 (13%) | 2,8 alkalom | £758 | 30 napja |
 
-A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~16%) — ez tipikus B2B viselkedés, nem lemorzsolódási jel.
+A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~16%), ez tipikus B2B viselkedés, nem lemorzsolódási jel.
 
-> ℹ️ A szegmensenkénti teljes bevételarány a notebookokból közvetlenül nem olvasható ki — a dashboard tartalmaz erre vonatkozó aggregált nézetet.
+> ℹ️ A szegmensenkénti teljes bevételarány a notebookokból közvetlenül nem olvasható ki, a dashboard tartalmaz erre vonatkozó aggregált nézetet.
 
 ---
 
