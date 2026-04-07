@@ -14,7 +14,6 @@
   <img src="https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/Storage-Parquet-50fa7b?style=flat-square" alt="Parquet">
   <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/AI--assisted-Claude-a855f7?style=flat-square" alt="AI-assisted">
 </p>
 
 <p align="center">
@@ -266,7 +265,7 @@ flowchart TD
 <details>
 <summary>💡 Miért Parquet fájlokban van a kimenet?</summary>
 
-> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, gyorsabb I/O, típusbiztos séma, kisebb méret — ezért ez az iparági standard analitikai pipeline-okban
+> A Parquet fájlok legnagyobb előnye az oszlopos tárolási formátum, gyorsabb I/O, típusbiztos séma, kisebb méret.
 </details>
 
 ---
@@ -282,9 +281,9 @@ flowchart TD
 ---
 
 <details>
-<summary>💡 Akartál ajánlani valami bővítményt Visual Studio Code-hoz, nem?</summary>
+<summary>💡 Ajánlott Visual Studio Code bővítmény</summary>
 
-> De! Kódolvasás Visual Studio Code-ban: a projekt megtekintéséhez erősen ajánlott a [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments) bővítmény telepítése. A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával sokkal átláthatóbbá válik a kód logikája.
+>[Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments): A forráskódban tudatosan használok színkódolt kommenteket a fontos megjegyzések, összefüggések és kiemelések jelölésére, így a bővítmény használatával átláthatóbbá válik a kód logikája.
 </details>
 
 ---
