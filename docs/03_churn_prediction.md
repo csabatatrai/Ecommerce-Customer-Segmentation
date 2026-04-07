@@ -1,7 +1,7 @@
 <a id="teteje"></a>
 # 03 Prediktív Modellezés: Churn Prediction (XGBoost)
 ---
-**Függőség:** `config.py` (Útvonalak definíciója és a `CUTOFF_DATE` paraméter az időablak felosztásához)
+**Függőség:** `config.py` (Útvonalak definíciója és a `CUTOFF_DATE` paraméter az időablak felosztásához) és `02_customer_segmentation.ipynb` (előtte kell futtatni!)
 
 ---
 
@@ -789,6 +789,14 @@ else:
     🏆 Nyertes modell: A: Csak RFM (PR-AUC: 0.8098 vs 0.8098)
     
 
+> **🔍 Modellválasztás értelmezése – Occam borotvája érvényesül**
+>
+> A két modell CV PR-AUC-ja negyedik tizedesjegyig azonos (0.8098), és az automatikus kiválasztás a **nyers, kerekítetlen** értékek alapján dönt – az A modell marginálisan jobb, ezért nyert.
+>
+> Ez önmagában is fontos eredmény: a B modell **9 feature-rel** (5 RFM + 4 klaszter OHE) pontosan ugyanannyit teljesít, mint az A **5 feature-rel**. A K-Means szegmentáció tehát nem ad hozzá prediktív erőt a churnhöz – a `recency_days`, `frequency` és `monetary_total` önmagukban megragadják azt az információt, amit a klasztertagság is kódolna.
+>
+> Összetettebb modell azonos teljesítménnyel = felesleges komplexitás. Az **egyszerűbb, azonos erejű modell** a helyes választás – ezt erősíti meg a 04-es notebook SHAP elemzése is, ahol a klaszter feature-ök (`cluster_0–3`) elhanyagolható SHAP értékekkel a lista alján szerepelnek.
+
 ### 8.3 CV eredmények vizualizálása
 
 Minden doboz egy modell 5-fold keresztvalidációs eredményeinek eloszlását mutatja:
@@ -1008,6 +1016,8 @@ Az alábbi cella futtatható, de **nem kötelező** a notebook többi részéhez
 A keresési tér nagy (~10k kombináció), és a randomizált keresés általában közel azonos eredményt ad töredéknyi idő alatt (*Bergstra & Bengio, 2012*).
 
 > 🚀 **Következő szint:** Ha a pontosság maximalizálása a cél az idő drasztikus növelése nélkül, érdemes **Bayesi optimalizációra** (pl. **Optuna**) váltani, amely tanul a korábbi iterációkból.
+
+> 📌 **Megjegyzés az overfitting monitoringhoz:** A 8.5-ös táblázat az RSCV **előtti** állapotot rögzíti, ez szándékos pillanatkép, amely megmutatja, miért indokolt a hangolás. Ha az RSCV lefut és jobb modellt talál, a végleges Train−Teszt rés a **9.2-es összefoglalóban** olvasható, amely már a hangolt modell értékeit tükrözi.
 
 
 ```python
@@ -1244,7 +1254,7 @@ print("  (SHAP, kalibráció, feature importance, threshold optimalizálás, akc
     [03_churn_prediction.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 10 sor, 1 csere.
+    [README] Táblázat frissítve: 15 sor, 1 csere.
     
     ==================================================
     Kesz!

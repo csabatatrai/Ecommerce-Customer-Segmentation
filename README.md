@@ -79,7 +79,7 @@ Az 1 067 371 nyers sorból 5 lépéses pipeline után **793 900 sor** maradt ele
 | 👻 Elvesztett / Inaktív | 2 098 (40%) | 1,4 alkalom | £330 | 340 napja |
 | 🌱 Új / Ígéretes | 660 (13%) | 2,8 alkalom | £758 | 30 napja |
 
-A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~16%), ez tipikus B2B viselkedés, nem lemorzsolódási jel.
+A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elvesztett szegmenshez képest (£10 391 vs £330). A SHAP-elemzés megerősítette, hogy a visszaküldési arány a VIP-eknél a legmagasabb (~15,9%), ez tipikus B2B viselkedés, nem lemorzsolódási jel.
 
 > ℹ️ A szegmensenkénti teljes bevételarány a notebookokból közvetlenül nem olvasható ki, a dashboard tartalmaz erre vonatkozó aggregált nézetet.
 
@@ -87,25 +87,39 @@ A VIP szegmens az ügyfelek 16%-a, de fejenként ~31-szeresét költi az Elveszt
 
 ### Churn-előrejelzés (XGBoost + A/B pipeline)
 
-Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után, ami erősen imbalanced osztályeloszlást jelent. Ezért a fő metrika a **PR-AUC**, nem az Accuracy (és nem a ROC-AUC, amely imbalanced esetben félrevezető lehet).
+Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után (44,3% maradt aktív) – az osztályok közel kiegyensúlyozottak, de a **PR-AUC** így is informatívabb metrika, mint az Accuracy vagy a ROC-AUC, mivel érzékenyebb a pozitív osztályon nyújtott teljesítményre.
 
-**5-fold keresztvalidáció eredményei:**
+**5-fold keresztvalidáció eredményei (X_train-en):**
 
 | Pipeline | PR-AUC | F1-Score | Recall |
 |---|---|---|---|
-| A – Csak RFM | 0,818 | 0,750 | 0,745 |
-| **B – RFM + K-Means** | **0,819** | **0,758** | **0,752** |
+| A – Csak RFM (5 feature) | 0,8098 | 0,740 | 0,734 |
+| B – RFM + K-Means OHE (9 feature) | 0,8098 | 0,743 | 0,738 |
 
-A két modell teljesítménye szorosan egyforma, a klasztercímkék marginális javulást adnak, ezért az **A pipeline** az ajánlottabb produkciós megoldás (kisebb komplexitás, azonos teljesítmény). A tréning PR-AUC 0,882, ami minimális overfittingre utal.
+A két modell CV PR-AUC-ja **negyedik tizedesjegyig azonos** – a K-Means klasztercímkék nem adnak hozzá prediktív erőt az 5 RFM feature mellé. Az **Occam borotvája** elve alapján az **A pipeline** a nyertes: kisebb komplexitás, azonos teljesítmény. Ezt a SHAP-elemzés is megerősíti: a klaszter feature-ök (`cluster_0–3`) elhanyagolható fontossággal szerepelnek.
 
-Az optimális döntési küszöb **0,35** (az alapértelmezett 0,5 helyett), ahol a modell **Recall = 0,92**-t ér el 0,73-as Precision mellett, azaz a valóban lemorzsolódó ügyfelek 92%-át elkapja, 27%-os hamis riasztás árán.
+**RandomizedSearchCV hangolás után** (100 iteráció, X_train-en): CV PR-AUC → **0,8121**, holdout teszt PR-AUC → **0,8253**, overfitting rés → **0,0017** (a hangolás előtti 0,0504-ről).
 
-A legfontosabb feature mindkét modellben: `recency_days` (SHAP-hatás ~+0,4), ezt követi a `monetary_total` és a `frequency`.
+**Végső teljesítmény – holdout teszt szett (1 049 ügyfél, soha nem látott adat):**
 
-> ℹ️ Explicit baseline összehasonlítás nem szerepel a notebookokban, a PR-AUC random baseline értéke imbalanced adatnál az osztályok arányával egyenlő (~0,557), tehát a modell (~0,819) közel **1,47×-es javulást** jelent a véletlenszerű osztályozóhoz képest.
+| Metrika | Érték |
+|---|---|
+| PR-AUC | **0,8322** |
+| F1-score (opt. threshold) | 0,785 |
+| Recall (opt. threshold) | 0,856 |
+| Precision (opt. threshold) | 0,724 |
+| Brier-score (kalibráció) | 0,1824 *(elfogadható)* |
+| Optimális döntési küszöb | **0,419** *(F1-maximalizáló, nem hardcoded 0,5)* |
+
+> ℹ️ **Módszertani megjegyzés:** A threshold és az összes kiértékelési metrika a holdout teszt szetten számolódott – nem a tréningadaton. Tréningadaton mérve a threshold 0,35-re és a csúcsvalószínűség ~97%-ra adódott volna, ami **kiértékelési adatszivárgásból** fakadó torzítás. A 04-es notebook részletezi ezt a különbséget.
+
+A legfontosabb feature mindkét modellben: `recency_days` (SHAP-fontosság ~55,7%), ezt követi a `frequency` (~20,8%) és a `monetary_total` (~19,2%). A SHAP és az XGBoost natív Gain-fontosság sorrendje Spearman ρ = 0,900-as egyezést mutat – az eredmények megbízhatóak.
+
+> ℹ️ **Baseline összehasonlítás:** PR-AUC véletlen alapvonal imbalanced adatnál az osztályok arányával egyenlő (~0,557); a modell (0,8322) közel **1,49×-es javulást** jelent ehhez képest.
 
 <a id="elemzes-lepesek"></a>
-## Elemzési lépések
+## Elemzési lépések 
+>A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével!
 
 | # | Lépés | Notebook | Lefutott eredmények megtekintése (ugrás adott részhez) |
 |---|-------|----------|----------------------------------|
@@ -119,6 +133,11 @@ A legfontosabb feature mindkét modellben: `recency_days` (SHAP-hatás ~+0,4), e
 | 7 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#7-ab-modellezés-pipeline-ok-felépítése) |
 | 8 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#8-keresztvalidáció-és-modellek-összehasonlítása) |
 | 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#9-végleges-modell-exportja) |
+| 10 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#10-modell-betöltése-és-adatok-előkészítése) |
+| 11 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#11-modell-kiértékelése) |
+| 12 | Modell magyarázata – SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
+| 13 | Üzleti kiértékelés és Akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#13-üzleti-kiértékelés-és-akciótervek) |
+| 14 | Export – Előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#14-export-előrejelzések-mentése) |
 
 <a id="dashboard"></a>
 ## Dashboard
@@ -170,6 +189,7 @@ jupyter notebook
    - `01_data_preparation.ipynb` – Adatelőkészítés: Data Preparation (Adattisztítás és Parquet Pipeline)
    - `02_customer_segmentation.ipynb` – Ügyfélszegmentáció: Customer Segmentation (RFM Elemzés és K-means)
    - `03_churn_prediction.ipynb` – Prediktív Modellezés: Churn Prediction (XGBoost Klasszifikáció)
+   - `04_model_evaluation.ipynb` – Modell Kiértékelés: Kalibráció, SHAP, Threshold & üzleti akciótervek
 
 7. A Streamlit dashboardok lokális megnyitásához navigálj terminállal a gyökérkönyvtárba, és használd a `streamlit run app.py` parancsot!
 
@@ -195,7 +215,8 @@ ecommerce-customer-segmentation/
 │
 ├── <a href="01_data_preparation.ipynb">01_data_preparation.ipynb</a>         # adattisztítás
 ├── <a href="02_customer_segmentation.ipynb">02_customer_segmentation.ipynb</a>    # RFM feature engineering és K-means klaszterezés
-├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost churn predikció
+├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost churn predikció – modellépítés, holdout split, export
+├── <a href="04_model_evaluation.ipynb">04_model_evaluation.ipynb</a>         # kalibráció, SHAP, threshold optimalizálás, üzleti akciólista
 │
 ├── models/                           # 🚨notebook hozza létre, szerializált modell- és transzformátor-objektumok (joblib)
 │
@@ -206,10 +227,12 @@ ecommerce-customer-segmentation/
 │   ├── <a href="docs/images/">images/</a>
 │   │   ├── <a href="docs/images/01_data_preparation/">01_data_preparation/</a>
 │   │   ├── <a href="docs/images/02_customer_segmentation/">02_customer_segmentation/</a>
-│   │   └── <a href="docs/images/03_churn_prediction/">03_churn_prediction/</a>
+│   │   ├── <a href="docs/images/03_churn_prediction/">03_churn_prediction/</a>
+│   │   └── <a href="docs/images/04_model_evaluation/">04_model_evaluation/</a>
 │   ├── <a href="docs/01_data_preparation.md">01_data_preparation.md</a>
 │   ├── <a href="docs/02_customer_segmentation.md">02_customer_segmentation.md</a>
-│   └── <a href="docs/03_churn_prediction.md">03_churn_prediction.md</a>
+│   ├── <a href="docs/03_churn_prediction.md">03_churn_prediction.md</a>
+│   └── <a href="docs/04_model_evaluation.md">04_model_evaluation.md</a>
 │
 └── <a href="update_docs.py">update_docs.py</a>                    # 💡 dokumentáció-automatizáló szkript (részben dokumentálja magát a kód)
 </pre>
@@ -227,18 +250,21 @@ flowchart TD
     CFG -.-> PREP
     CFG -.-> SEG
     CFG -.-> CHURN
+    CFG -.-> EVAL
     CSV --> PREP
 
     PREP["📋 01 Adatelőkészítés\nParquet konverzió · tisztítás · outlier szűrés"]
     SEG["🎯 02 Ügyfélszegmentáció\nRFM Feature Engineering · K-means K=4"]
-    CHURN["🤖 03 Churn Prediction\nXGBoost · SHAP · A/B pipeline tesztelés"]
+    CHURN["🤖 03 Churn Prediction\nXGBoost · Holdout split · A/B pipeline"]
+    EVAL["🔍 04 Modell Kiértékelés\nKalibráció · SHAP · Threshold · Akciólista"]
     DASH["📊 Streamlit Dashboard"]
 
-    PREP --> SEG --> CHURN --> DASH
+    PREP --> SEG --> CHURN --> EVAL --> DASH
 
     PREP -.->|kimenet| P1[("💾 Parquet fájlok\nraw · cleaned · rfm_ready")]
     SEG  -.->|kimenet| M1[("🧩 Modellek × 2\nscaler · kmeans_rfm .joblib")]
-    CHURN-.->|kimenet| P2[("📈 Előrejelzések\nxgboost.joblib · churn_pred.parquet")]
+    CHURN-.->|kimenet| P2[("🤖 Modell + teszt szett\nxgboost.joblib · test_set.parquet")]
+    EVAL -.->|kimenet| P3[("📈 Előrejelzések\nchurn_predictions.parquet")]
 ```
 <a id="gyik"></a>
 ## GYIK
@@ -246,7 +272,7 @@ flowchart TD
 <details>
 <summary>💡 Hogyan használtam AI-eszközöket a projekt során?</summary>
 
-> A projekt tervezési döntései, az elemzési logika és a pipeline-architektúra 
+> Kifejezett célja volt a projektnek tesztelni, hogy az LLM-ek nyújtotta lehetőségek által magasabb absztrakciós szinten dolgozva milyen összetettségű data product elkészítése lehetséges viszonylag rövid idő alatt egyedül. A projekt tervezési döntései, az elemzési logika és a pipeline-architektúra 
 > saját munkám. AI-eszközöket (főként Claude) a következőkre 
 > használtam: kódgenerálás, dokumentáció és kommentek megfogalmazása, hibakeresés iteratív módszerrel, visszajelzések kérése. A modellek kiválasztása és az üzleti értelmezés emberi döntés maradt.
 </summary>

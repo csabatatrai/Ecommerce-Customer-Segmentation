@@ -96,7 +96,12 @@ else:
     RAW_XLSX     : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
     PARQUET_OUT  : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
-    ✅ Nyers XLSX megtalálható, konverzió következik: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
+    ⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...
+       URL: https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip
+       Letöltve: 45.6 MB
+       Kibontás: online_retail_II.xlsx → online_retail_II.xlsx
+    
+    ✅ Nyers XLSX mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx  (45.6 MB)
     
 
 ### 0.2 – XLSX → Parquet konverzió (python-calamine engine)
@@ -171,13 +176,13 @@ else:
 ```
 
     XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
-      • Sheet 'Year 2009-2010': 525,461 sor  (14.2s)
-      • Sheet 'Year 2010-2011': 541,910 sor  (28.8s)
+      • Sheet 'Year 2009-2010': 525,461 sor  (16.8s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (33.2s)
     
     ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
        Fájlméret:  6.9 MB
        Sorok:      1,067,371 | Oszlopok: 8
-       Futási idő: 30.7s
+       Futási idő: 35.3s
     
     Séma:
     Invoice        string[python]
@@ -562,7 +567,7 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 10 sor, 1 csere.
+    [README] Táblázat frissítve: 15 sor, 1 csere.
     
     ==================================================
     Kesz!
