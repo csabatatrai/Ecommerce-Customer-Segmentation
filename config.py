@@ -44,10 +44,10 @@ CHURN_PREDICTIONS_PARQUET = PROCESSED_DIR / "churn_predictions.parquet"
 
 
 """
-! Későbbi 04-es CLV notebook bővítéshez:
+! Későbbi 05-ös CLV notebook bővítéshez:
 """
 # ============================================================
-# 04-es notebook – BG/NBD + Gamma-Gamma CLV regresszió
+# 05-ös notebook – BG/NBD + Gamma-Gamma CLV regresszió
 # ============================================================
 # Szükséges csomag: pip install lifetimes
 #
