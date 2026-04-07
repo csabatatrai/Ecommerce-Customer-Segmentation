@@ -40,6 +40,7 @@
 </p>
 
 <a id="adathalmaz"></a>
+
 ## Adathalmaz
 
 Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi tranzakciós adathalmaz.
@@ -194,6 +195,17 @@ flowchart TD
 ```
 <a id="gyik"></a>
 ## GYIK
+
+<details>
+<summary>💡 Hogyan használtam AI-eszközöket a projekt során?</summary>
+
+> A projekt tervezési döntései, az elemzési logika és a pipeline-architektúra 
+> saját munkám. AI-eszközöket (főként Claude) a következőkre 
+> használtam: kódgenerálás, dokumentáció és kommentek megfogalmazása, hibakeresés iteratív módszerrel, visszajelzések kérése. A modellek kiválasztása és az üzleti értelmezés emberi döntés maradt.
+</summary>
+</details>
+
+---
 
 <details>
 <summary>💡 Milyen módszerrel történt az adatfeltárás (EDA)?</summary>
