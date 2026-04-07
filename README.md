@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/Storage-Parquet-50fa7b?style=flat-square" alt="Parquet">
   <img src="https://img.shields.io/badge/License-MIT-06d6a0?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/AI--assisted-Claude-a855f7?style=flat-square" alt="AI-assisted">
 </p>
 
 <p align="center">
