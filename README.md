@@ -9,12 +9,11 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Focus-MLOps_%26_Engineering-22c55e?style=flat-square" alt="Focus">
   <img src="https://img.shields.io/badge/Model-XGBoost-f97316?style=flat-square" alt="XGBoost">
   <img src="https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/Storage-Parquet-50fa7b?style=flat-square" alt="Parquet">
-  <img src="https://img.shields.io/badge/License-MIT-06d6a0?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/AI--assisted-Claude-a855f7?style=flat-square" alt="AI-assisted">
 </p>
 
@@ -30,7 +29,7 @@
 </p>
 
 <p align="center">
-🛒End-to-end data product: RFM szegmentáció · Prediktív churn-modellezés · Interaktív dashboard
+🛒End-to-end data product interaktív dashboarddal.
 </p>
 
 [<img src="https://github.com/csabatatrai/csabatatrai/blob/main/dataproduct1.webp?raw=true" alt="Ecommerce projekt kép" title="Kattints a portfólióm megtekintéséhez!">](https://csabatatrai.hu/)
