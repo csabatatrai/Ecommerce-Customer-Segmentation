@@ -9,15 +9,17 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Focus-MLOps_%26_Engineering-22c55e?style=flat-square" alt="Focus">
+  <img src="https://img.shields.io/badge/Focus-MLOps_-22c55e?style=flat-square" alt="Focus">
   <img src="https://img.shields.io/badge/Model-XGBoost-f97316?style=flat-square" alt="XGBoost">
   <img src="https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?style=flat-square&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/Storage-Parquet-50fa7b?style=flat-square" alt="Parquet">
   <img src="https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Roles-Data_Engineering_%26_Steward-8b5cf6?style=flat-square" alt="Roles">
 </p>
 
 <p align="center">
   <a href="#adathalmaz">Adathalmaz</a> &bull;
+  <a href="#eredmenyek">Eredmények</a> &bull;
   <a href="#elemzes-lepesek">Elemzési lépések</a> &bull;
   <a href="#dashboard">Dashboard</a> &bull;
   <a href="#setup">Setup</a> &bull;
@@ -39,13 +41,13 @@
 </p>
 
 <a id="adathalmaz"></a>
-
 ## Adathalmaz
 
 Az elemzés alapja egy [Kaggle-ről](https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data) (eredeti: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)) származó valódi, ~1 millió soros tranzakciós adathalmaz 2009 és 2011 közti, Egyesült Királyságban működő kereskedő tranzakcióival.
 
 > Az adathalmazban B2B és B2C ügyfelek vegyesen szerepelnek. Ez különösen indokolja az RFM-alapú szegmentációs megközelítést, ahol a visszatérő vásárlók azonosítása és a churn előrejelzése üzletileg kritikus..
 
+<a id="eredmenyek"></a>
 ## Eredmények
 
 ### Adattisztítás
@@ -116,9 +118,7 @@ A legfontosabb feature mindkét modellben: `recency_days` (SHAP-hatás ~+0,4), e
 | 6 | Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#6-adatbetöltés-time-split-és-célváltozó-churn-kialakítása) |
 | 7 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#7-ab-modellezés-pipeline-ok-felépítése) |
 | 8 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#8-keresztvalidáció-és-modellek-összehasonlítása) |
-| 9 | Modell magyarázata SHAP segítségével | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#9-modell-magyarázata-shap-segítségével) |
-| 10 | Üzleti kiértékelés és Akciótervek | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#10-üzleti-kiértékelés-és-akciótervek) |
-| 11 | Export - A modell és az előrejelzések mentése | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#11-export---a-modell-és-az-előrejelzések-mentése) |
+| 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#9-végleges-modell-exportja) |
 
 <a id="dashboard"></a>
 ## Dashboard

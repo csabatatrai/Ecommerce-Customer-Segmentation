@@ -1164,7 +1164,7 @@ display(cluster_profile)
 
 
 <div class="alert alert-success">
-<b>✅Üzleti Insight</b> A táblázatból jól látszik, hogy a legmagasabb visszaküldési aránnyal (cca. 16%) a VIP Bajnokok rendelkeznek. Ez tipikus e-kereskedelmi viselkedés: a leglojálisabb és legtöbbet költő vásárlók használják a legbátrabban a visszaküldési politikát. Ezt a mutatót a következő notebookban a lemorzsolódás (churn) előrejelzésénél fontos feature-ként fogjuk kezelni.
+<b>✅Üzleti felismerés (insight)</b> A táblázatból jól látszik, hogy a legmagasabb visszaküldési aránnyal (cca. 16%) a VIP Bajnokok rendelkeznek. Ez tipikus e-kereskedelmi viselkedés: a leglojálisabb és legtöbbet költő vásárlók használják a legbátrabban a visszaküldési politikát. Ezt a mutatót a következő notebookban a lemorzsolódás (churn) előrejelzésénél fontos feature-ként fogjuk kezelni.
 </div>
 
 ### 5.2 Szegmentált adatok mentése az XGBoost számára
@@ -1200,7 +1200,8 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
 *Az ugrás gomb nem minden környezetben működik!
 
 # Dokumentáció frissítése README.md-ben és docs mappában
-🚨 **Ctrl+S szükséges az alábbi cella futtatása előtt, mivel az nbconvert lemezről olvas!**
+🚨 **Figyelmeztetés:** <kbd>Ctrl</kbd> + <kbd>S</kbd> / <kbd>Cmd ⌘</kbd> + <kbd>S</kbd> szükséges az alábbi cella futtatása előtt!  
+(Az nbconvert a fájl utolsó elmentett állapotát olvassa a lemezről, nem az aktuális memóriaképet.)
 
 
 ```python
@@ -1214,7 +1215,7 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [02_customer_segmentation.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 12 sor, 1 csere.
+    [README] Táblázat frissítve: 10 sor, 1 csere.
     
     ==================================================
     Kesz!

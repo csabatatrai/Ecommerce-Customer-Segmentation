@@ -5,7 +5,7 @@
 
 ---
 
-**Bemenet:** UCI ML Repository – Online Retail II (automatikus letöltés, nincs szükség kézi beavatkozásra)  
+**Bemenet:** UCI ML Repository - Online Retail II (automatikus letöltés, nincs szükség kézi beavatkozásra, letölti az .xlsx fájlt)  
 **Kimenetek:** 
 - `data/raw/online_retail_II.xlsx` (letöltött nyers forrás, cache)
 - `data/raw/online_retail_raw.parquet` (Nyers adat gyorsítótárazva)
@@ -26,6 +26,8 @@ Mindkét cella **idempotens**: ha a fájl már létezik lemezen, a letöltés é
 kimarad. Kézi beavatkozásra csak akkor van szükség, ha az UCI szervere nem elérhető
 (ebben az esetben a cella részletes instrukciót ad a Kaggle-ről történő kézi letöltéshez).
 
+
+### 0.1 – Konfiguráció, könyvtárak és adathalmaz letöltése
 
 
 ```python
@@ -94,13 +96,10 @@ else:
     RAW_XLSX     : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
     PARQUET_OUT  : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
     
-    ⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...
-       URL: https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip
-       Letöltve: 45.6 MB
-       Kibontás: online_retail_II.xlsx → online_retail_II.xlsx
+    ✅ Nyers XLSX megtalálható, konverzió következik: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
     
-    ✅ Nyers XLSX mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx  (45.6 MB)
-    
+
+### 0.2 – XLSX → Parquet konverzió (python-calamine engine)
 
 
 ```python
@@ -172,13 +171,13 @@ else:
 ```
 
     XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
-      • Sheet 'Year 2009-2010': 525,461 sor  (15.4s)
-      • Sheet 'Year 2010-2011': 541,910 sor  (31.7s)
+      • Sheet 'Year 2009-2010': 525,461 sor  (14.2s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (28.8s)
     
     ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
        Fájlméret:  6.9 MB
        Sorok:      1,067,371 | Oszlopok: 8
-       Futási idő: 33.8s
+       Futási idő: 30.7s
     
     Séma:
     Invoice        string[python]
@@ -195,7 +194,6 @@ else:
 ## 1. Adattisztítás
 
 ### 1.1. Első lépések
-
 A Customer Lifetime Value (CLV) modellezés és az RFM szegmentáció alapfeltétele, hogy az adatokat vásárlói szinten tudjuk aggregálni. Ennek megfelelően az alábbi tisztítási lépéseket végezzük el:
 
 - **Anonim tranzakciók eltávolítása:** A hiányzó `Customer ID`-val rendelkező sorok kötelezően eldobandók.
@@ -324,7 +322,6 @@ df.info()
     
 
 ### 1.3. Technikai outlierek és anomáliák szűrése (Feature Engineering előtt)
-
 Mielőtt rátérnénk a vásárlói érték (RFM és CLV) kiszámítására, el kell távolítanunk a rendszerben maradt **technikai anomáliákat**. Fontos: itt még nem a statisztikai outliereket (pl. a kiugróan sokat költő VIP vevőket) kezeljük, hanem azokat a tranzakciókat, amelyek **torzítanák vagy logikailag ellehetetlenítenék** a vásárlói profilalkotást.
 
 Ebben a lépésben az alábbi "zajokat" szűrjük:
@@ -379,9 +376,10 @@ print(f"Adathalmaz mentve a következő fázishoz: {READY_FOR_RFM_PARQUET}")
     
 
 ### 1.4 Statisztikai érvényesség és üzleti logika ellenőrzése
+
 Míg a kezdeti EDA során a `describe()` a hibák felfedezését szolgálta, itt már **minőségbiztosítási (QA)** szerepe van. Az alábbi kimenet bizonyítja, hogy a tisztítási logikánk sikeres volt:
 * **Érvényes árak:** A `Price` oszlop minimum értéke szigorúan **> 0** (nincsenek ingyenes vagy negatív árú, adminisztratív tételek).
-* **Reális mennyiségek:** A `Quantity` oszlop extrém, rendszerhibából fakadó kilengései (pl. +/- 80 000 darab) eltűntek, a maximum és minimum értékek a beállított küszöbértéken belül maradtak.
+* **Reális mennyiségek:** A `Quantity` és `LineTotal` oszlopokban látható negatív értékek **szándékosak és helyesek**: ezek a visszaküldött (sztornó) tételek, amelyeket az `1.1`-es lépésben tudatosan megtartottunk, mivel a visszaküldési arány (`return_ratio`) fontos feature lesz a churn modellben. Az eltávolítás célpontjai a **rendszerhibás kilengések** voltak (pl. `±80 000` db-os tételek) – ezek eltűntek, a szélső értékek a beállított küszöbértéken belül maradtak.
 * **Adatszivárgás megelőzése:** Nincsenek olyan anomáliák, amik a későbbi aggregált RFM metrikákat (pl. átlagos kosárérték) irreális irányba torzítanák.
 
 
@@ -483,6 +481,7 @@ df.describe()
 
 
 ### 1.5. Cutoff validáció
+
 **Elegendő adat van-e a célablakban?**
 
 Mielőtt a `config.py`-ban rögzített `CUTOFF_DATE` értékét véglegesnek tekintjük,
@@ -547,7 +546,9 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
 *Az ugrás gomb nem minden környezetben működik!
 
 # Dokumentáció frissítése README.md-ben és docs mappában
-🚨 **Ctrl+S szükséges az alábbi cella futtatása előtt, mivel az nbconvert lemezről olvas!**
+
+🚨 **Figyelmeztetés:** <kbd>Ctrl</kbd> + <kbd>S</kbd> / <kbd>Cmd ⌘</kbd> + <kbd>S</kbd> szükséges az alábbi cella futtatása előtt!  
+(Az nbconvert a fájl utolsó elmentett állapotát olvassa a lemezről, nem az aktuális memóriaképet.)
 
 
 ```python
@@ -561,7 +562,7 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 12 sor, 1 csere.
+    [README] Táblázat frissítve: 10 sor, 1 csere.
     
     ==================================================
     Kesz!
