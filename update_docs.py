@@ -8,7 +8,7 @@ Teljes dokumentacio ujraepites (ha abraat toroltel, vagy a script logikajat modo
     python update_docs.py --clean
 
 A --clean flag torli a teljes docs/ mappat, majd nullarol ujrageneralja.
-Normal fejlesztes kozben nem szukseges — csak akkor, ha elavult fajlokat
+Normal fejlesztes kozben nem szukseges, csak akkor, ha elavult fajlokat
 kell eltavolitani a docs/-bol.
 
 A script a docs/ mappa frissitese utan automatikusan ujraepiti a README.md-ben
@@ -222,7 +222,7 @@ def github_anchor(heading_text: str) -> str:
     """
     text = heading_text.strip().lower()
     # Em-dash (–) és em-dash (—) explicit szóközzé alakítása, mielőtt a többi
-    # speciális karakter törlődne — így nem keletkezik dupla szóköz a környező
+    # speciális karakter törlődne, így nem keletkezik dupla szóköz a környező
     # szóközökkel, ami dupla kötőjelet adna az anchorban
     text = re.sub(r'[\u2013\u2014]', ' ', text)
     # Csak Unicode word-karakterek (\w = betű/szám/aláhúzás), szóköz és kötőjel marad
@@ -237,7 +237,7 @@ def extract_h2_headings_from_notebook(nb_path: str) -> list[str]:
     ## szintű, számozott fejléceket olvas közvetlenül a .ipynb fájlból.
 
     A docs/*.md helyett a notebookot olvassa, mert az a forrás mindig friss
-    és formátumfüggetlen — az nbconvert kimenet esetenként eltérhet attól,
+    és formátumfüggetlen, az nbconvert kimenet esetenként eltérhet attól,
     amit a regex a .md fájlban elvárna.
 
     Csak azokat adja vissza, amelyek számmal kezdődnek (pl. "0. Cím", "11. Cím").
@@ -327,7 +327,7 @@ def update_readme_steps_table(readme_path: str, notebooks_dir: str, docs_dir: st
     table_pattern = re.compile(
         r'(\| # \| Lépés \|[^\n]*\n'       # fejléc sor
         r'\|[-| :]+\n'                      # elválasztó sor (pl. |---|---|...)
-        r'(?:\|[^\n]*(?:\n|$))*)',          # adatsorok — utolsó sor \n nélkül is elfogva
+        r'(?:\|[^\n]*(?:\n|$))*)',          # adatsorok, utolsó sor \n nélkül is elfogva
         re.MULTILINE,
     )
 
@@ -358,7 +358,7 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
     es frissiti a .md hivatkozasokat.
 
     only: ha meg van adva, csak ezt az egy notebookot dolgozza fel
-          (pl. "03_churn_prediction.ipynb") — a tobbi erintetlen marad.
+          (pl. "03_churn_prediction.ipynb") - a tobbi erintetlen marad.
 
     A notebookok feldolgozasa utan automatikusan frissul a README.md
     'Elemzes foobb lepései' tablazata is.
@@ -400,7 +400,7 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
         auto_map = build_auto_name_map(notebook)
 
         # 3. Kepek athelyezese es atnevezese
-        # Elobb toroljuk a korabbi kepeket — kulonben ujrafutaskor duplikalodnak
+        # Elobb toroljuk a korabbi kepeket, kulonben ujrafutaskor duplikalodnak
         if os.path.exists(nb_img_dir):
             shutil.rmtree(nb_img_dir)
         os.makedirs(nb_img_dir)
@@ -414,7 +414,7 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
 
                 descriptive, is_fallback = resolve_image_name(base_name, stem, auto_map)
 
-                # Move elobb — a print crash nem akadalyozhatja meg az athelyezest
+                # Move elobb, a print crash nem akadalyozhatja meg az athelyezest
                 new_filename = f"{descriptive}{ext}"
                 dst = os.path.join(nb_img_dir, new_filename)
                 shutil.move(src, dst)
@@ -435,7 +435,7 @@ def update_documentation(clean: bool = False, only: str | None = None) -> None:
                 new_ref = f"images/{base_name}/{os.path.basename(dst)}"
                 ref_map[old_ref] = new_ref
 
-            # Ideiglenes mappa torlese — rmtree, mert az nbconvert
+            # Ideiglenes mappa torlese - rmtree, mert az nbconvert
             # nem-kep fajlokat is generalhat, az rmdir csak ures mappakon mukodik
             shutil.rmtree(files_dir, ignore_errors=True)
 

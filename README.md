@@ -139,7 +139,7 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 > ℹ️ **Baseline:** PR-AUC véletlen alapvonal ~0,557 (osztályarány); a fejlesztési modell (0,8253) közel **1,48×-es javulást** jelent.
 <a id="elemzes-lepesek"></a>
 ## Elemzési lépések 
->A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export – Előrejelzések mentése`) — csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók GitHub-on.
+>A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export – Előrejelzések mentése`) - csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók GitHub-on.
 
 | # | Lépés | Notebook | Lefutott eredmények megtekintése (ugrás adott részhez) |
 |---|-------|----------|----------------------------------|
