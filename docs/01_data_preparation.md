@@ -1,11 +1,14 @@
 <a id="teteje"></a>
 # 01 Adatelőkészítés: Data Preparation (dataset beszerzés, tisztítás és transzformáció)
 ---
-**Függőség:** `config.py` (Útvonalak definíciója)
+**Függőség:** 
+- `config.py` (Útvonalak definíciója)
 
 ---
 
-**Bemenet:** UCI ML Repository - Online Retail II (automatikus letöltés, nincs szükség kézi beavatkozásra, letölti az .xlsx fájlt)  
+**Bemenet:** 
+- UCI ML Repository - Online Retail II (automatikus letöltés, nincs szükség kézi beavatkozásra, letölti az .xlsx fájlt)  
+
 **Kimenetek:** 
 - `data/raw/online_retail_II.xlsx` (letöltött nyers forrás, cache)
 - `data/raw/online_retail_raw.parquet` (Nyers adat gyorsítótárazva)
@@ -176,13 +179,13 @@ else:
 ```
 
     XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
-      • Sheet 'Year 2009-2010': 525,461 sor  (16.8s)
-      • Sheet 'Year 2010-2011': 541,910 sor  (33.2s)
+      • Sheet 'Year 2009-2010': 525,461 sor  (13.8s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (28.7s)
     
     ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
        Fájlméret:  6.9 MB
        Sorok:      1,067,371 | Oszlopok: 8
-       Futási idő: 35.3s
+       Futási idő: 30.6s
     
     Séma:
     Invoice        string[python]
@@ -564,7 +567,7 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     Docs frissitese...
     ==================================================
     [01_data_preparation.ipynb] Konvertalas Markdown-ra...
-    [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
+    [01_data_preparation.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
     [README] Táblázat frissítve: 15 sor, 1 csere.

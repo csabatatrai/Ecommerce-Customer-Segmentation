@@ -1,7 +1,9 @@
 <a id="teteje"></a>
 # 04 Modell Kiértékelés: Kalibráció, SHAP, Threshold & Üzleti Akciótervek
 ---
-**Függőség:** `config.py` · `03_churn_prediction.ipynb` (előtte kell lefuttatni)
+**Függőség:** 
+- `config.py`
+- `03_churn_prediction.ipynb` (előtte kell lefuttatni)
 
 ---
 
@@ -630,15 +632,7 @@ print(f"   Feature nevek: {FEATURE_NAMES}")
     SHAP értékek számítása az összes ügyfélen (néhány perc)...
     
 
-    ExactExplainer explainer: 5244it [00:19, 135.63it/s]                                                                   
-    
-
-    
-    ✔️ SHAP értékek kiszámítva: (5243, 5, 2)
-       Churn=1 szelet alakja:   (5243, 5)
-       Base value (Churn=1):    0.5295
-       Feature nevek: ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio']
-    
+    ExactExplainer explainer:  22%|███████████▍                                       | 1172/5243 [00:17<00:12, 327.40it/s]
 
 ### 12.2 SHAP Summary Plot – Globális feature fontosság
 
@@ -675,22 +669,6 @@ print("  • Magas recency_days (piros, jobbra) → churnel: aki rég vásárolt
 print("  • Alacsony frequency (kék, jobbra)  → churnel: ritka vásárló nagyobb kockázat")
 print("  • Magas monetary_total (piros, balra) → marad: a legtöbbet költők hűségesek")
 ```
-
-    SHAP Summary Plot generálása...
-    
-
-
-    
-![png](images/04_model_evaluation/04_12.2_SHAP_Summary_Plot_–_Globális_feature_fontosság.png)
-    
-
-
-    
-    📊 Értelmezés:
-      • Magas recency_days (piros, jobbra) → churnel: aki rég vásárolt, elmegy
-      • Alacsony frequency (kék, jobbra)  → churnel: ritka vásárló nagyobb kockázat
-      • Magas monetary_total (piros, balra) → marad: a legtöbbet költők hűségesek
-    
 
 ### 12.3 SHAP Waterfall Plot – Egyedi VIP ügyfél magyarázata
 
@@ -746,49 +724,6 @@ plt.title(f'SHAP Waterfall Plot – VIP lemorzsolódó ügyfél (ID: {selected_i
 plt.tight_layout()
 plt.show()
 ```
-
-    Elemzett VIP lemorzsolódó ügyfél: ID 17305
-    
-    Az elemzett ügyfél profilja:
-    
-
-
-<style type="text/css">
-</style>
-<table id="T_00bcc">
-  <thead>
-    <tr>
-      <th class="blank level0" >&nbsp;</th>
-      <th id="T_00bcc_level0_col0" class="col_heading level0 col0" >recency_days</th>
-      <th id="T_00bcc_level0_col1" class="col_heading level0 col1" >frequency</th>
-      <th id="T_00bcc_level0_col2" class="col_heading level0 col2" >monetary_total</th>
-      <th id="T_00bcc_level0_col3" class="col_heading level0 col3" >monetary_avg</th>
-      <th id="T_00bcc_level0_col4" class="col_heading level0 col4" >return_ratio</th>
-      <th id="T_00bcc_level0_col5" class="col_heading level0 col5" >churn</th>
-      <th id="T_00bcc_level0_col6" class="col_heading level0 col6" >churn_proba</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th id="T_00bcc_level0_row0" class="row_heading level0 row0" >17305</th>
-      <td id="T_00bcc_row0_col0" class="data row0 col0" >556</td>
-      <td id="T_00bcc_row0_col1" class="data row0 col1" >1.000000</td>
-      <td id="T_00bcc_row0_col2" class="data row0 col2" >£2,135</td>
-      <td id="T_00bcc_row0_col3" class="data row0 col3" >£2,135</td>
-      <td id="T_00bcc_row0_col4" class="data row0 col4" >0.000000</td>
-      <td id="T_00bcc_row0_col5" class="data row0 col5" >1.000000</td>
-      <td id="T_00bcc_row0_col6" class="data row0 col6" >75.26%</td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-
-    
-![png](images/04_model_evaluation/04_12.3_SHAP_Waterfall_Plot_–_Egyedi_VIP_ügyfél_magyarázata.png)
-    
-
 
 ### 12.4 Feature importance konzisztencia-ellenőrzés: XGBoost natív vs. SHAP
 
@@ -863,74 +798,6 @@ elif rho > 0.5:
 else:
     print("  🚨 Gyenge egyezés – a SHAP és a natív importance ellentmond egymásnak!")
 ```
-
-    Feature Importance összehasonlítás (SHAP vs. XGBoost Gain):
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>SHAP (normalizált)</th>
-      <th>XGBoost Gain (normalizált)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>recency_days</th>
-      <td>0.5574</td>
-      <td>0.4803</td>
-    </tr>
-    <tr>
-      <th>frequency</th>
-      <td>0.2081</td>
-      <td>0.3185</td>
-    </tr>
-    <tr>
-      <th>monetary_total</th>
-      <td>0.1921</td>
-      <td>0.1512</td>
-    </tr>
-    <tr>
-      <th>return_ratio</th>
-      <td>0.0248</td>
-      <td>0.0238</td>
-    </tr>
-    <tr>
-      <th>monetary_avg</th>
-      <td>0.0177</td>
-      <td>0.0262</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-    
-![png](images/04_model_evaluation/04_12.4_Feature_importance_konzisztencia-ellenőrzés_XGBoost_natív_vs._SHAP.png)
-    
-
-
-    
-    📊 Sorrend-konzisztencia (Spearman ρ): 0.900  (p=0.037)
-      ✅ A két módszer erősen egyezik – a SHAP eredmények megbízhatóak.
-    
 
 ## 13. Üzleti kiértékelés és akciótervek
 
@@ -1025,152 +892,6 @@ cross_tab = pd.crosstab(
 display(cross_tab)
 ```
 
-    ✔️ Szegmenscímkék becsatolva ('Segment' oszlopból)
-       Egyedi szegmensek: ['Elvesztett / Inaktív', 'Lemorzsolódó / Alvó', 'VIP Bajnokok', 'Új / Ígéretes']
-    
-    Optimális threshold alkalmazva: 0.419
-    
-    Üzleti akció-szegmensek összefoglalása:
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Akció kategória</th>
-      <th>Ügyfelek száma</th>
-      <th>Arány (%)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>⚠️  Lemorzsolódó – Win-Back Kampány</td>
-      <td>2473</td>
-      <td>47.2</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>💎 VIP Stabil – Lojalitás Program</td>
-      <td>1558</td>
-      <td>29.7</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>🚨 VIP Veszélyben – Azonnali Retenció</td>
-      <td>1062</td>
-      <td>20.3</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>✅ Stabil – Standard Kommunikáció</td>
-      <td>150</td>
-      <td>2.9</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    
-    RFM-szegmens × Churn-kockázat kereszttábla:
-    
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th>action</th>
-      <th>⚠️  Lemorzsolódó – Win-Back Kampány</th>
-      <th>✅ Stabil – Standard Kommunikáció</th>
-      <th>💎 VIP Stabil – Lojalitás Program</th>
-      <th>🚨 VIP Veszélyben – Azonnali Retenció</th>
-      <th>Összesen</th>
-    </tr>
-    <tr>
-      <th>rfm_segment</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Elvesztett / Inaktív</th>
-      <td>1987</td>
-      <td>0</td>
-      <td>0</td>
-      <td>111</td>
-      <td>2098</td>
-    </tr>
-    <tr>
-      <th>Lemorzsolódó / Alvó</th>
-      <td>224</td>
-      <td>1</td>
-      <td>476</td>
-      <td>923</td>
-      <td>1624</td>
-    </tr>
-    <tr>
-      <th>VIP Bajnokok</th>
-      <td>0</td>
-      <td>0</td>
-      <td>855</td>
-      <td>6</td>
-      <td>861</td>
-    </tr>
-    <tr>
-      <th>Új / Ígéretes</th>
-      <td>262</td>
-      <td>149</td>
-      <td>227</td>
-      <td>22</td>
-      <td>660</td>
-    </tr>
-    <tr>
-      <th>Összesen</th>
-      <td>2473</td>
-      <td>150</td>
-      <td>1558</td>
-      <td>1062</td>
-      <td>5243</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 ### 13.2 VIP Veszélyben lista – TOP 20
 
 A 🚨 VIP Veszélyben kategóriából a legmagasabb churn-valószínűségű ügyfelek listája.
@@ -1211,242 +932,6 @@ display(
 )
 ```
 
-    VIP Veszélyben ügyfelek száma: 1,062
-    Becsült veszélyeztetett bevétel: £1,880,008
-    
-    Top 20 legmagasabb kockázatú VIP ügyfél:
-    
-
-
-<style type="text/css">
-#T_3e847_row0_col5, #T_3e847_row1_col5, #T_3e847_row2_col5, #T_3e847_row3_col5, #T_3e847_row4_col5, #T_3e847_row5_col5, #T_3e847_row6_col5, #T_3e847_row7_col5, #T_3e847_row8_col5 {
-  background-color: #67000d;
-  color: #f1f1f1;
-}
-#T_3e847_row9_col5, #T_3e847_row10_col5, #T_3e847_row11_col5 {
-  background-color: #fcb499;
-  color: #000000;
-}
-#T_3e847_row12_col5, #T_3e847_row13_col5, #T_3e847_row14_col5, #T_3e847_row15_col5 {
-  background-color: #fed8c7;
-  color: #000000;
-}
-#T_3e847_row16_col5, #T_3e847_row17_col5 {
-  background-color: #fee4d8;
-  color: #000000;
-}
-#T_3e847_row18_col5, #T_3e847_row19_col5 {
-  background-color: #fff5f0;
-  color: #000000;
-}
-</style>
-<table id="T_3e847">
-  <thead>
-    <tr>
-      <th class="blank level0" >&nbsp;</th>
-      <th id="T_3e847_level0_col0" class="col_heading level0 col0" >monetary_total</th>
-      <th id="T_3e847_level0_col1" class="col_heading level0 col1" >frequency</th>
-      <th id="T_3e847_level0_col2" class="col_heading level0 col2" >recency_days</th>
-      <th id="T_3e847_level0_col3" class="col_heading level0 col3" >return_ratio</th>
-      <th id="T_3e847_level0_col4" class="col_heading level0 col4" >rfm_segment</th>
-      <th id="T_3e847_level0_col5" class="col_heading level0 col5" >churn_proba</th>
-    </tr>
-    <tr>
-      <th class="index_name level0" >Customer ID</th>
-      <th class="blank col0" >&nbsp;</th>
-      <th class="blank col1" >&nbsp;</th>
-      <th class="blank col2" >&nbsp;</th>
-      <th class="blank col3" >&nbsp;</th>
-      <th class="blank col4" >&nbsp;</th>
-      <th class="blank col5" >&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th id="T_3e847_level0_row0" class="row_heading level0 row0" >12368</th>
-      <td id="T_3e847_row0_col0" class="data row0 col0" >£918</td>
-      <td id="T_3e847_row0_col1" class="data row0 col1" >1</td>
-      <td id="T_3e847_row0_col2" class="data row0 col2" >536 nap</td>
-      <td id="T_3e847_row0_col3" class="data row0 col3" >0.0%</td>
-      <td id="T_3e847_row0_col4" class="data row0 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row0_col5" class="data row0 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row1" class="row_heading level0 row1" >13775</th>
-      <td id="T_3e847_row1_col0" class="data row1 col0" >£1,050</td>
-      <td id="T_3e847_row1_col1" class="data row1 col1" >1</td>
-      <td id="T_3e847_row1_col2" class="data row1 col2" >498 nap</td>
-      <td id="T_3e847_row1_col3" class="data row1 col3" >0.0%</td>
-      <td id="T_3e847_row1_col4" class="data row1 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row1_col5" class="data row1 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row2" class="row_heading level0 row2" >17474</th>
-      <td id="T_3e847_row2_col0" class="data row2 col0" >£1,047</td>
-      <td id="T_3e847_row2_col1" class="data row2 col1" >1</td>
-      <td id="T_3e847_row2_col2" class="data row2 col2" >507 nap</td>
-      <td id="T_3e847_row2_col3" class="data row2 col3" >0.0%</td>
-      <td id="T_3e847_row2_col4" class="data row2 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row2_col5" class="data row2 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row3" class="row_heading level0 row3" >12784</th>
-      <td id="T_3e847_row3_col0" class="data row3 col0" >£1,034</td>
-      <td id="T_3e847_row3_col1" class="data row3 col1" >1</td>
-      <td id="T_3e847_row3_col2" class="data row3 col2" >437 nap</td>
-      <td id="T_3e847_row3_col3" class="data row3 col3" >0.0%</td>
-      <td id="T_3e847_row3_col4" class="data row3 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row3_col5" class="data row3 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row4" class="row_heading level0 row4" >13204</th>
-      <td id="T_3e847_row4_col0" class="data row4 col0" >£967</td>
-      <td id="T_3e847_row4_col1" class="data row4 col1" >1</td>
-      <td id="T_3e847_row4_col2" class="data row4 col2" >639 nap</td>
-      <td id="T_3e847_row4_col3" class="data row4 col3" >0.0%</td>
-      <td id="T_3e847_row4_col4" class="data row4 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row4_col5" class="data row4 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row5" class="row_heading level0 row5" >12396</th>
-      <td id="T_3e847_row5_col0" class="data row5 col0" >£931</td>
-      <td id="T_3e847_row5_col1" class="data row5 col1" >1</td>
-      <td id="T_3e847_row5_col2" class="data row5 col2" >582 nap</td>
-      <td id="T_3e847_row5_col3" class="data row5 col3" >0.0%</td>
-      <td id="T_3e847_row5_col4" class="data row5 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row5_col5" class="data row5 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row6" class="row_heading level0 row6" >12503</th>
-      <td id="T_3e847_row6_col0" class="data row6 col0" >£896</td>
-      <td id="T_3e847_row6_col1" class="data row6 col1" >1</td>
-      <td id="T_3e847_row6_col2" class="data row6 col2" >492 nap</td>
-      <td id="T_3e847_row6_col3" class="data row6 col3" >0.0%</td>
-      <td id="T_3e847_row6_col4" class="data row6 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row6_col5" class="data row6 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row7" class="row_heading level0 row7" >14969</th>
-      <td id="T_3e847_row7_col0" class="data row7 col0" >£906</td>
-      <td id="T_3e847_row7_col1" class="data row7 col1" >1</td>
-      <td id="T_3e847_row7_col2" class="data row7 col2" >611 nap</td>
-      <td id="T_3e847_row7_col3" class="data row7 col3" >0.0%</td>
-      <td id="T_3e847_row7_col4" class="data row7 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row7_col5" class="data row7 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row8" class="row_heading level0 row8" >15559</th>
-      <td id="T_3e847_row8_col0" class="data row8 col0" >£1,109</td>
-      <td id="T_3e847_row8_col1" class="data row8 col1" >1</td>
-      <td id="T_3e847_row8_col2" class="data row8 col2" >476 nap</td>
-      <td id="T_3e847_row8_col3" class="data row8 col3" >0.0%</td>
-      <td id="T_3e847_row8_col4" class="data row8 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row8_col5" class="data row8 col5" >75.6%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row9" class="row_heading level0 row9" >17039</th>
-      <td id="T_3e847_row9_col0" class="data row9 col0" >£1,955</td>
-      <td id="T_3e847_row9_col1" class="data row9 col1" >1</td>
-      <td id="T_3e847_row9_col2" class="data row9 col2" >512 nap</td>
-      <td id="T_3e847_row9_col3" class="data row9 col3" >0.0%</td>
-      <td id="T_3e847_row9_col4" class="data row9 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row9_col5" class="data row9 col5" >75.3%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row10" class="row_heading level0 row10" >12911</th>
-      <td id="T_3e847_row10_col0" class="data row10 col0" >£1,652</td>
-      <td id="T_3e847_row10_col1" class="data row10 col1" >1</td>
-      <td id="T_3e847_row10_col2" class="data row10 col2" >459 nap</td>
-      <td id="T_3e847_row10_col3" class="data row10 col3" >0.0%</td>
-      <td id="T_3e847_row10_col4" class="data row10 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row10_col5" class="data row10 col5" >75.3%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row11" class="row_heading level0 row11" >17305</th>
-      <td id="T_3e847_row11_col0" class="data row11 col0" >£2,135</td>
-      <td id="T_3e847_row11_col1" class="data row11 col1" >1</td>
-      <td id="T_3e847_row11_col2" class="data row11 col2" >556 nap</td>
-      <td id="T_3e847_row11_col3" class="data row11 col3" >0.0%</td>
-      <td id="T_3e847_row11_col4" class="data row11 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row11_col5" class="data row11 col5" >75.3%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row12" class="row_heading level0 row12" >13559</th>
-      <td id="T_3e847_row12_col0" class="data row12 col0" >£990</td>
-      <td id="T_3e847_row12_col1" class="data row12 col1" >2</td>
-      <td id="T_3e847_row12_col2" class="data row12 col2" >420 nap</td>
-      <td id="T_3e847_row12_col3" class="data row12 col3" >0.0%</td>
-      <td id="T_3e847_row12_col4" class="data row12 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row12_col5" class="data row12 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row13" class="row_heading level0 row13" >12905</th>
-      <td id="T_3e847_row13_col0" class="data row13 col0" >£1,012</td>
-      <td id="T_3e847_row13_col1" class="data row13 col1" >2</td>
-      <td id="T_3e847_row13_col2" class="data row13 col2" >484 nap</td>
-      <td id="T_3e847_row13_col3" class="data row13 col3" >33.3%</td>
-      <td id="T_3e847_row13_col4" class="data row13 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row13_col5" class="data row13 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row14" class="row_heading level0 row14" >15484</th>
-      <td id="T_3e847_row14_col0" class="data row14 col0" >£1,062</td>
-      <td id="T_3e847_row14_col1" class="data row14 col1" >2</td>
-      <td id="T_3e847_row14_col2" class="data row14 col2" >448 nap</td>
-      <td id="T_3e847_row14_col3" class="data row14 col3" >0.0%</td>
-      <td id="T_3e847_row14_col4" class="data row14 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row14_col5" class="data row14 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row15" class="row_heading level0 row15" >17020</th>
-      <td id="T_3e847_row15_col0" class="data row15 col0" >£936</td>
-      <td id="T_3e847_row15_col1" class="data row15 col1" >2</td>
-      <td id="T_3e847_row15_col2" class="data row15 col2" >450 nap</td>
-      <td id="T_3e847_row15_col3" class="data row15 col3" >0.0%</td>
-      <td id="T_3e847_row15_col4" class="data row15 col4" >Elvesztett / Inaktív</td>
-      <td id="T_3e847_row15_col5" class="data row15 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row16" class="row_heading level0 row16" >12671</th>
-      <td id="T_3e847_row16_col0" class="data row16 col0" >£2,622</td>
-      <td id="T_3e847_row16_col1" class="data row16 col1" >1</td>
-      <td id="T_3e847_row16_col2" class="data row16 col2" >514 nap</td>
-      <td id="T_3e847_row16_col3" class="data row16 col3" >0.0%</td>
-      <td id="T_3e847_row16_col4" class="data row16 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row16_col5" class="data row16 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row17" class="row_heading level0 row17" >18052</th>
-      <td id="T_3e847_row17_col0" class="data row17 col0" >£10,877</td>
-      <td id="T_3e847_row17_col1" class="data row17 col1" >1</td>
-      <td id="T_3e847_row17_col2" class="data row17 col2" >472 nap</td>
-      <td id="T_3e847_row17_col3" class="data row17 col3" >0.0%</td>
-      <td id="T_3e847_row17_col4" class="data row17 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row17_col5" class="data row17 col5" >75.2%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row18" class="row_heading level0 row18" >13459</th>
-      <td id="T_3e847_row18_col0" class="data row18 col0" >£1,160</td>
-      <td id="T_3e847_row18_col1" class="data row18 col1" >2</td>
-      <td id="T_3e847_row18_col2" class="data row18 col2" >532 nap</td>
-      <td id="T_3e847_row18_col3" class="data row18 col3" >0.0%</td>
-      <td id="T_3e847_row18_col4" class="data row18 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row18_col5" class="data row18 col5" >75.1%</td>
-    </tr>
-    <tr>
-      <th id="T_3e847_level0_row19" class="row_heading level0 row19" >17622</th>
-      <td id="T_3e847_row19_col0" class="data row19 col0" >£1,125</td>
-      <td id="T_3e847_row19_col1" class="data row19 col1" >2</td>
-      <td id="T_3e847_row19_col2" class="data row19 col2" >505 nap</td>
-      <td id="T_3e847_row19_col3" class="data row19 col3" >33.3%</td>
-      <td id="T_3e847_row19_col4" class="data row19 col4" >Lemorzsolódó / Alvó</td>
-      <td id="T_3e847_row19_col5" class="data row19 col5" >75.1%</td>
-    </tr>
-  </tbody>
-</table>
-
-
-
 ## 14. Export, előrejelzések mentése
 
 A `churn_predictions.parquet` az összes downstream felhasználás bemenete:
@@ -1486,25 +971,6 @@ print("="*60)
 print("\n→ Következő lépés: Streamlit dashboard (app.py)")
 ```
 
-    ✔️ Előrejelzések mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
-       Dimenziók: 5,243 ügyfél × 10 oszlop
-       Oszlopok:  ['recency_days', 'frequency', 'monetary_total', 'monetary_avg', 'return_ratio', 'churn_proba', 'churn_pred', 'actual_churn', 'rfm_segment', 'action']
-    
-    ============================================================
-    04_model_evaluation.ipynb – KÉSZ
-    ============================================================
-      Brier-score (kalibráció):    0.1824
-      Optimális threshold:         0.419
-      Teszt PR-AUC:                0.8322
-      Teszt F1 (opt. threshold):   0.7847
-      Teszt Recall (opt.):         0.8564
-      VIP Veszélyben ügyfelek:     1,062
-      Export mentve:               D:\Workspace\ecommerce-customer-segmentation\data\processed\churn_predictions.parquet
-    ============================================================
-    
-    → Következő lépés: Streamlit dashboard (app.py)
-    
-
 <div align="center">
   <br>
   <a href="#teteje">
@@ -1524,15 +990,3 @@ print("\n→ Következő lépés: Streamlit dashboard (app.py)")
 # 04-es notebook docs generálása/frissítése
 !python update_docs.py --notebook 04_model_evaluation.ipynb
 ```
-
-    Docs frissitese...
-    ==================================================
-    [04_model_evaluation.ipynb] Konvertalas Markdown-ra...
-    [04_model_evaluation.ipynb] [OK] Kesz! (7 kep)
-    
-    [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 15 sor, 1 csere.
-    
-    ==================================================
-    Kesz!
-    

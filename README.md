@@ -257,6 +257,39 @@ ecommerce-customer-segmentation/
 └── <a href="update_docs.py">update_docs.py</a>                    # 💡 dokumentáció-automatizáló szkript (részben dokumentálja magát a kód)
 </pre>
 
+<details>
+<summary>📁 Generált adatfájlok és modellek részletesen</summary>
+
+> Ezek a fájlok nem részei a repónak – a notebookok futtatásakor keletkeznek.
+
+**`data/processed/`**
+
+| Fájl | Leírás | Forrás → Cél |
+|---|---|---|
+| `online_retail_cleaned.parquet` | Köztes tisztított tranzakciós adat | 01 kimenet |
+| `online_retail_ready_for_rfm.parquet` | RFM-re kész végső tranzakciós adat | 01 kimenet → 02, 03 bemenet |
+| `rfm_features.parquet` | RFM-aggregátum outlier-szűrés előtt | 02 közbenső kimenet |
+| `customer_segments.parquet` | K-means szegmenscímkékkel ellátott ügyféladatok | 02 kimenet |
+| `test_set.parquet` | Holdout teszt szett (~1 049 ügyfél) | 03 kimenet → 04 bemenet |
+| `churn_predictions.parquet` | Teljes ügyfélbázis churn-valószínűségekkel és akciócímkékkel | 04 kimenet → Streamlit bemenet |
+
+**`data/raw/`**
+
+| Fájl | Leírás |
+|---|---|
+| `online_retail_II.xlsx` | UCI-ről letöltött nyers forrás (cache) |
+| `online_retail_raw.parquet` | Nyers adat Parquet-be konvertálva (cache) |
+
+**`models/`**
+
+| Fájl | Leírás |
+|---|---|
+| `scaler_rfm.joblib` | RFM feature-ökhöz illesztett StandardScaler |
+| `kmeans_rfm.joblib` | Tanított K-means szegmentációs modell |
+| `xgboost_churn.joblib` | Teljes adathalmazon betanított végleges XGBoost churn modell |
+
+</details>
+
 <a id="architektura"></a>
 ## Architektúra
 

@@ -1,7 +1,9 @@
 <a id="teteje"></a>
 # 03 Prediktív Modellezés: Churn Prediction (XGBoost)
 ---
-**Függőség:** `config.py` (Útvonalak definíciója és a `CUTOFF_DATE` paraméter az időablak felosztásához) és `02_customer_segmentation.ipynb` (előtte kell futtatni!)
+**Függőség:** 
+- `config.py` (Útvonalak definíciója és a `CUTOFF_DATE` paraméter az időablak felosztásához)
+- `02_customer_segmentation.ipynb` (előtte kell futtatni!)
 
 ---
 
@@ -1251,7 +1253,7 @@ print("  (SHAP, kalibráció, feature importance, threshold optimalizálás, akc
     Docs frissitese...
     ==================================================
     [03_churn_prediction.ipynb] Konvertalas Markdown-ra...
-    [03_churn_prediction.ipynb] [OK] Kesz! (1 kep)
+    [03_churn_prediction.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
     [README] Táblázat frissítve: 15 sor, 1 csere.

@@ -1,11 +1,15 @@
 <a id="teteje"></a>
 # 02 Ügyfélszegmentáció: Customer Segmentation (RFM & K-means)
 ---
-**Függőség:** `config.py` (Útvonalak definíciója és a `Q_THRESHOLD` paraméter az outlierek szűréséhez) és `01_data_preparation.ipynb` (előtte kell futtatni!)
+**Függőség:** 
+- `config.py` (Útvonalak definíciója és a `Q_THRESHOLD` paraméter az outlierek szűréséhez)
+- `01_data_preparation.ipynb` (előtte kell futtatni!)
 
 ---
 
-**Bemenet:** `data/processed/online_retail_ready_for_rfm.parquet`  
+**Bemenet:** 
+- `data/processed/online_retail_ready_for_rfm.parquet`
+
 **Kimenetek:** 
 - `data/processed/rfm_features.parquet` (Feature-engineering utáni állapot)
 - `data/processed/customer_segments.parquet` (Végső klaszterezett ügyféladatok)
@@ -1212,7 +1216,7 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     Docs frissitese...
     ==================================================
     [02_customer_segmentation.ipynb] Konvertalas Markdown-ra...
-    [02_customer_segmentation.ipynb] [OK] Kesz! (4 kep)
+    [02_customer_segmentation.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
     [README] Táblázat frissítve: 15 sor, 1 csere.
