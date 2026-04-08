@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import base64
 from pathlib import Path
 
@@ -99,6 +101,21 @@ if not df_preds.empty and not df_tx.empty:
     grey_zone_count = int(grey_zone_mask.sum())
     grey_zone_pct = grey_zone_count / len(df_preds) * 100
 
+    # ==========================================
+    # 7. KPI – Átlagos lemorzsolódási arány
+    # ==========================================
+    total_customers = len(df_preds)
+    churned_customers = int((df_preds['actual_churn'] == 1).sum())
+    churn_rate_pct = churned_customers / total_customers * 100
+
+    # ==========================================
+    # 8. KPI – VIP Bajnokok visszaküldési aránya
+    # ==========================================
+    vip_champions = df_preds[df_preds['rfm_segment'] == 'VIP Bajnokok']
+    vip_champions_count = len(vip_champions)
+    vip_return_ratio_pct = vip_champions['return_ratio'].mean() * 100
+    overall_return_ratio_pct = df_preds['return_ratio'].mean() * 100
+
     # -------------------------------------------------------
     # Háttérkép betöltése (base64, hogy Streamlit biztosan kiszolgálja)
     # -------------------------------------------------------
@@ -153,6 +170,11 @@ if not df_preds.empty and not df_tx.empty:
                 letter-spacing: -0.5px;
                 margin-top: 0.25rem;
             }}
+            .kpi-sub {{
+                font-size: 13px;
+                color: rgba(200, 207, 232, 0.65);
+                margin-top: 0.1rem;
+            }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -170,8 +192,23 @@ if not df_preds.empty and not df_tx.empty:
                 <div class="kpi-value">{vip_at_risk_count:,} fő</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">🎯 "Szürke Zóna" – Menthető ügyfelek aránya</div>
+                <div class="kpi-label">🎯 "Szürke Zóna" – Bizonytalan churn-valószínűségű ügyfelek</div>
                 <div class="kpi-value">{grey_zone_pct:.1f}%</div>
+                <div class="kpi-sub">{grey_zone_count:,} fő a teljes {len(df_preds):,} fős ügyfélbázisból, az ő marketing célzásuk megtérülése a legmagasabb!</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">📉 Átlagos lemorzsolódási (churn) arány</div>
+                <div class="kpi-value">{churn_rate_pct:.1f}%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">🧮 Modellezhető aktív ügyfélbázis</div>
+                <div class="kpi-value">{total_customers:,} fő</div>
+                <div class="kpi-sub">Az RFM modellbe bevont, érvényes vásárlók száma</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">↩️ Legértékesebb ügyfelek (VIP Bajnokok) visszaküldési aránya</div>
+                <div class="kpi-value">{vip_return_ratio_pct:.1f}%</div>
+                <div class="kpi-sub">Teljes bázis átlaga: {overall_return_ratio_pct:.1f}% — {vip_champions_count:,} VIP Bajnok ügyfélre számítva</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -229,7 +266,7 @@ if not df_preds.empty and not df_tx.empty:
             *Megjegyzés: Az `actual_churn` kizárólag historikus validációs label. Éles működésben ez az érték nem ismert előre – ezért is van szükség a modellre.*
             """)
 
-    col3, _ = st.columns(2)
+    col3, col4 = st.columns(2)
     with col3:
         with st.expander("ℹ️ Hogyan számoltuk? – \"Szürke Zóna\""):
             st.markdown(f"""
@@ -253,3 +290,64 @@ if not df_preds.empty and not df_tx.empty:
 
             *Megjegyzés: A küszöbértékek az app.py-ban a `grey_zone_lower` / `grey_zone_upper` változókkal módosíthatók.*
             """)
+
+    with col4:
+        with st.expander("ℹ️ Hogyan számoltuk? – Átlagos lemorzsolódási arány"):
+            st.markdown(f"""
+            **Adatforrás:** `churn_predictions.parquet` — a teljes ügyfélbázis historikus lemorzsolódási labelje (`actual_churn`).
+
+            **Számítás:**
+
+            $$ \\text{{Churn arány}} = \\frac{{\\text{{Lemorzsolódott ügyfelek}}}}{{\\text{{Összes ügyfél}}}} \\times 100 $$
+
+            ---
+            | Metrika | Érték |
+            |---|---|
+            | Összes ügyfél | {total_customers:,} fő |
+            | Lemorzsolódott (`actual_churn = 1`) | {churned_customers:,} fő |
+            | **Churn arány** | **{churn_rate_pct:.1f}%** |
+
+            **Értelmezés:** Ez a mutató az ügyfélmegtartási stratégia legfőbb egészségügyi indikátora. Egy {churn_rate_pct:.0f}%-os churn arány azt jelenti, hogy az ügyfelek több mint fele lemorzsolódott a megfigyelési időszakban — ez kiemelt megtartási fókuszt indokol.
+
+            *Megjegyzés: Az `actual_churn` historikus label, a modell tanítása és validációja során került meghatározásra.*
+            """)
+
+    col5, col6 = st.columns(2)
+    with col5:
+        with st.expander("ℹ️ Hogyan számoltuk? – Modellezhető aktív ügyfélbázis"):
+            st.markdown(f"""
+            **Adatforrás:** `churn_predictions.parquet` — minden olyan ügyfél, akire a modell érvényes előrejelzést tudott adni.
+
+            **Mit jelent ez a szám?** A nyers tranzakciós adatból az adatelőkészítés során kiszűrésre kerültek:
+            - hiányos azonosítójú sorok,
+            - visszáru-tranzakciók (negatív mennyiség),
+            - az RFM-számításhoz nem elegendő aktivitású ügyfelek.
+
+            Az itt látható **{total_customers:,} fő** az a végső ügyfélkör, amelyre az RFM-szegmentáció és a churn-modell együttesen alkalmazható.
+
+            **Miért fontos kontextusként?** A dashboard többi százalékos mutatója ({churn_rate_pct:.1f}% churn, {grey_zone_pct:.1f}% szürke zóna) kizárólag ebből a {total_customers:,} fős bázisból értelmezendő. Egy azonos arány kisebb bázison kisebb abszolút érintett számot jelent — ez a kártya adja meg a léptéket.
+            """)
+
+    with col6:
+        with st.expander("ℹ️ Hogyan számoltuk? – VIP Bajnokok visszaküldési aránya"):
+            st.markdown(f"""
+            **Célcsoport:** Az `rfm_segment == 'VIP Bajnokok'` szegmens — a legmagasabb RFM-pontszámú, leglojálisabb és legtöbbet költő {vip_champions_count:,} ügyfél.
+
+            **A `return_ratio` definíciója:**
+
+            $$ \\text{{return\\_ratio}} = \\frac{{\\text{{visszaküldött tételek száma}}}}{{\\text{{összes tranzakciós sor}}}} $$
+
+            Ez az arány az adatelőkészítés során ügyfelenkénti szinten kerül kiszámításra a nyers tranzakciós adatból (negatív `Quantity` = visszaküldés).
+
+            ---
+            | Metrika | Érték |
+            |---|---|
+            | VIP Bajnokok átlagos visszaküldési aránya | **{vip_return_ratio_pct:.1f}%** |
+            | Teljes ügyfélbázis átlaga | {overall_return_ratio_pct:.1f}% |
+            | Különbség | +{vip_return_ratio_pct - overall_return_ratio_pct:.1f} százalékpont |
+            | Érintett ügyfelek | {vip_champions_count:,} fő |
+
+            **Üzleti következtetés:** A VIP Bajnokok visszaküldési aránya {vip_return_ratio_pct / overall_return_ratio_pct:.1f}×-osa az átlagnak. Ez arra utal, hogy a lemorzsolódás hátterében termékminőségi vagy logisztikai problémák állhatnak — a megoldás nem kizárólag marketing-, hanem termékfejlesztési és logisztikai feladat is.
+            """)
+
+    
