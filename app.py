@@ -89,6 +89,16 @@ if not df_preds.empty and not df_tx.empty:
     vip_fp = int((vip_df['actual_churn'] == 0).sum())   # téves riasztás
     vip_precision_pct = vip_tp / vip_at_risk_count * 100
 
+    # ==========================================
+    # 6. KPI – "Szürke Zóna": menthető ügyfelek aránya
+    # ==========================================
+    # #! SZÜRKE ZÓNA KÜSZÖB — az alsó és felső határ itt módosítható
+    grey_zone_lower = 0.3
+    grey_zone_upper = 0.7
+    grey_zone_mask = (df_preds['churn_proba'] >= grey_zone_lower) & (df_preds['churn_proba'] <= grey_zone_upper)
+    grey_zone_count = int(grey_zone_mask.sum())
+    grey_zone_pct = grey_zone_count / len(df_preds) * 100
+
     # -------------------------------------------------------
     # Háttérkép betöltése (base64, hogy Streamlit biztosan kiszolgálja)
     # -------------------------------------------------------
@@ -159,6 +169,10 @@ if not df_preds.empty and not df_tx.empty:
                 <div class="kpi-label">👥 Veszélyben lévő VIP ügyfelek</div>
                 <div class="kpi-value">{vip_at_risk_count:,} fő</div>
             </div>
+            <div class="kpi-card">
+                <div class="kpi-label">🎯 "Szürke Zóna" – Menthető ügyfelek aránya</div>
+                <div class="kpi-value">{grey_zone_pct:.1f}%</div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -213,4 +227,29 @@ if not df_preds.empty and not df_tx.empty:
             A lista **{vip_precision_pct:.0f}%-os precizitással** azonosítja a valódi lemorzsolódókat. A fennmaradó {100 - vip_precision_pct:.0f}% (téves riasztás) proaktív megkeresése üzletileg nem kockázatos – egy VIP ügyfelet felhívni soha nem árt.
 
             *Megjegyzés: Az `actual_churn` kizárólag historikus validációs label. Éles működésben ez az érték nem ismert előre – ezért is van szükség a modellre.*
+            """)
+
+    col3, _ = st.columns(2)
+    with col3:
+        with st.expander("ℹ️ Hogyan számoltuk? – \"Szürke Zóna\""):
+            st.markdown(f"""
+            **Célcsoport:** Minden ügyfél, akinek a modell által becsült lemorzsolódási valószínűsége a bizonytalansági sávba esik.
+
+            **Definíció:** A „Szürke Zóna" azokat az ügyfeleket foglalja magába, akiknél:
+
+            $$ {grey_zone_lower} \\leq \\text{{churn\\_proba}} \\leq {grey_zone_upper} $$
+
+            Ők sem egyértelműen „maradók", sem egyértelműen „lemorzsolódók" – a döntésük még befolyásolható.
+
+            **Miért fontos ez a marketing csapatnak?**
+            A magas (`> {grey_zone_upper}`) valószínűségű ügyfelek megmentése valószínűleg már túl késő és drága. Az alacsony (`< {grey_zone_lower}`) valószínűségűek nem igényelnek beavatkozást. A Szürke Zóna a leghatékonyabb kampánycélpont: **maximális ROI minimális ráfordítással.**
+
+            ---
+            | Metrika | Érték |
+            |---|---|
+            | Sávban lévő ügyfelek száma | {grey_zone_count:,} fő |
+            | Arány az összes ügyfélből | **{grey_zone_pct:.1f}%** |
+            | Valószínűségi küszöb | {grey_zone_lower} – {grey_zone_upper} |
+
+            *Megjegyzés: A küszöbértékek az app.py-ban a `grey_zone_lower` / `grey_zone_upper` változókkal módosíthatók.*
             """)
