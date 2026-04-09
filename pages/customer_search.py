@@ -82,16 +82,18 @@ st.markdown(f"""
             margin-bottom: 8px;
         }}
         .stats-bar {{
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            color: #c8cfe8;
-            font-size: 13px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.6rem;
         }}
-        @media (max-width: 768px) {{
-            .stats-item {{
-                width: 100%;
-            }}
+        .stats-item {{
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #c8cfe8;
+            font-size: 12px;
+            text-align: center;
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -542,14 +544,13 @@ if not df_tx_all.empty:
         last_purchase  = cust_tx["InvoiceDate"].max().strftime("%Y-%m-%d")
 
         st.markdown(f"""
-            <div style="background:rgba(168,16,34,0.3); border:1px solid rgba(255,255,255,0.12);
-                    border-radius:8px; padding:12px 18px; margin-top:10px;">
+            <div style="margin-top:10px;">
                 <div class="stats-bar">
-                    <span class="stats-item">📦 <b style="color:white">{total_orders:,}</b> rendelés</span>
-                    <span class="stats-item">🛍️ <b style="color:white">{total_items:,}</b> tétel összesen</span>
-                    <span class="stats-item">💰 <b style="color:white">£{total_revenue:,.0f}</b> teljes bevétel (élettartam)</span>
-                    <span class="stats-item">📅 Első vásárlás: <b style="color:white">{first_purchase}</b></span>
-                    <span class="stats-item">📅 Utolsó vásárlás: <b style="color:white">{last_purchase}</b></span>
+                    <div class="stats-item">📦 Rendelések<br><b style="color:white;font-size:15px;">{total_orders:,}</b></div>
+                    <div class="stats-item">🛍️ Tételek<br><b style="color:white;font-size:15px;">{total_items:,}</b></div>
+                    <div class="stats-item">💰 Bevétel (LTV)<br><b style="color:white;font-size:15px;">£{total_revenue:,.0f}</b></div>
+                    <div class="stats-item">📅 Első vásárlás<br><b style="color:white;font-size:15px;">{first_purchase}</b></div>
+                    <div class="stats-item">📅 Utolsó vásárlás<br><b style="color:white;font-size:15px;">{last_purchase}</b></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
