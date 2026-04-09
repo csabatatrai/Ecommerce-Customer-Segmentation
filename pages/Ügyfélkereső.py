@@ -501,6 +501,7 @@ if not df_tx_all.empty:
 
         # ── Utolsó 20 tranzakció táblázat ─────────────────────────────────────
         st.subheader("Összes tranzakció")
+        st.caption("Visszaküldött tételek narancssárgával kiemelve.")
 
         top_n = cust_tx[
             ["InvoiceDate", "Invoice", "Description", "Quantity", "Price", "LineTotal"]
