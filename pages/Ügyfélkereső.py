@@ -423,16 +423,18 @@ if not df_tx_all.empty:
         fig_trend = go.Figure()
 
         # Bevétel terület
+        REVENUE_COLOR = "#00e676"
+
         fig_trend.add_trace(go.Scatter(
             x=monthly["InvoiceDate"],
             y=monthly["LineTotal"],
             mode="lines+markers",
             name="Nettó bevétel",
-            line=dict(color=seg_color, width=2.5),
-            marker=dict(size=7, color=seg_color,
+            line=dict(color=REVENUE_COLOR, width=2.5),
+            marker=dict(size=7, color=REVENUE_COLOR,
                         line=dict(width=1.5, color="white")),
             fill="tozeroy",
-            fillcolor=hex_to_rgba(seg_color, 0.15),
+            fillcolor=hex_to_rgba(REVENUE_COLOR, 0.15),
             hovertemplate="<b>%{x}</b><br>Nettó bevétel: £%{y:,.0f}<extra></extra>",
         ))
 
@@ -499,11 +501,14 @@ if not df_tx_all.empty:
         )
         st.plotly_chart(fig_trend, use_container_width=True)
 
-        # ── Utolsó 20 tranzakció táblázat ─────────────────────────────────────
+        # ── Összes tranzakció táblázat ─────────────────────────────────────────
         st.subheader("Összes tranzakció")
+
+        only_returns = st.checkbox("Csak visszaküldött tételek", value=False)
         st.caption("Visszaküldött tételek narancssárgával kiemelve.")
 
-        top_n = cust_tx[
+        tx_filtered = cust_tx[cust_tx["Quantity"] < 0] if only_returns else cust_tx
+        top_n = tx_filtered[
             ["InvoiceDate", "Invoice", "Description", "Quantity", "Price", "LineTotal"]
         ].copy()
         top_n["InvoiceDate"] = top_n["InvoiceDate"].dt.strftime("%Y-%m-%d")
