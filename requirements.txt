@@ -9,7 +9,7 @@ python-calamine==0.6.2
 
 # --- Gépi Tanulás és Modellezés ---
 scikit-learn==1.7.2
-xgboost==3.2
+xgboost==3.2.0
 shap==0.49.1
 joblib==1.5.3
 
