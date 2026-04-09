@@ -155,6 +155,11 @@ if not df_preds.empty and not df_tx.empty:
                 gap: 1.25rem;
                 margin-bottom: 1.5rem;
             }}
+            @media (max-width: 640px) {{
+                .kpi-grid {{
+                    grid-template-columns: 1fr;
+                }}
+            }}
             .kpi-card {{
                 /* #! KÁRTYA HÁTTÉRSZÍN - itt módosítható */
                 background: rgba(168, 16, 34, 0.45);
