@@ -350,86 +350,90 @@ if not df_preds.empty and not df_tx.empty:
     # 8. Feature importance grafikon
     # ==========================================
     churn_model = load_churn_model()
-    if churn_model is not None:
-        clf = churn_model.named_steps['clf']
-        fi_series = pd.Series(
-            clf.feature_importances_,
-            index=clf.feature_names_in_
-        ).sort_values(ascending=True)  # ascending = alulról felfelé a bar chart-on
+    if churn_model is None:
+        st.warning("A churn modell nem tölthető be – ellenőrizd a `models/xgboost_churn.joblib` fájlt.")
+    else:
+        try:
+            clf = churn_model.named_steps['clf']
+            fi_series = pd.Series(
+                clf.feature_importances_,
+                index=clf.feature_names_in_
+            ).sort_values(ascending=True)
 
-        label_map = {
-            'recency_days':    'Utolsó vásárlás óta eltelt napok',
-            'frequency':       'Vásárlások gyakorisága',
-            'monetary_total':  'Teljes elköltött összeg',
-            'monetary_avg':    'Átlagos kosárérték',
-            'return_ratio':    'Visszaküldési arány',
-        }
-        fi_series.index = [label_map.get(i, i) for i in fi_series.index]
+            label_map = {
+                'recency_days':    'Utolsó vásárlás óta eltelt napok',
+                'frequency':       'Vásárlások gyakorisága',
+                'monetary_total':  'Teljes elköltött összeg',
+                'monetary_avg':    'Átlagos kosárérték',
+                'return_ratio':    'Visszaküldési arány',
+            }
+            fi_series.index = [label_map.get(i, i) for i in fi_series.index]
 
-        # Szín: fontossági súly arányában interpolált skála (szürke-kék → narancs → piros)
-        # A normalizált érték alapján minden bar saját színt kap - modellfrissítésnél automatikusan követi az értékeket
-        fi_min, fi_max = fi_series.values.min(), fi_series.values.max()
-        norm_vals = [(v - fi_min) / (fi_max - fi_min) for v in fi_series.values]
-        color_scale = [[0.0, '#9898c0'], [0.5, '#ff8c1a'], [1.0, '#ff1a3c']]
-        bar_colors = pc.sample_colorscale(color_scale, norm_vals)
+            fi_min, fi_max = fi_series.values.min(), fi_series.values.max()
+            norm_vals = [(v - fi_min) / (fi_max - fi_min) for v in fi_series.values]
+            color_scale = [[0.0, '#9898c0'], [0.5, '#ff8c1a'], [1.0, '#ff1a3c']]
+            bar_colors = pc.sample_colorscale(color_scale, norm_vals)
 
-        fig_fi = go.Figure(go.Bar(
-            x=fi_series.values * 100,
-            y=fi_series.index,
-            orientation='h',
-            marker=dict(color=bar_colors, line=dict(width=0)),
-            text=[f'<b>{v:.1f}%</b>' for v in fi_series.values * 100],
-            textposition='outside',
-            textfont=dict(color='white', size=13),
-            cliponaxis=False,
-        ))
+            fig_fi = go.Figure(go.Bar(
+                x=fi_series.values * 100,
+                y=fi_series.index,
+                orientation='h',
+                marker=dict(color=bar_colors, line=dict(width=0)),
+                text=[f'<b>{v:.1f}%</b>' for v in fi_series.values * 100],
+                textposition='outside',
+                textfont=dict(color='white', size=13),
+                cliponaxis=False,
+            ))
 
-        fig_fi.update_layout(
-            xaxis=dict(
-                title='Fontossági súly (%)',
-                color='rgba(200,207,232,0.6)',
-                showgrid=True,
-                gridcolor='rgba(255,255,255,0.08)',
-                range=[0, 60],
-                ticksuffix='%',
-            ),
-            yaxis=dict(
-                color='white',
-                tickfont=dict(size=13),
-            ),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(168,16,34,0.12)',
-            font=dict(color='white'),
-            margin=dict(l=10, r=80, t=20, b=40),
-            height=300,
-            showlegend=False,
-        )
+            fig_fi.update_layout(
+                xaxis=dict(
+                    title='Fontossági súly (%)',
+                    color='rgba(200,207,232,0.6)',
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.08)',
+                    range=[0, 60],
+                    ticksuffix='%',
+                ),
+                yaxis=dict(
+                    color='white',
+                    tickfont=dict(size=13),
+                ),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(168,16,34,0.12)',
+                font=dict(color='white'),
+                margin=dict(l=10, r=80, t=20, b=40),
+                height=300,
+                showlegend=False,
+            )
 
-        st.subheader("Mi hajtja a churn-t? - A modell 5 magyarázó tényezője")
-        st.plotly_chart(fig_fi, use_container_width=True)
+            st.subheader("Mi hajtja a churn-t? - A modell 5 magyarázó tényezője")
+            st.plotly_chart(fig_fi, use_container_width=True)
 
-        with st.expander("ℹ️ Magyarázat"):
-            st.markdown(f"""
-            **Adatforrás:** `xgboost_churn.joblib` - az XGBoost modell belső feature importance értékei (weight: hány döntési csomópontban szerepel az adott feature).
+            with st.expander("ℹ️ Magyarázat"):
+                st.markdown(f"""
+                **Adatforrás:** `xgboost_churn.joblib` - az XGBoost modell belső feature importance értékei (weight: hány döntési csomópontban szerepel az adott feature).
 
-            **Mit mutat?** Azt, hogy a churn-előrejelzési modell döntéseihez melyik tényező mennyit nyom a latban:
+                **Mit mutat?** Azt, hogy a churn-előrejelzési modell döntéseihez melyik tényező mennyit nyom a latban:
 
-            | Tényező | Fontossági súly | Üzleti üzenet |
-            |---|---|---|
-            | Utolsó vásárlás óta eltelt napok | **{fi_series.iloc[4]:.1%}** | Ha rég nem járt vissza → ez a legfőbb figyelmeztető jel |
-            | Vásárlások gyakorisága | **{fi_series.iloc[3]:.1%}** | Ritka vásárlók sokkal inkább lemorzsolódnak |
-            | Teljes elköltött összeg | **{fi_series.iloc[2]:.1%}** | Kisebb életértékű ügyfelek kockázatosabbak |
-            | Átlagos kosárérték | **{fi_series.iloc[1]:.1%}** | Minimális prediktív erő |
-            | Visszaküldési arány | **{fi_series.iloc[0]:.1%}** | Szinte nem számít a churn előrejelzésekor |
+                | Tényező | Fontossági súly | Üzleti üzenet |
+                |---|---|---|
+                | Utolsó vásárlás óta eltelt napok | **{fi_series.iloc[4]:.1%}** | Ha rég nem járt vissza → ez a legfőbb figyelmeztető jel |
+                | Vásárlások gyakorisága | **{fi_series.iloc[3]:.1%}** | Ritka vásárlók sokkal inkább lemorzsolódnak |
+                | Teljes elköltött összeg | **{fi_series.iloc[2]:.1%}** | Kisebb életértékű ügyfelek kockázatosabbak |
+                | Átlagos kosárérték | **{fi_series.iloc[1]:.1%}** | Minimális prediktív erő |
+                | Visszaküldési arány | **{fi_series.iloc[0]:.1%}** | Szinte nem számít a churn előrejelzésekor |
 
-            **Kulcsüzenet a vezető számára:**
-            A modell döntéseit elsősorban az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.
-            A visszaküldési arány a modellben alig 2%-ot magyaráz - ez azonban nem zárja ki, hogy oksági szerepe van; csupán azt jelenti, hogy az XGBoost ennél erősebb jeleket talált.
+                **Kulcsüzenet a vezető számára:**
+                A modell döntéseit elsősorban az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.
+                A visszaküldési arány a modellben alig 2%-ot magyaráz - ez azonban nem zárja ki, hogy oksági szerepe van; csupán azt jelenti, hogy az XGBoost ennél erősebb jeleket talált.
 
-            **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
+                **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
-            *Modell megbízhatósága: ROC-AUC = 0.815 - döntéstámogatásra alkalmas szint.*
-            """)
+                *Modell megbízhatósága: ROC-AUC = 0.815 - döntéstámogatásra alkalmas szint.*
+                """)
+
+        except Exception as e:
+            st.error(f"Feature importance grafikon hiba: {e}")
 
     st.markdown("---")
 
