@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import base64
+import joblib
+import warnings
 from pathlib import Path
 
 # ==========================================
@@ -18,34 +20,43 @@ st.set_page_config(
 # ==========================================
 # 2. Adatbetöltés (Két fájlra van szükségünk)
 # ==========================================
+@st.cache_resource
+def load_churn_model():
+    model_path = Path("models/xgboost_churn.joblib")
+    if model_path.exists():
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            return joblib.load(model_path)
+    return None
+
 @st.cache_data
 def load_data():
     preds_path = Path("data/processed/churn_predictions.parquet")
-    tx_path = Path("data/processed/online_retail_ready_for_rfm.parquet")
-    
+    tx_path    = Path("data/processed/online_retail_ready_for_rfm.parquet")
+    seg_path   = Path("data/processed/customer_segments.parquet")
+
     if preds_path.exists() and tx_path.exists():
-        preds = pd.read_parquet(preds_path)
-        tx_data = pd.read_parquet(tx_path)
-        
-        # Biztosítjuk, hogy a tranzakciós dátum megfelelő formátumú legyen
+        preds    = pd.read_parquet(preds_path)
+        tx_data  = pd.read_parquet(tx_path)
+        seg_data = pd.read_parquet(seg_path).reset_index() if seg_path.exists() else pd.DataFrame()
+
         tx_data['InvoiceDate'] = pd.to_datetime(tx_data['InvoiceDate'])
-        
-        # JAVÍTÁS: Ha a Customer ID az indexben van (RFM aggregáció miatt), 
+
+        # JAVÍTÁS: Ha a Customer ID az indexben van (RFM aggregáció miatt),
         # akkor oszloppá alakítjuk, hogy a KeyError-t elkerüljük!
         if 'Customer ID' not in preds.columns:
             preds = preds.reset_index()
-            # Biztosítjuk a helyes oszlopnevet
             if 'index' in preds.columns:
                 preds = preds.rename(columns={'index': 'Customer ID'})
             elif 'CustomerID' in preds.columns:
                 preds = preds.rename(columns={'CustomerID': 'Customer ID'})
-                
-        return preds, tx_data
+
+        return preds, tx_data, seg_data
     else:
         st.error("Hiba: Hiányzó adatfájlok a data/processed/ mappában!")
-        return pd.DataFrame(), pd.DataFrame()
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-df_preds, df_tx = load_data()
+df_preds, df_tx, df_seg = load_data()
 
 # ==========================================
 # 3. Dashboard fejléc
@@ -53,7 +64,7 @@ df_preds, df_tx = load_data()
 st.title("Vezetői összefoglaló")
 st.markdown("---")
 
-if not df_preds.empty and not df_tx.empty:
+if not df_preds.empty and not df_tx.empty and not df_seg.empty:
 # ==========================================
     # 4. KPI kiszámítása (Szcenárió alapú Tól-Ig sáv)
     # ==========================================
@@ -350,4 +361,167 @@ if not df_preds.empty and not df_tx.empty:
             **Üzleti következtetés:** A VIP Bajnokok visszaküldési aránya {vip_return_ratio_pct / overall_return_ratio_pct:.1f}×-osa az átlagnak. Ez arra utal, hogy a lemorzsolódás hátterében termékminőségi vagy logisztikai problémák állhatnak — a megoldás nem kizárólag marketing-, hanem termékfejlesztési és logisztikai feladat is.
             """)
 
-    
+    st.markdown("---")
+
+    # ==========================================
+    # 9. Feature importance grafikon
+    # ==========================================
+    churn_model = load_churn_model()
+    if churn_model is not None:
+        clf = churn_model.named_steps['clf']
+        fi_series = pd.Series(
+            clf.feature_importances_,
+            index=clf.feature_names_in_
+        ).sort_values(ascending=True)  # ascending = alulról felfelé a bar chart-on
+
+        label_map = {
+            'recency_days':    'Utolsó vásárlás óta eltelt napok',
+            'frequency':       'Vásárlások gyakorisága',
+            'monetary_total':  'Teljes elköltött összeg',
+            'monetary_avg':    'Átlagos kosárérték',
+            'return_ratio':    'Visszaküldési arány',
+        }
+        fi_series.index = [label_map.get(i, i) for i in fi_series.index]
+
+        # Szín: top 2 = piros, közép = borostyán, alsó 2 = szürke
+        # Sorrend ascending → [0]=legkisebb ... [4]=legnagyobb
+        bar_colors = ['#9898c0', '#9898c0', '#ff8c1a', '#e0152a', '#ff1a3c']
+
+        fig_fi = go.Figure(go.Bar(
+            x=fi_series.values * 100,
+            y=fi_series.index,
+            orientation='h',
+            marker=dict(color=bar_colors, line=dict(width=0)),
+            text=[f'<b>{v:.1f}%</b>' for v in fi_series.values * 100],
+            textposition='outside',
+            textfont=dict(color='white', size=13),
+            cliponaxis=False,
+        ))
+
+        fig_fi.update_layout(
+            xaxis=dict(
+                title='Fontossági súly (%)',
+                color='rgba(200,207,232,0.6)',
+                showgrid=True,
+                gridcolor='rgba(255,255,255,0.08)',
+                range=[0, 60],
+                ticksuffix='%',
+            ),
+            yaxis=dict(
+                color='white',
+                tickfont=dict(size=13),
+            ),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(168,16,34,0.12)',
+            font=dict(color='white'),
+            margin=dict(l=10, r=80, t=20, b=40),
+            height=300,
+            showlegend=False,
+        )
+
+        st.subheader("Mi hajtja a churn-t? – A modell 5 magyarázó tényezője")
+        st.plotly_chart(fig_fi, use_container_width=True)
+
+        with st.expander("ℹ️ Hogyan értelmezzük ezt a grafikont?"):
+            st.markdown(f"""
+            **Adatforrás:** `xgboost_churn.joblib` – az XGBoost modell belső feature importance értékei (normalized gain).
+
+            **Mit mutat?** Azt, hogy a churn-előrejelzési modell döntéseihez melyik tényező mennyit nyom a latban:
+
+            | Tényező | Fontossági súly | Üzleti üzenet |
+            |---|---|---|
+            | Utolsó vásárlás óta eltelt napok | **{fi_series.iloc[4]:.1%}** | Ha rég nem járt vissza → ez a legfőbb figyelmeztető jel |
+            | Vásárlások gyakorisága | **{fi_series.iloc[3]:.1%}** | Ritka vásárlók sokkal inkább lemorzsolódnak |
+            | Teljes elköltött összeg | **{fi_series.iloc[2]:.1%}** | Kisebb életértékű ügyfelek kockázatosabbak |
+            | Átlagos kosárérték | **{fi_series.iloc[1]:.1%}** | Minimális prediktív erő |
+            | Visszaküldési arány | **{fi_series.iloc[0]:.1%}** | Szinte nem számít a churn előrejelzésekor |
+
+            **Kulcsüzenet a vezető számára:**
+            A churn **nem termékminőségi probléma** – a visszaküldési arány alig 2%-ot magyaráz.
+            A lemorzsolódást az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.
+
+            **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási freckvencia növelése** (pl. loyalty program), nem a visszáru-folyamat optimalizálása.
+
+            *Modell megbízhatósága: ROC-AUC = 0.808 – döntéstámogatásra alkalmas szint.*
+            """)
+
+    st.markdown("---")
+
+    # ==========================================
+    # 10. CHART 1 – Havi bevétel trend szegmens szerint
+    # ==========================================
+    SEG_COLORS = {
+        'VIP Bajnokok':           '#ff1a3c',
+        'Lemmorzsolódó / Alvó':   '#ff8c1a',
+        'Új / Ígéretes':          '#1ab4ff',
+        'Elveszett / Inaktív':    '#9898c0',
+    }
+    st.subheader("Hogyan alakult a bevétel időben? – Havi trend szegmensenként")
+
+    seg_lookup = df_preds.set_index('Customer ID')['rfm_segment']
+    tx_seg = df_tx.copy()
+    tx_seg['rfm_segment'] = tx_seg['Customer ID'].map(seg_lookup).fillna('Ismeretlen')
+    tx_seg = tx_seg[tx_seg['rfm_segment'] != 'Ismeretlen']
+    tx_seg['YearMonth'] = tx_seg['InvoiceDate'].dt.to_period('M').astype(str)
+
+    monthly_rev = (
+        tx_seg.groupby(['YearMonth', 'rfm_segment'])['LineTotal']
+        .sum()
+        .reset_index()
+        .rename(columns={'LineTotal': 'Bevétel (£)', 'rfm_segment': 'Szegmens'})
+    )
+    monthly_rev = monthly_rev.sort_values('YearMonth')
+
+    fig_area = px.area(
+        monthly_rev,
+        x='YearMonth',
+        y='Bevétel (£)',
+        color='Szegmens',
+        color_discrete_map={
+            'VIP Bajnokok':         '#ff1a3c',
+            'Lemmorzsolódó / Alvó': '#ff8c1a',
+            'Új / Ígéretes':        '#1ab4ff',
+            'Elveszett / Inaktív':  '#9898c0',
+        },
+        labels={'YearMonth': 'Hónap'},
+    )
+    fig_area.update_traces(line=dict(width=1.5))
+    fig_area.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(168,16,34,0.08)',
+        font=dict(color='white'),
+        xaxis=dict(
+            color='rgba(200,207,232,0.6)',
+            gridcolor='rgba(255,255,255,0.07)',
+            tickangle=-35,
+        ),
+        yaxis=dict(
+            color='rgba(200,207,232,0.6)',
+            gridcolor='rgba(255,255,255,0.07)',
+            tickprefix='£',
+            tickformat=',.0f',
+        ),
+        legend=dict(
+            bgcolor='rgba(0,0,0,0.3)',
+            bordercolor='rgba(255,255,255,0.15)',
+            borderwidth=1,
+        ),
+        margin=dict(l=10, r=10, t=20, b=60),
+        height=420,
+    )
+    st.plotly_chart(fig_area, use_container_width=True)
+
+    with st.expander("ℹ️ Hogyan értelmezzük ezt a grafikont?"):
+        st.markdown("""
+        **Adatforrás:** `online_retail_ready_for_rfm.parquet` tranzakciók + `churn_predictions.parquet` szegmens-hozzárendelés (Customer ID alapú join).
+
+        **Mit mutat?** Az egyes RFM-szegmensek havi összbevételét 2009 decembertől 2011 végéig.
+        A területek egymásra halmozva mutatják a teljes bevételt és annak összetételét.
+
+        **Szezonalitás:** Az év végi csúcsok (november–december) jól láthatóak — ez a kiskereskedelem tipikus ünnepi szezonja.
+
+        **Kulcsüzenet:** A VIP Bajnokok (piros) a bevétel domináns forrása.
+        Csökkentük-e az aktív vásárlók körét az évek során? Hány hónappal a cutoff előtt kezdett el csökkeni a lemmorzsolódó szegmens bevétele?
+        """)
+
+    st.markdown("---")
