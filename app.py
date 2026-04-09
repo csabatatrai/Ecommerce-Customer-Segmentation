@@ -8,7 +8,8 @@ st.set_page_config(
 )
 
 pg = st.navigation([
-    st.Page("pages/executive_summary.py", title="Vezetői összefoglaló", icon="📊"),
-    st.Page("pages/customer_search.py", title="Ügyfélkereső", icon="🔍"),
+    st.Page("pages/executive_summary.py", title="Vezetői összefoglaló"),
+    st.Page("pages/marketing_segments.py", title="Marketing szegmensek"),
+    st.Page("pages/customer_search.py", title="Ügyfélkereső"),
 ])
 pg.run()
