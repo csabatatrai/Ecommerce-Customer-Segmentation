@@ -114,34 +114,34 @@ SEG_FILL = {
 
 # Pontos action nevek a parquet-ból
 ACTION_COLORS = {
-    "🚨 VIP Veszélyben – Azonnali Retenció":  "#ff1a3c",
-    "💎 VIP Stabil – Lojalitás Program":       "#1ab4ff",
-    "⚠️  Lemorzsolódó – Win-Back Kampány":     "#ff8c1a",
-    "✅ Stabil – Standard Kommunikáció":        "#9898c0",
+    "🚨 VIP Veszélyben - Azonnali Retenció":  "#ff1a3c",
+    "💎 VIP Stabil - Lojalitás Program":       "#1ab4ff",
+    "⚠️  Lemorzsolódó - Win-Back Kampány":     "#ff8c1a",
+    "✅ Stabil - Standard Kommunikáció":        "#9898c0",
 }
 
 ACTION_ADVICE = {
-    "🚨 VIP Veszélyben – Azonnali Retenció": [
+    "🚨 VIP Veszélyben - Azonnali Retenció": [
         "Személyes account manager megkeresés (B2B ügyfeleknél kötelező)",
-        "Exkluzív visszatérési kupon (15–20% kedvezmény, 30 napos érvényességgel)",
+        "Exkluzív visszatérési kupon (15-20% kedvezmény, 30 napos érvényességgel)",
         "Win-back e-mail sorozat (3 üzenet, 2 hetes intervallummal)",
-        "NPS/CSAT felmérés küldése – proaktív panaszkezelés",
+        "NPS/CSAT felmérés küldése - proaktív panaszkezelés",
         "Prioritásos ügyfélszolgálati csoport bevonása",
     ],
-    "💎 VIP Stabil – Lojalitás Program": [
+    "💎 VIP Stabil - Lojalitás Program": [
         "VIP hűségkártya vagy pontalapú jutalomrendszer",
         "Korai hozzáférés új termékekhez és exkluzív akciókhoz",
         "Személyes születésnapi/évfordulós üzenet és ajándék",
         "Upselling: prémium termékcsaládok és bundlök kiemelése",
         "Referral program: jutalomért cserébe új ügyfelek ajánlása",
     ],
-    "⚠️  Lemorzsolódó – Win-Back Kampány": [
+    "⚠️  Lemorzsolódó - Win-Back Kampány": [
         "Automatikus reaktivációs e-mail trigger (6 hónap inaktivitás után)",
-        "Win-back kupon (5–10% kedvezmény)",
+        "Win-back kupon (5-10% kedvezmény)",
         "Szezonális hírlevél és akciós termékajánlatok",
         "Kategóriaalapú ajánlás (az ügyfél korábbi vásárlásai alapján)",
     ],
-    "✅ Stabil – Standard Kommunikáció": [
+    "✅ Stabil - Standard Kommunikáció": [
         "Általános hírlevél és promóciós kampányok",
         "Kosárelhagyás emlékeztető e-mail aktiválása",
         "Collaborative filtering alapú termékajánló bekapcsolása",
@@ -149,7 +149,7 @@ ACTION_ADVICE = {
     ],
 }
 
-# Közlekedési lámpa logika — zöld→sárga→narancs→piros, dark mode-ra optimalizálva
+# Közlekedési lámpa logika, zöld→sárga→narancs→piros, dark mode-ra optimalizálva
 RISK_LEVELS = [
     (0.0,  0.30, "🟢 Alacsony kockázat",  "#00e676"),   # Material Green A400
     (0.30, 0.55, "🟡 Közepes kockázat",   "#ffd740"),   # Material Amber A400
@@ -342,13 +342,13 @@ with cmp_col:
         f"""<div style="background:rgba(168,16,34,0.3); border:1px solid rgba(255,255,255,0.15);
                 border-radius:8px; padding:12px 16px; color:white;">
             <div style="font-size:13px; color:#c8cfe8; margin-bottom:6px;">
-                Szegmens átlag — {rfm_segment}
+                Szegmens átlag: {rfm_segment}
             </div>
             <div style="font-size:22px; font-weight:700;">
                 {seg_avg_churn:.1%}
             </div>
             <div style="margin-top:6px; font-size:13px; color:{delta_color}; font-weight:600;">
-                {delta_sign}{delta_vs_seg:.1%} — ez az ügyfél <b>{delta_szoveg}</b>
+                {delta_sign}{delta_vs_seg:.1%} ez az ügyfél <b>{delta_szoveg}</b>
             </div>
             <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px;
                         text-align:center; font-weight:600; color:{pred_color};">
@@ -409,9 +409,9 @@ if not df_tx_all.empty:
             hovertemplate="<b>%{x}</b><br>Nettó bevétel: £%{y:,.0f}<extra></extra>",
         ))
 
-        # Visszaküldések – lefelé mutató háromszög a tengelyen
+        # Visszaküldések - lefelé mutató háromszög a tengelyen
         if not monthly_returns.empty:
-            # Marker mérete: visszaküldött összeg alapján skálázva (8–22 px között)
+            # Marker mérete: visszaküldött összeg alapján skálázva (8-22 px között)
             max_ret = monthly_returns["LineTotal"].max()
             marker_sizes = (
                 monthly_returns["LineTotal"] / max_ret * 14 + 8
