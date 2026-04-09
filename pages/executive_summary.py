@@ -98,7 +98,7 @@ if not df_preds.empty and not df_tx.empty:
     # -------------------------------------------------------
     # Háttérkép betöltése (base64, hogy Streamlit biztosan kiszolgálja)
     # -------------------------------------------------------
-    bg_path = Path("assets/streamlit_bg.webp")
+    bg_path = Path("src/streamlit_bg.webp")
     if bg_path.exists():
         bg_b64 = base64.b64encode(bg_path.read_bytes()).decode()
         bg_css = f'background-image: url("data:image/webp;base64,{bg_b64}");'
@@ -268,7 +268,7 @@ if not df_preds.empty and not df_tx.empty:
             | Arány az összes ügyfélből | **{grey_zone_pct:.1f}%** |
             | Valószínűségi küszöb | {grey_zone_lower} – {grey_zone_upper} |
 
-            *Megjegyzés: A küszöbértékek a vezeto_osszefoglalo.py-ban a `grey_zone_lower` / `grey_zone_upper` változókkal módosíthatók.*
+            *Megjegyzés: A küszöbértékek a executive_summary.py-ban a `grey_zone_lower` / `grey_zone_upper` változókkal módosíthatók.*
             """)
 
     with col4:

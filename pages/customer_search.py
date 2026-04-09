@@ -16,7 +16,7 @@ from src.data_loader import load_churn_predictions, load_transactions
 render_sidebar()
 
 # ── Háttérkép (app.py-val azonos megközelítés) ─────────────────────────────────
-bg_path = Path("assets/streamlit_bg.webp")
+bg_path = Path("src/streamlit_bg.webp")
 if bg_path.exists():
     bg_b64 = base64.b64encode(bg_path.read_bytes()).decode()
     bg_css = f'background-image: url("data:image/webp;base64,{bg_b64}");'
