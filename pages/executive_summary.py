@@ -382,16 +382,30 @@ if not df_preds.empty and not df_tx.empty:
     # ==========================================
     # 8. Feature importance grafikon
     # ==========================================
+    shap_path = Path(__file__).parent.parent / "data/processed/shap_importance.parquet"
+    if not shap_path.exists():
+        shap_path = Path("data/processed/shap_importance.parquet")
+
+    if shap_path.exists():
+        fi_series = (
+            pd.read_parquet(shap_path)['shap_importance']
+            .sort_values(ascending=True)
+        )
+        _use_shap = True
+    else:
+        _use_shap = False
+
     churn_model = load_churn_model()
-    if churn_model is None:
+    if not _use_shap and churn_model is None:
         st.warning("A churn modell nem tölthető be – ellenőrizd a `models/xgboost_churn.joblib` fájlt.")
     else:
-        try:
+        if not _use_shap:
             clf = churn_model.named_steps['clf']
             fi_series = pd.Series(
                 clf.feature_importances_,
                 index=clf.feature_names_in_
             ).sort_values(ascending=True)
+        try:
 
             label_map = {
                 'recency_days':    'Utolsó vásárlás óta eltelt napok',
@@ -444,17 +458,17 @@ if not df_preds.empty and not df_tx.empty:
 
             with st.expander("ℹ️ Magyarázat"):
                 st.markdown(f"""
-                **Adatforrás:** `xgboost_churn.joblib` - az XGBoost modell belső feature importance értékei (weight: hány döntési csomópontban szerepel az adott feature).
+                **Adatforrás:** `shap_importance.parquet` - SHAP-alapú feature fontosság (átlagos |SHAP érték| feature-enként, a `04_model_evaluation.ipynb`-ből exportálva).
 
                 **Mit mutat?** Azt, hogy a churn-előrejelzési modell döntéseihez melyik tényező mennyit nyom a latban:
 
                 | Tényező | Fontossági súly | Üzleti üzenet |
                 |---|---|---|
-                | Utolsó vásárlás óta eltelt napok | **{fi_series.iloc[4]:.1%}** | Ha rég nem járt vissza → ez a legfőbb figyelmeztető jel |
-                | Vásárlások gyakorisága | **{fi_series.iloc[3]:.1%}** | Ritka vásárlók sokkal inkább lemorzsolódnak |
-                | Teljes elköltött összeg | **{fi_series.iloc[2]:.1%}** | Kisebb életértékű ügyfelek kockázatosabbak |
-                | Átlagos kosárérték | **{fi_series.iloc[1]:.1%}** | Minimális prediktív erő |
-                | Visszaküldési arány | **{fi_series.iloc[0]:.1%}** | Szinte nem számít a churn előrejelzésekor |
+                | Utolsó vásárlás óta eltelt napok | **{fi_series.loc['Utolsó vásárlás óta eltelt napok']:.1%}** | Ha rég nem járt vissza → ez a legfőbb figyelmeztető jel |
+                | Vásárlások gyakorisága | **{fi_series.loc['Vásárlások gyakorisága']:.1%}** | Ritka vásárlók sokkal inkább lemorzsolódnak |
+                | Teljes elköltött összeg | **{fi_series.loc['Teljes elköltött összeg']:.1%}** | Kisebb életértékű ügyfelek kockázatosabbak |
+                | Átlagos kosárérték | **{fi_series.loc['Átlagos kosárérték']:.1%}** | Minimális prediktív erő |
+                | Visszaküldési arány | **{fi_series.loc['Visszaküldési arány']:.1%}** | Szinte nem számít a churn előrejelzésekor |
 
                 **Kulcsüzenet a vezető számára:**
                 A modell döntéseit elsősorban az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.

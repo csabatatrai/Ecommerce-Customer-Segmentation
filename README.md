@@ -254,9 +254,9 @@ ecommerce-customer-segmentation/
 </pre>
 
 <details>
-<summary>📁 Generált adatfájlok és modellek részletesen</summary>
+<summary>📁 Adatfájlok és szerializált modellek részletesen</summary>
 
-> Ezek a fájlok nem részei a repónak – a notebookok futtatásakor keletkeznek.
+> Ami itt szerepel, de a repoban nem található meg, azt notebook hozza létre lokális futtatáskor!
 
 **`data/processed/`**
 
@@ -268,6 +268,7 @@ ecommerce-customer-segmentation/
 | `customer_segments.parquet` | K-means szegmenscímkékkel ellátott ügyféladatok | 02 kimenet |
 | `test_set.parquet` | Holdout teszt szett (~1 049 ügyfél) | 03 kimenet → 04 bemenet |
 | `churn_predictions.parquet` | Teljes ügyfélbázis churn-valószínűségekkel és akciócímkékkel | 04 kimenet → Streamlit bemenet |
+| `shap_importance.parquet` | SHAP-alapú feature fontossági értékek (mean\|SHAP\| / sum, feature-enként normalizálva) | 04 kimenet → Streamlit bemenet |
 
 **`data/raw/`**
 
@@ -313,7 +314,7 @@ flowchart TD
     PREP -.->|kimenet| P1[("💾 Parquet fájlok\nraw · cleaned · rfm_ready")]
     SEG  -.->|kimenet| M1[("🧩 Modellek × 2\nscaler · kmeans_rfm .joblib")]
     CHURN-.->|kimenet| P2[("🤖 Modell + teszt szett\nxgboost.joblib · test_set.parquet")]
-    EVAL -.->|kimenet| P3[("📈 Előrejelzések\nchurn_predictions.parquet")]
+    EVAL -.->|kimenet| P3[("📈 Előrejelzések + SHAP\nchurn_predictions.parquet · shap_importance.parquet")]
 ```
 <a id="gyik"></a>
 ## GYIK
