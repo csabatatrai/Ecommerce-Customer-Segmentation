@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.colors as pc
 import base64
 import joblib
 import warnings
@@ -366,8 +367,7 @@ if not df_preds.empty and not df_tx.empty:
         fi_series.index = [label_map.get(i, i) for i in fi_series.index]
 
         # Szín: fontossági súly arányában interpolált skála (szürke-kék → narancs → piros)
-        # A normalizált érték alapján minden bar saját színt kap — modellfrissítésnél automatikusan követi az értékeket
-        import plotly.colors as pc
+        # A normalizált érték alapján minden bar saját színt kap - modellfrissítésnél automatikusan követi az értékeket
         fi_min, fi_max = fi_series.values.min(), fi_series.values.max()
         norm_vals = [(v - fi_min) / (fi_max - fi_min) for v in fi_series.values]
         color_scale = [[0.0, '#9898c0'], [0.5, '#ff8c1a'], [1.0, '#ff1a3c']]
