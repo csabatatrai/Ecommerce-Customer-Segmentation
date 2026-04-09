@@ -4,10 +4,6 @@ import streamlit as st
 def render_sidebar():
     with st.sidebar:
         st.markdown("## E-kereskedelmi vásárlói szegmentáció és churn-elemzés")
-        st.markdown(
-            "RFM-alapú ügyfélszegmentáció és XGBoost churn-előrejelzés "
-            "egy valós brit e-kereskedelmi adathalmazon."
-        )
         st.markdown("---")
         st.markdown("**Adatforrás**")
         st.markdown(
