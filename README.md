@@ -98,7 +98,7 @@ Az ügyfelek **55,7%-a** lemorzsolódott a 2011-09-09-es cutoff után – az osz
 | A – Csak RFM (5 feature) | 0,8098 | 0,740 | 0,734 |
 | B – RFM + K-Means OHE (9 feature) | 0,8098 | 0,743 | 0,738 |
 
-A két pipeline CV PR-AUC-ja negyedik tizedesjegyig azonos – a klasztercímkék nem adnak hozzá prediktív erőt. Az **A pipeline** a nyertes: nemcsak egyszerűbb, hanem **stabilabb is**, a B pipeline PR-AUC szórása fold-ok között lényegesen nagyobb, ami élesben kiszámíthatatlanabb teljesítményt jelent.
+A két pipeline CV PR-AUC-ja negyedik tizedesjegyig azonos – a klasztercímkék nem adnak hozzá prediktív erőt. Az **A pipeline** a nyertes: egyszerűbb, és a CV szórása marginálisan kisebb (A: 0,0217 vs B: 0,0221), ami az Occam borotvája elvét erősíti meg – azonos teljesítménynél az egyszerűbb modell a helyes választás.
 
 **RandomizedSearchCV hangolás után** (100 iteráció, X_train-en): CV PR-AUC → **0,8121**, holdout teszt PR-AUC → **0,8253**, overfitting rés → **0,0017** (hangolás előtt: 0,0504).
 
@@ -137,6 +137,10 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 | `return_ratio`, `monetary_avg` | ~4,3% |
 
 > ℹ️ **Baseline:** PR-AUC véletlen alapvonal ~0,557 (osztályarány); a fejlesztési modell (0,8253) közel **1,48×-es javulást** jelent.
+
+>**Fejlesztési irányok**: Mivel a fejlesztési modell holdout PR-AUC-ja 0.8253 (XGBoost, 5 RFM feature, StratifiedKFold CV), a teljesítményplafon valószínűleg a feature-készleten múlik. A fejlesztési prioritás inkább új feature-ök bevonása (szezonalitás, termékkategóriák), mintsem a keresztvalidációs stratégia finomhangolása (pl. rolling window CV).
+
+
 <a id="elemzes-lepesek"></a>
 ## Elemzési lépések 
 >A dokumentációnak ez a része automatikusan frissül új notebookok és új H2 headerek hozzáadásakor az update_docs.py segítségével! Ennek feltétele, hogy a fejléc a `## {szám}. {cím}` formátumot kövesse (pl. `## 14. Export – Előrejelzések mentése`) - csak az így strukturált fejlécek kerülnek be a táblázatba és lesznek kattinthatók GitHub-on.

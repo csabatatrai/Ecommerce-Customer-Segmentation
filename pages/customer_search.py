@@ -183,6 +183,9 @@ if combined.empty:
 # Globális statisztikák (adatból számolva, nem hardkódolva)
 churn_proba_mean = combined["churn_proba"].mean()
 
+# Recency referencia-dátum: az adatkészlet legfrissebb tranzakciójának dátuma
+TX_REFERENCE_DATE = df_tx_all["InvoiceDate"].max() if not df_tx_all.empty else None
+
 # Modell megbízhatósága: precision a churn=1 osztályon (historikus validáció alapján)
 _tp = int(((combined["churn_pred"] == 1) & (combined["actual_churn"] == 1)).sum())
 _pp = int((combined["churn_pred"] == 1).sum())
@@ -238,6 +241,30 @@ return_ratio = float(customer["return_ratio"])
 rfm_segment  = str(customer["rfm_segment"])
 action       = str(customer["action"])  # közvetlenül a parquet-ból
 
+# RFM értékek újraszámolva az élő tranzakciós adatból (a parquet csak a cutoff előtti
+# megfigyelési ablakot tükrözi; a dashboard az összes tranzakciót mutatja)
+if not df_tx_all.empty:
+    _cust_tx       = df_tx_all[df_tx_all["Customer ID"] == selected_id]
+    _cust_purchases = _cust_tx[_cust_tx["Quantity"] > 0]
+    _cust_returns   = _cust_tx[_cust_tx["Quantity"] < 0]
+
+    if not _cust_purchases.empty:
+        _freq    = int(_cust_purchases["Invoice"].nunique())
+        _ret_cnt = int(_cust_returns["Invoice"].nunique())
+        _mon     = float(_cust_tx["LineTotal"].sum())
+
+        frequency    = _freq
+        monetary     = _mon
+        monetary_avg = _mon / _freq if _freq > 0 else 0.0
+        return_ratio = _ret_cnt / (_freq + _ret_cnt) if (_freq + _ret_cnt) > 0 else 0.0
+        recency      = int((TX_REFERENCE_DATE - _cust_purchases["InvoiceDate"].max()).days)
+    else:
+        frequency    = int(customer["frequency"])
+        recency      = int(customer["recency_days"])
+else:
+    frequency    = int(customer["frequency"])
+    recency      = int(customer["recency_days"])
+
 risk_label, risk_color = churn_risk_label(churn_prob)
 action_color = ACTION_COLORS.get(action, "#9898c0")
 seg_color    = SEG_COLORS.get(rfm_segment, "#9898c0")
@@ -270,6 +297,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ── Adatforrás magyarázat ─────────────────────────────────────────────────────
+st.markdown(
+    f"""<div style="background:rgba(255,255,255,0.04); border-left:3px solid rgba(200,207,232,0.3);
+                border-radius:0 6px 6px 0; padding:8px 14px; margin-bottom:16px;
+                font-size:0.82em; color:rgba(200,207,232,0.65);">
+        ℹ️ A <b style="color:rgba(200,207,232,0.85);">churn-előrejelzés és RFM szegmens</b>
+        a <b style="color:rgba(200,207,232,0.85);">2011-09-09</b> előtti aktivitás alapján készült.
+        Az <b style="color:rgba(200,207,232,0.85);">RFM értékek és statisztikák</b>
+        a teljes tranzakcióhistóriát tükrözik.
+    </div>""",
+    unsafe_allow_html=True,
+)
+
 # ── KPI kártyák ───────────────────────────────────────────────────────────────
 seg_avg_churn = combined[combined["rfm_segment"] == rfm_segment]["churn_proba"].mean()
 delta_vs_seg  = churn_prob - seg_avg_churn
@@ -280,21 +320,22 @@ st.markdown(f"""
         <div class="kpi-card">
             <div class="kpi-label">🕐 Recency</div>
             <div class="kpi-value">{recency} nap</div>
-            <div class="kpi-sub">Utolsó vásárlás óta eltelt</div>
+            <div class="kpi-sub">Utolsó vásárlás óta eltelt (adatkészlet végéhez képest)</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-label">🛒 Frequency</div>
             <div class="kpi-value">{frequency} db</div>
-            <div class="kpi-sub">Összes vásárlás</div>
+            <div class="kpi-sub">Összes vásárlás (teljes időszak)</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-label">💰 Monetary</div>
             <div class="kpi-value">£{monetary:,.0f}</div>
-            <div class="kpi-sub">Átl. kosár: £{monetary_avg:,.0f}</div>
+            <div class="kpi-sub">Átl. kosár: £{monetary_avg:,.0f} · teljes időszak</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-label">🔄 Visszaküldési arány</div>
             <div class="kpi-value">{return_ratio:.1%}</div>
+            <div class="kpi-sub">Teljes időszak</div>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -537,7 +578,7 @@ if not df_tx_all.empty:
         )
 
         # Összesítő sor
-        total_orders   = cust_tx["Invoice"].nunique()
+        total_orders   = cust_tx[cust_tx["Quantity"] > 0]["Invoice"].nunique()
         total_revenue  = cust_tx["LineTotal"].sum()
         total_items    = cust_tx["Quantity"].sum()
         first_purchase = cust_tx["InvoiceDate"].min().strftime("%Y-%m-%d")
