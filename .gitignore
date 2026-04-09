@@ -11,8 +11,9 @@
 *.pkl
 *.joblib
 *.model
-/data/
+/data/raw/
 !/data/sample_*.csv  # Ha esetleg egy kis minta adatot mégis feltöltenél
+!/data/processed/*.parquet
 
 # ========================
 # Jupyter Notebook
