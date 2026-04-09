@@ -211,8 +211,9 @@ if not df_preds.empty and not df_tx.empty and not df_seg.empty:
                 <div class="kpi-sub">{grey_zone_count:,} fő a teljes {len(df_preds):,} fős ügyfélbázisból, az ő marketing célzásuk megtérülése a legmagasabb!</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">📉 Átlagos lemorzsolódási (churn) arány</div>
+                <div class="kpi-label">📉 Historikus lemorzsolódási (churn) arány</div>
                 <div class="kpi-value">{churn_rate_pct:.1f}%</div>
+                <div class="kpi-sub">Historikus adat – a modell tanításához használt label, nem jövőbeli előrejelzés</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">🧮 Modellezhető aktív ügyfélbázis</div>
@@ -440,10 +441,10 @@ if not df_preds.empty and not df_tx.empty and not df_seg.empty:
             | Visszaküldési arány | **{fi_series.iloc[0]:.1%}** | Szinte nem számít a churn előrejelzésekor |
 
             **Kulcsüzenet a vezető számára:**
-            A churn **nem termékminőségi probléma** – a visszaküldési arány alig 2%-ot magyaráz.
-            A lemorzsolódást az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.
+            A modell döntéseit elsősorban az **inaktivitás** hajtja: ki mikor és milyen sűrűn vásárolt.
+            A visszaküldési arány a modellben alig 2%-ot magyaráz – ez azonban nem zárja ki, hogy oksági szerepe van; csupán azt jelenti, hogy az XGBoost ennél erősebb jeleket talált.
 
-            **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási freckvencia növelése** (pl. loyalty program), nem a visszáru-folyamat optimalizálása.
+            **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
             *Modell megbízhatósága: ROC-AUC = 0.808 – döntéstámogatásra alkalmas szint.*
             """)
@@ -454,10 +455,10 @@ if not df_preds.empty and not df_tx.empty and not df_seg.empty:
     # 10. CHART 1 – Havi bevétel trend szegmens szerint
     # ==========================================
     SEG_COLORS = {
-        'VIP Bajnokok':           '#ff1a3c',
-        'Lemmorzsolódó / Alvó':   '#ff8c1a',
-        'Új / Ígéretes':          '#1ab4ff',
-        'Elveszett / Inaktív':    '#9898c0',
+        'VIP Bajnokok':          '#ff1a3c',
+        'Lemorzsolódó / Alvó':   '#ff8c1a',
+        'Új / Ígéretes':         '#1ab4ff',
+        'Elvesztett / Inaktív':  '#9898c0',
     }
     st.subheader("Hogyan alakult a bevétel időben? – Havi trend szegmensenként")
 
@@ -482,9 +483,9 @@ if not df_preds.empty and not df_tx.empty and not df_seg.empty:
         color='Szegmens',
         color_discrete_map={
             'VIP Bajnokok':         '#ff1a3c',
-            'Lemmorzsolódó / Alvó': '#ff8c1a',
+            'Lemorzsolódó / Alvó':  '#ff8c1a',
             'Új / Ígéretes':        '#1ab4ff',
-            'Elveszett / Inaktív':  '#9898c0',
+            'Elvesztett / Inaktív': '#9898c0',
         },
         labels={'YearMonth': 'Hónap'},
     )
