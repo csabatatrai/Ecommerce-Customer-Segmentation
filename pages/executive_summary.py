@@ -15,12 +15,15 @@ from src.data_loader import load_churn_predictions, load_transactions
 # ==========================================
 @st.cache_resource
 def load_churn_model():
-    for candidate in ("models/xgboost_churn.joblib", "../models/xgboost_churn.joblib"):
-        model_path = Path(candidate)
-        if model_path.exists():
+    for candidate in (
+        Path(__file__).parent.parent / "models/xgboost_churn.joblib",
+        Path("models/xgboost_churn.joblib"),
+        Path("../models/xgboost_churn.joblib"),
+    ):
+        if candidate.exists():
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                return joblib.load(model_path)
+                return joblib.load(candidate)
     return None
 
 render_sidebar()
