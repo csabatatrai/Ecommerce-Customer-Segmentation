@@ -181,6 +181,14 @@ if combined.empty:
 # Globális statisztikák (adatból számolva, nem hardkódolva)
 churn_proba_mean = combined["churn_proba"].mean()
 
+# Modell megbízhatósága: precision a churn=1 osztályon (historikus validáció alapján)
+_tp = int(((combined["churn_pred"] == 1) & (combined["actual_churn"] == 1)).sum())
+_pp = int((combined["churn_pred"] == 1).sum())
+model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
+
+# Döntési küszöb: az a legkisebb churn_proba, aminél a modell már churnernek jelöl
+decision_threshold_pct = float(combined.loc[combined["churn_pred"] == 1, "churn_proba"].min()) * 100
+
 # ── Fő fejléc ─────────────────────────────────────────────────────────────────
 st.title("Ügyfélkereső értékesítőknek")
 st.markdown("---")
@@ -302,7 +310,7 @@ st.subheader("Churn kockázat mérő")
 fig_gauge = go.Figure(go.Indicator(
     mode="gauge+number",
     value=churn_prob * 100,
-    title={"text": f"Churn valószínűség<br><span style='font-size:0.75em;color:#c8cfe8'>Bázis átlag: {churn_proba_mean:.1%}</span>", "font": {"size": 14, "color": "white"}},
+    title={"text": f"Churn valószínűség<br><span style='font-size:0.75em;color:#c8cfe8'>Bázis átlag: {churn_proba_mean:.1%} · Döntési küszöb: {decision_threshold_pct:.1f}% (▲)</span>", "font": {"size": 14, "color": "white"}},
     number={"suffix": "%", "valueformat": ".1f", "font": {"color": risk_color, "size": 42}},
     gauge={
         "axis": {"range": [0, 100], "ticksuffix": "%", "tickcolor": TICK_CLR, "tickfont": {"color": TICK_CLR}},
@@ -316,9 +324,9 @@ fig_gauge = go.Figure(go.Indicator(
             {"range": [75, 100], "color": "rgba(255,23,68,0.55)"},
         ],
         "threshold": {
-            "line":      {"color": "rgba(255,255,255,0.6)", "width": 2},
-            "thickness": 0.8,
-            "value":     churn_proba_mean * 100,
+            "line":      {"color": "#ff1aff", "width": 6},
+            "thickness": 0.85,
+            "value":     decision_threshold_pct,
         },
     },
 ))
@@ -329,6 +337,27 @@ fig_gauge.update_layout(
     margin=dict(l=80, r=80, t=60, b=20),
 )
 st.plotly_chart(fig_gauge, use_container_width=True)
+
+st.markdown(
+    f"<div style='display:flex; flex-direction:column; gap:0.5rem; margin-top:0.25rem;'>"
+
+    f"<div style='background:rgba(255,26,255,0.08); border-left:3px solid #ff1aff; "
+    f"border-radius:0 6px 6px 0; padding:8px 14px; font-size:0.85em;'>"
+    f"<span style='color:#ff1aff; font-weight:700;'>▲ {decision_threshold_pct:.1f}%-os döntési küszöb:</span>"
+    f"<span style='color:rgba(200,207,232,0.85);'> efölött jelöli a modell churnernek az ügyfelet. "
+    f"A churnernek jelöltek <b>{model_precision_pct:.2f}%-a</b> valóban lemorzsolódott a historikus adatban.</span>"
+    f"</div>"
+
+    f"<div style='background:rgba(200,207,232,0.05); border-left:3px solid rgba(200,207,232,0.25); "
+    f"border-radius:0 6px 6px 0; padding:8px 14px; font-size:0.85em; color:rgba(200,207,232,0.7);'>"
+    f"💡 <b style='color:rgba(200,207,232,0.9);'>30–70% közötti sáv:</b> a leginkább befolyásolható kimenetelű ügyfelek: "
+    f"sem nem döntöttek végleg a lemorzsolódás mellett, sem nem elég stabilak beavatkozás nélkül. "
+    f"Itt a leghatékonyabb egy célzott megtartási kampány."
+    f"</div>"
+
+    f"</div>",
+    unsafe_allow_html=True,
+)
 
 # Szegmens átlag összehasonlítás
 _, cmp_col, _ = st.columns([1, 2, 1])

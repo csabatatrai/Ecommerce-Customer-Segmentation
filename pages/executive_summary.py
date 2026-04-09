@@ -7,6 +7,7 @@ import base64
 import joblib
 import warnings
 from pathlib import Path
+from sklearn.metrics import roc_auc_score
 from src.sidebar import render_sidebar
 from src.data_loader import load_churn_predictions, load_transactions
 
@@ -58,11 +59,13 @@ if not df_preds.empty and not df_tx.empty:
         (all_churn_tx['InvoiceDate'] <  cutoff_date)
     ]['LineTotal'].sum()
 
-    # Precision-korrekció: a modell 72%-os precizitással azonosítja a valódi churnereket,
-    # tehát a várható valós bevételkiesés = TTM × 0.72
-    model_precision_pct = 72.0  # Lemorzsolódik osztály precision a teszt halmazon (classification report alapján)
+    # Precision-korrekció: adatból számolva (churn_pred=1 & actual_churn=1 / összes churn_pred=1)
+    _tp = int(((df_preds['churn_pred'] == 1) & (df_preds['actual_churn'] == 1)).sum())
+    _pp = int((df_preds['churn_pred'] == 1).sum())
+    model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
     model_precision = model_precision_pct / 100
     revenue_at_risk = all_churn_ttm * model_precision
+    roc_auc = roc_auc_score(df_preds['actual_churn'], df_preds['churn_proba'])
 
     # VIP Veszélyben szegmens külön (expander kontextushoz)
     vip_tx = df_tx[df_tx['Customer ID'].isin(vip_at_risk_ids)]
@@ -96,6 +99,19 @@ if not df_preds.empty and not df_tx.empty:
     grey_zone_mask = (df_preds['churn_proba'] >= grey_zone_lower) & (df_preds['churn_proba'] <= grey_zone_upper)
     grey_zone_count = int(grey_zone_mask.sum())
     grey_zone_pct = grey_zone_count / len(df_preds) * 100
+
+    # Szürke zóna TTM bevétele és reálisan menthető összeg
+    grey_zone_ttm = df_tx[
+        df_tx['Customer ID'].isin(df_preds.index[grey_zone_mask])
+    ].pipe(lambda t: t[
+        (t['InvoiceDate'] >= start_date_ttm) &
+        (t['InvoiceDate'] <  cutoff_date)
+    ])['LineTotal'].sum()
+    grey_zone_arpu = grey_zone_ttm / grey_zone_count if grey_zone_count > 0 else 0
+    grey_zone_expected_churners = grey_zone_count * 0.50
+    retention_benchmark_pct = 15.0  # közepes e-commerce kampány (iparági átlag: 10–20%)
+    salvageable_revenue = grey_zone_ttm * 0.50 * (retention_benchmark_pct / 100)
+    salvageable_pct_of_risk = salvageable_revenue / revenue_at_risk * 100 if revenue_at_risk > 0 else 0
 
     # ==========================================
     # 6. KPI Átlagos lemorzsolódási arány
@@ -182,12 +198,12 @@ if not df_preds.empty and not df_tx.empty:
             <div class="kpi-card">
                 <div class="kpi-label">🚨 Becsült veszélyben lévő éves bevétel</div>
                 <div class="kpi-value">£ {revenue_at_risk/1000:,.0f}k</div>
-                <div class="kpi-sub">a 2010-es éves bevétel (£ {revenue_2010:,.0f}) ~{risk_pct:.1f}%-ának megfelelő összeg {model_precision_pct:.0f}%-os modellprecizitással korrigált becslés</div>
+                <div class="kpi-sub">a 2010-es éves bevétel (£ {revenue_2010:,.0f}) ~{risk_pct:.1f}%-ának megfelelő összeg, {model_precision_pct:.2f}%-os modellprecizitással korrigálva · <b style="color:#1aff6e;">Ebből reálisan menthető: £ {salvageable_revenue/1000:,.0f}k</b> (szürke zóna, 15%-os iparági benchmark retenció)</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">👥 Veszélyben lévő VIP ügyfelek</div>
                 <div class="kpi-value">{vip_at_risk_count:,} fő</div>
-                <div class="kpi-sub">A teljes ügyfélbázison {model_precision_pct:.0f}%-os, a VIP Bajnokok szegmensen belül {vip_precision_pct:.0f}%-os megbízhatósággal tudtuk azonosítani a lemorzsolódókat.</div>
+                <div class="kpi-sub">A teljes ügyfélbázison {model_precision_pct:.2f}%-os, a VIP Bajnokok szegmensen belül {vip_precision_pct:.2f}%-os megbízhatósággal tudtuk azonosítani a lemorzsolódókat.</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">🎯 "Szürke Zóna"  Bizonytalan churn-valószínűségű ügyfelek</div>
@@ -220,19 +236,28 @@ if not df_preds.empty and not df_tx.empty:
     with col1:
         with st.expander("ℹ️ Hogyan számoltuk? Becsült bevételkiesés"):
             st.markdown(f"""
-            **Célcsoport:** Az összes churn-re jelölt ügyfél (`churn_pred = 1`) - {len(all_churn_ids):,} fő.
+            **Célcsoport:** Az összes churn-re jelölt ügyfél (`churn_pred = 1`): {len(all_churn_ids):,} fő.
 
             **Számítás:**
 
-            $$ \\text{{Becsült kiesés}} = \\underbrace{{\\sum_{{\\text{{churn\\_pred}}=1}} \\text{{TTM bevétel}}}}_{{£\\,{all_churn_ttm:,.0f}}} \\times \\underbrace{{\\text{{Precision}}}}_{{0.72}} = £\\,{revenue_at_risk:,.0f} $$
+            $$ \\text{{Becsült kiesés}} = \\underbrace{{\\sum_{{\\text{{churn\\_pred}}=1}} \\text{{TTM bevétel}}}}_{{£\\,{all_churn_ttm:,.0f}}} \\times \\underbrace{{\\text{{Precision}}}}_{{{{model\\_precision}}={model_precision:.4f}}} = £\\,{revenue_at_risk:,.0f} $$
 
-            **Miért precision-korrekció?** A modell a churn-re jelölt ügyfelek {model_precision_pct:.0f}%-ánál jelez valódi lemorzsolódást (teszt halmaz, classification report). A fennmaradó {100-model_precision_pct:.0f}% téves riasztás - az ő bevételük nem kiesés, ezért levonjuk.
+            **Miért precision-korrekció?** A modell a churn-re jelölt ügyfelek {model_precision_pct:.2f}%-ánál jelez valódi lemorzsolódást (teszt halmaz, classification report). A fennmaradó {100-model_precision_pct:.2f}% téves riasztás - az ő bevételük nem kiesés, ezért levonjuk.
 
             ---
             | Metrika | Érték |
             |---|---|
             | Churn-re jelölt ügyfelek | {len(all_churn_ids):,} fő |
             | Churn-re jelöltek TTM bevétele | £ {all_churn_ttm:,.0f} |
+
+            ---
+            **Reálisan menthető összeg: £ {salvageable_revenue:,.0f}**
+
+            A teljes kiesésből nem menthető vissza minden összeg, mivel csak a „Szürke Zóna" ügyfelei befolyásolhatók jó eséllyel kampánnyal (churn-valószínűség: 30–70%). A valóban megmenthető rész becslése:
+
+            $$ \\text{{Menthető}} = \\underbrace{{\\text{{Szürke zóna TTM}}}}_{{£\\,{grey_zone_ttm:,.0f}}} \\times \\underbrace{{50\\%\\text{{ átlag churn proba}}}}_{{\\text{{várható veszteség}}}} \\times \\underbrace{{{retention_benchmark_pct:.0f}\\%\\text{{ retenció}}}}_{{\\text{{iparági benchmark}}}} = £\\,{salvageable_revenue:,.0f} $$
+
+            Ez a kiesés ~{salvageable_pct_of_risk:.0f}%-a — a reálisan elérhető bevédelmi sáv egy közepes minőségű, célzott megtartási kampánnyal.
 
             *TTM (Trailing Twelve Months): a cutoff dátum (2011-09-09) előtti gördülő 365 nap tranzakcióinak összege - a legfrissebb viselkedést tükrözi, nem egy rögzített naptári évet.*
             *A legpontosabb előrejelzéshez jövőbeli fejlesztésként Prediktív CLV modell bevezetése javasolt.*
@@ -254,11 +279,11 @@ if not df_preds.empty and not df_tx.empty:
 
             | | Ügyfelek száma | Arány |
             |---|---|---|
-            | ✅ Valódi churner (TP) | {vip_tp:,} fő | {vip_precision_pct:.0f}% |
-            | ⚠️ Téves riasztás (FP) | {vip_fp:,} fő | {100 - vip_precision_pct:.0f}% |
+            | ✅ Valódi churner (TP) | {vip_tp:,} fő | {vip_precision_pct:.2f}% |
+            | ⚠️ Téves riasztás (FP) | {vip_fp:,} fő | {100 - vip_precision_pct:.2f}% |
             | **Összesen (akció-lista)** | **{vip_at_risk_count:,} fő** | **100%** |
 
-            A lista **{vip_precision_pct:.0f}%-os precizitással** azonosítja a valódi lemorzsolódókat. A fennmaradó {100 - vip_precision_pct:.0f}% (téves riasztás) proaktív megkeresése üzletileg nem kockázatos - egy VIP ügyfelet felhívni soha nem árt.
+            A lista **{vip_precision_pct:.2f}%-os precizitással** azonosítja a valódi lemorzsolódókat. A fennmaradó {100 - vip_precision_pct:.2f}% (téves riasztás) proaktív megkeresése üzletileg nem kockázatos - egy VIP ügyfelet felhívni soha nem árt.
 
             *Megjegyzés: Az `actual_churn` kizárólag historikus validációs label. Éles működésben ez az érték nem ismert előre - ezért is van szükség a modellre.*
             """)
@@ -432,7 +457,7 @@ if not df_preds.empty and not df_tx.empty:
 
                 **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
-                *Modell megbízhatósága: ROC-AUC = 0.815 - döntéstámogatásra alkalmas szint.*
+                *Modell megbízhatósága: ROC-AUC = {roc_auc:.3f} - döntéstámogatásra alkalmas szint.*
                 """)
 
         except Exception as e:
@@ -655,4 +680,3 @@ if not df_preds.empty and not df_tx.empty:
         Az ő elvesztésük aránytalanul nagy bevételkiesést okoz - ezért indokolt a VIP-szegmens kiemelt kezelése.
         """)
 
-    st.markdown("---")
