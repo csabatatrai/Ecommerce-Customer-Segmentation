@@ -228,7 +228,7 @@ ecommerce-customer-segmentation/
 │
 ├── data/                             # 🚨 notebook hozza létre config.py segítségével
 │   ├── raw/                          # 🚨 notebook hozza létre, ide tölti le a nyers datasetet
-│   └── processed/                    # 💾 notebook hozza létre, tisztított, parquet fájlok
+│   └── processed/                    # 💾 tisztított parquet fájlok, Streamlit működése miatt maradt benne, notebookok futtatása előtt törölhetők
 │
 ├── <a href="sql/">sql/</a>
 │   └── <a href="sql/eda_exploratory_analysis.sql">eda_exploratory_analysis.sql</a>  # SQL szkriptek

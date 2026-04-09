@@ -6,6 +6,7 @@ import base64
 import joblib
 import warnings
 from pathlib import Path
+from sidebar import render_sidebar
 
 # ==========================================
 # 1. Oldal konfigurációja
@@ -55,6 +56,8 @@ def load_data():
     else:
         st.error("Hiba: Hiányzó adatfájlok a data/processed/ mappában!")
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
+render_sidebar()
 
 df_preds, df_tx, df_seg = load_data()
 

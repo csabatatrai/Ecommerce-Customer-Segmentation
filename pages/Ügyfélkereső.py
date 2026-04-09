@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from pathlib import Path
+from sidebar import render_sidebar
 
 # ── Oldal konfiguráció ─────────────────────────────────────────────────────────
 st.set_page_config(
@@ -19,6 +20,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+render_sidebar()
 
 # ── Háttérkép (app.py-val azonos megközelítés) ─────────────────────────────────
 bg_path = Path("assets/streamlit_bg.webp")
