@@ -13,14 +13,6 @@ from pathlib import Path
 from sidebar import render_sidebar
 from data_loader import load_churn_predictions, load_transactions
 
-# ── Oldal konfiguráció ─────────────────────────────────────────────────────────
-st.set_page_config(
-    page_title="Ügyfél Kereső",
-    page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 render_sidebar()
 
 # ── Háttérkép (app.py-val azonos megközelítés) ─────────────────────────────────
@@ -42,7 +34,7 @@ st.markdown(f"""
         }}
         .kpi-grid {{
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
             margin-bottom: 1.5rem;
         }}
@@ -88,6 +80,18 @@ st.markdown(f"""
             border-radius: 6px;
             padding: 9px 14px;
             margin-bottom: 8px;
+        }}
+        .stats-bar {{
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            color: #c8cfe8;
+            font-size: 13px;
+        }}
+        @media (max-width: 768px) {{
+            .stats-item {{
+                width: 100%;
+            }}
         }}
     </style>
 """, unsafe_allow_html=True)
@@ -510,12 +514,13 @@ if not df_tx_all.empty:
 
         st.markdown(f"""
             <div style="background:rgba(168,16,34,0.3); border:1px solid rgba(255,255,255,0.12);
-                    border-radius:8px; padding:12px 18px; margin-top:10px;
-                    display:flex; gap:2rem; flex-wrap:wrap; color:#c8cfe8; font-size:13px;">
-                <span>📦 <b style="color:white">{total_orders:,}</b> rendelés</span>
-                <span>🛍️ <b style="color:white">{total_items:,}</b> tétel összesen</span>
-                <span>💰 <b style="color:white">£{total_revenue:,.0f}</b> teljes bevétel (élettartam)</span>
-                <span>📅 Első vásárlás: <b style="color:white">{first_purchase}</b></span>
-                <span>📅 Utolsó vásárlás: <b style="color:white">{last_purchase}</b></span>
+                    border-radius:8px; padding:12px 18px; margin-top:10px;">
+                <div class="stats-bar">
+                    <span class="stats-item">📦 <b style="color:white">{total_orders:,}</b> rendelés</span>
+                    <span class="stats-item">🛍️ <b style="color:white">{total_items:,}</b> tétel összesen</span>
+                    <span class="stats-item">💰 <b style="color:white">£{total_revenue:,.0f}</b> teljes bevétel (élettartam)</span>
+                    <span class="stats-item">📅 Első vásárlás: <b style="color:white">{first_purchase}</b></span>
+                    <span class="stats-item">📅 Utolsó vásárlás: <b style="color:white">{last_purchase}</b></span>
+                </div>
             </div>
         """, unsafe_allow_html=True)
