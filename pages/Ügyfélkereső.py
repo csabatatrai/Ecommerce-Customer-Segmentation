@@ -500,9 +500,9 @@ if not df_tx_all.empty:
         st.plotly_chart(fig_trend, use_container_width=True)
 
         # ── Utolsó 20 tranzakció táblázat ─────────────────────────────────────
-        st.subheader("Legutóbbi tranzakciók")
+        st.subheader("Összes tranzakció")
 
-        top_n = cust_tx.head(20)[
+        top_n = cust_tx[
             ["InvoiceDate", "Invoice", "Description", "Quantity", "Price", "LineTotal"]
         ].copy()
         top_n["InvoiceDate"] = top_n["InvoiceDate"].dt.strftime("%Y-%m-%d")
@@ -517,8 +517,13 @@ if not df_tx_all.empty:
             "LineTotal":   "Összeg",
         })
 
+        def _highlight_returns(row):
+            if row["Mennyiség"] < 0:
+                return ["background-color: rgba(255,109,0,0.22); color: #ff6d00;"] * len(row)
+            return [""] * len(row)
+
         st.dataframe(
-            top_n,
+            top_n.style.apply(_highlight_returns, axis=1),
             use_container_width=True,
             hide_index=True,
         )

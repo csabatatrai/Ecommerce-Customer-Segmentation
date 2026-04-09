@@ -165,11 +165,11 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 > Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be.
 
 <p align="center">
-  <a href="https://csabatatrai.hu/">
+  <a href="https://churn-elemzes.streamlit.app/">
     <img src="https://github.com/csabatatrai/csabatatrai/blob/main/purchases.gif?raw=true" alt="Purchases dynamics" title="Kattints a teljes dashboardért!">
   </a>
   <br>
-  <a href="https://csabatatrai.hu/">
+  <a href="https://churn-elemzes.streamlit.app/">
     <img src="https://img.shields.io/badge/Kattints_a_teljes_dashboardért-E4405F?style=for-the-badge&logo=streamlit&logoColor=white" alt="Dashboard gomb">
   </a>
 </p>
