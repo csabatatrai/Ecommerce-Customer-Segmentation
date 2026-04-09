@@ -14,11 +14,12 @@ from src.data_loader import load_churn_predictions, load_transactions
 # ==========================================
 @st.cache_resource
 def load_churn_model():
-    model_path = Path("models/xgboost_churn.joblib")
-    if model_path.exists():
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            return joblib.load(model_path)
+    for candidate in ("models/xgboost_churn.joblib", "../models/xgboost_churn.joblib"):
+        model_path = Path(candidate)
+        if model_path.exists():
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                return joblib.load(model_path)
     return None
 
 render_sidebar()
@@ -242,7 +243,7 @@ if not df_preds.empty and not df_tx.empty:
             1. **VIP szegmens** a vásárló magas értéket képvisel (Champions / Top szegmens az RFM-besorolás alapján).
             2. **Lemorzsolódás előrejelzett** a modell által becsült valószínűség átlépi az **optimalizált döntési küszöböt** (`churn_proba ≥ {effective_threshold:.3f}`).
 
-            **A küszöb meghatározása:** Az F1-score-t maximalizáló threshold a Precision-Recall görbéből, kizárólag a holdout teszthalmazon számítva (1 049 ügyfél). Ez a küszöb csökkenti az elszalasztott lemorzsolódókat (FN) a téves riasztások (FP) rovására - üzletileg ez az ésszerű prioritás.
+            **A küszöb meghatározása:** Az F1-score-t maximalizáló threshold a Precision-Recall görbéből, kizárólag a holdout teszthalmazon számítva (1 049 ügyfél). Az F1-optimális küszöb matematikai egyensúlyt keres a téves riasztások (FP) és az elszalasztott lemorzsolódók (FN) között - ez az üzletileg ésszerű kompromisszum.
 
             ---
             **Historikus validáció - mennyire „tiszta" a lista?**
@@ -299,7 +300,7 @@ if not df_preds.empty and not df_tx.empty:
             | Lemorzsolódott (`actual_churn = 1`) | {churned_customers:,} fő |
             | **Churn arány** | **{churn_rate_pct:.1f}%** |
 
-            **Értelmezés:** Ez a mutató az ügyfélmegtartási stratégia legfőbb egészségügyi indikátora. Egy {churn_rate_pct:.0f}%-os churn arány azt jelenti, hogy az ügyfelek több mint fele lemorzsolódott a megfigyelési időszakban - ez kiemelt megtartási fókuszt indokol.
+            **Értelmezés:** Ez a mutató az ügyfélmegtartási stratégia legfőbb egészségügyi indikátora. Egy {churn_rate_pct:.0f}%-os churn arány azt jelenti, hogy az ügyfelek {'több mint fele' if churn_rate_pct > 50 else 'közel fele'} lemorzsolódott a megfigyelési időszakban - ez kiemelt megtartási fókuszt indokol.
 
             *Megjegyzés: Az `actual_churn` historikus label, a modell tanítása és validációja során került meghatározásra.*
             """)
@@ -409,7 +410,7 @@ if not df_preds.empty and not df_tx.empty:
 
         with st.expander("ℹ️ Magyarázat"):
             st.markdown(f"""
-            **Adatforrás:** `xgboost_churn.joblib` - az XGBoost modell belső feature importance értékei (normalized gain).
+            **Adatforrás:** `xgboost_churn.joblib` - az XGBoost modell belső feature importance értékei (weight: hány döntési csomópontban szerepel az adott feature).
 
             **Mit mutat?** Azt, hogy a churn-előrejelzési modell döntéseihez melyik tényező mennyit nyom a latban:
 
@@ -427,7 +428,7 @@ if not df_preds.empty and not df_tx.empty:
 
             **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
-            *Modell megbízhatósága: ROC-AUC = 0.808 - döntéstámogatásra alkalmas szint.*
+            *Modell megbízhatósága: ROC-AUC = 0.815 - döntéstámogatásra alkalmas szint.*
             """)
 
     st.markdown("---")
