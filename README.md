@@ -197,7 +197,7 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 <a id="setup"></a>
 ## Lokális futtatás és környezet beállítása (Setup)
 
-> **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
+> **💡 Megjegyzés:** A projekt alapértelmezett bemeneti/kimeneti fájlútvonalait és a főbb paramétereket (pl. `CUTOFF_DATE`) a `notebooks/config.py` fájl tartalmazza. Az útvonalakat itt lehet módosítani eltérő mappastruktúra használatához.
 
 A projekt futtatásához javasolt egy izolált virtuális környezet (pl. Conda) használata:
 
@@ -225,11 +225,11 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-6. Futtasd a notebookokat **sorrendben**:
-   - `01_data_preparation.ipynb` – Adatelőkészítés: Data Preparation (Adattisztítás és Parquet Pipeline)
-   - `02_customer_segmentation.ipynb` – Ügyfélszegmentáció: Customer Segmentation (RFM Elemzés és K-means)
-   - `03_churn_prediction.ipynb` – Prediktív Modellezés: Churn Prediction (XGBoost Klasszifikáció)
-   - `04_model_evaluation.ipynb` – Modell Kiértékelés: Kalibráció, SHAP, Threshold & üzleti akciótervek
+6. Futtasd a notebookokat **sorrendben** (a `notebooks/` mappából):
+   - `notebooks/01_data_preparation.ipynb` – Adatelőkészítés: Data Preparation (Adattisztítás és Parquet Pipeline)
+   - `notebooks/02_customer_segmentation.ipynb` – Ügyfélszegmentáció: Customer Segmentation (RFM Elemzés és K-means)
+   - `notebooks/03_churn_prediction.ipynb` – Prediktív Modellezés: Churn Prediction (XGBoost Klasszifikáció)
+   - `notebooks/04_model_evaluation.ipynb` – Modell Kiértékelés: Kalibráció, SHAP, Threshold & üzleti akciótervek
 
 7. A Streamlit dashboardok lokális megnyitásához navigálj terminállal a gyökérkönyvtárba, és használd a `streamlit run app.py` parancsot!
 
@@ -241,40 +241,13 @@ jupyter notebook
 <pre>
 ecommerce-customer-segmentation/
 │
-├── <a href="LICENSE">LICENSE</a>                           # MIT – szabadon tanulmányozható és futtatható
-├── <a href="config.py">config.py</a>                         # közös útvonal-konstansok és pipeline paraméterek
-├── <a href="requirements.txt">requirements.txt</a>
-├── .gitignore
-│
-├── data/                             # 🚨 notebook hozza létre config.py segítségével
-│   ├── raw/                          # 🚨 notebook hozza létre, ide tölti le a nyers datasetet
-│   └── processed/                    # 💾 tisztított parquet fájlok, Streamlit működése miatt maradt benne, notebookok futtatása előtt törölhetők
-│
-├── <a href="sql/">sql/</a>
-│   └── <a href="sql/eda_exploratory_analysis.sql">eda_exploratory_analysis.sql</a>  # SQL szkriptek
-│
-├── <a href="01_data_preparation.ipynb">01_data_preparation.ipynb</a>         # adattisztítás
-├── <a href="02_customer_segmentation.ipynb">02_customer_segmentation.ipynb</a>    # RFM feature engineering és K-means klaszterezés
-├── <a href="03_churn_prediction.ipynb">03_churn_prediction.ipynb</a>         # XGBoost churn predikció – modellépítés, holdout split, export
-├── <a href="04_model_evaluation.ipynb">04_model_evaluation.ipynb</a>         # kalibráció, SHAP, threshold optimalizálás, üzleti akciólista
-│
-├── models/                           # 🚨notebook hozza létre, szerializált modell- és transzformátor-objektumok (joblib)
-│
-├── <a href="app.py">app.py</a>                            # Streamlit dashboard főfájl
-├── <a href="pages/">pages/</a>                            # Streamlitnek további dashboardok
-│
-├── <a href="docs/">docs/</a>                             # 🟢 Lefuttatott notebookok markdownban
-│   ├── <a href="docs/images/">images/</a>
-│   │   ├── <a href="docs/images/01_data_preparation/">01_data_preparation/</a>
-│   │   ├── <a href="docs/images/02_customer_segmentation/">02_customer_segmentation/</a>
-│   │   ├── <a href="docs/images/03_churn_prediction/">03_churn_prediction/</a>
-│   │   └── <a href="docs/images/04_model_evaluation/">04_model_evaluation/</a>
-│   ├── <a href="docs/01_data_preparation.md">01_data_preparation.md</a>
-│   ├── <a href="docs/02_customer_segmentation.md">02_customer_segmentation.md</a>
-│   ├── <a href="docs/03_churn_prediction.md">03_churn_prediction.md</a>
-│   └── <a href="docs/04_model_evaluation.md">04_model_evaluation.md</a>
-│
-└── <a href="update_docs.py">update_docs.py</a>                    # 💡 dokumentáció-automatizáló szkript (részben dokumentálja magát a kód)
+├── <a href="data/">data/</a>                    # 💾 nyers és feldolgozott adatfájlok, a nyers adatot notebook tölti le
+├── <a href="sql/">sql/</a>                     # SQL szkriptek (EDA)
+├── <a href="notebooks/">notebooks/</a>               # Jupyter notebookok és pipeline szkriptek
+├── models/                  # 🚨 notebook hozza létre – szerializált modellek (joblib)
+├── <a href="pages/">pages/</a>                   # Streamlit oldalak
+├── <a href="src/">src/</a>                     # Streamlit segédmodulok
+└── <a href="docs/">docs/</a>                    # 🟢 Lefuttatott notebookok markdownban és grafikonjaik
 </pre>
 
 <details>
@@ -317,7 +290,7 @@ ecommerce-customer-segmentation/
 flowchart TD
     CSV[("📂 online_retail_II.csv\nKaggle / UCI · ~1M sor")]
     SQL["🔍 SQL EDA\nSQLite / DB Browser"]
-    CFG(["⚙️ config.py\nÚtvonalak · paraméterek"])
+    CFG(["⚙️ notebooks/config.py\nÚtvonalak · paraméterek"])
 
     SQL -.->|feltárás| CSV
     CFG -.-> PREP

@@ -6,8 +6,8 @@ import base64
 import joblib
 import warnings
 from pathlib import Path
-from sidebar import render_sidebar
-from data_loader import load_churn_predictions, load_transactions
+from src.sidebar import render_sidebar
+from src.data_loader import load_churn_predictions, load_transactions
 
 # ==========================================
 # 1. Adatbetöltés

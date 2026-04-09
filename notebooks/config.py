@@ -9,7 +9,7 @@ from pathlib import Path
 
 # --- Alapvető útvonalak ---
 # A projekt gyökerétől kiindulva definiáljuk a fontosabb könyvtárakat.
-PROJECT_ROOT  = Path(__file__).parent.resolve()
+PROJECT_ROOT  = Path(__file__).parent.parent.resolve()
 DATA_DIR      = PROJECT_ROOT / "data"
 RAW_DIR       = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
