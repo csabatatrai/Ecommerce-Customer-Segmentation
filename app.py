@@ -7,6 +7,7 @@ import joblib
 import warnings
 from pathlib import Path
 from sidebar import render_sidebar
+from data_loader import load_churn_predictions, load_transactions
 
 # ==========================================
 # 1. Oldal konfigurációja
@@ -19,7 +20,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. Adatbetöltés (Két fájlra van szükségünk)
+# 2. Adatbetöltés
 # ==========================================
 @st.cache_resource
 def load_churn_model():
@@ -30,36 +31,10 @@ def load_churn_model():
             return joblib.load(model_path)
     return None
 
-@st.cache_data
-def load_data():
-    preds_path = Path("data/processed/churn_predictions.parquet")
-    tx_path    = Path("data/processed/online_retail_ready_for_rfm.parquet")
-    seg_path   = Path("data/processed/customer_segments.parquet")
-
-    if preds_path.exists() and tx_path.exists():
-        preds    = pd.read_parquet(preds_path)
-        tx_data  = pd.read_parquet(tx_path)
-        seg_data = pd.read_parquet(seg_path).reset_index() if seg_path.exists() else pd.DataFrame()
-
-        tx_data['InvoiceDate'] = pd.to_datetime(tx_data['InvoiceDate'])
-
-        # JAVÍTÁS: Ha a Customer ID az indexben van (RFM aggregáció miatt),
-        # akkor oszloppá alakítjuk, hogy a KeyError-t elkerüljük!
-        if 'Customer ID' not in preds.columns:
-            preds = preds.reset_index()
-            if 'index' in preds.columns:
-                preds = preds.rename(columns={'index': 'Customer ID'})
-            elif 'CustomerID' in preds.columns:
-                preds = preds.rename(columns={'CustomerID': 'Customer ID'})
-
-        return preds, tx_data, seg_data
-    else:
-        st.error("Hiba: Hiányzó adatfájlok a data/processed/ mappában!")
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
-
 render_sidebar()
 
-df_preds, df_tx, df_seg = load_data()
+df_preds = load_churn_predictions()
+df_tx    = load_transactions()
 
 # ==========================================
 # 3. Dashboard fejléc
@@ -67,12 +42,12 @@ df_preds, df_tx, df_seg = load_data()
 st.title("Vezetői összefoglaló")
 st.markdown("---")
 
-if not df_preds.empty and not df_tx.empty and not df_seg.empty:
+if not df_preds.empty and not df_tx.empty:
 # ==========================================
     # 4. KPI kiszámítása (Szcenárió alapú Tól-Ig sáv)
     # ==========================================
     vip_at_risk_mask = df_preds['action'].str.contains('VIP Veszélyben', na=False)
-    vip_at_risk_ids = df_preds.loc[vip_at_risk_mask, 'Customer ID']
+    vip_at_risk_ids = df_preds.index[vip_at_risk_mask]
     
     vip_tx = df_tx[df_tx['Customer ID'].isin(vip_at_risk_ids)]
     
@@ -462,7 +437,7 @@ if not df_preds.empty and not df_tx.empty and not df_seg.empty:
     }
     st.subheader("Hogyan alakult a bevétel időben? – Havi trend szegmensenként")
 
-    seg_lookup = df_preds.set_index('Customer ID')['rfm_segment']
+    seg_lookup = df_preds['rfm_segment']
     tx_seg = df_tx.copy()
     tx_seg['rfm_segment'] = tx_seg['Customer ID'].map(seg_lookup).fillna('Ismeretlen')
     tx_seg = tx_seg[tx_seg['rfm_segment'] != 'Ismeretlen']

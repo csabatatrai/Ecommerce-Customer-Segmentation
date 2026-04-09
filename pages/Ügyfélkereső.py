@@ -4,7 +4,6 @@ Egyedi ügyfél RFM-profil és churn-kockázat kereső
 """
 
 import base64
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -12,6 +11,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from pathlib import Path
 from sidebar import render_sidebar
+from data_loader import load_churn_predictions, load_transactions
 
 # ── Oldal konfiguráció ─────────────────────────────────────────────────────────
 st.set_page_config(
@@ -167,40 +167,7 @@ def hex_to_rgba(hex_color: str, alpha: float = 0.2) -> str:
 
 
 # ── Adatbetöltés ───────────────────────────────────────────────────────────────
-@st.cache_data(show_spinner="Adatok betöltése...")
-def load_data() -> pd.DataFrame:
-    path = Path("data/processed/churn_predictions.parquet")
-    if not path.exists():
-        path = Path("../data/processed/churn_predictions.parquet")
-    if not path.exists():
-        return pd.DataFrame()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        df = pd.read_parquet(path)
-    if df.index.name != "Customer ID":
-        if "Customer ID" in df.columns:
-            df = df.set_index("Customer ID")
-        elif "CustomerID" in df.columns:
-            df = df.set_index("CustomerID")
-            df.index.name = "Customer ID"
-    df.index = df.index.astype(str)
-    return df
-
-
-@st.cache_data(show_spinner="Tranzakciók betöltése...")
-def load_transactions() -> pd.DataFrame:
-    path = Path("data/processed/online_retail_ready_for_rfm.parquet")
-    if not path.exists():
-        path = Path("../data/processed/online_retail_ready_for_rfm.parquet")
-    if not path.exists():
-        return pd.DataFrame()
-    df = pd.read_parquet(path)
-    df["InvoiceDate"] = pd.to_datetime(df["InvoiceDate"])
-    df["Customer ID"] = df["Customer ID"].astype(str)
-    return df
-
-
-combined  = load_data()
+combined  = load_churn_predictions()
 df_tx_all = load_transactions()
 
 if combined.empty:
