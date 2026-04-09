@@ -7,7 +7,6 @@ import base64
 import joblib
 import warnings
 from pathlib import Path
-from sklearn.metrics import roc_auc_score
 from src.sidebar import render_sidebar
 from src.data_loader import load_churn_predictions, load_transactions
 
@@ -65,7 +64,14 @@ if not df_preds.empty and not df_tx.empty:
     model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
     model_precision = model_precision_pct / 100
     revenue_at_risk = all_churn_ttm * model_precision
-    roc_auc = roc_auc_score(df_preds['actual_churn'], df_preds['churn_proba'])
+    # Dokumentált, holdout teszt szett alapú metrikák (04_model_evaluation.ipynb)
+    TEST_PR_AUC         = 0.8322
+    TEST_RECALL_PCT     = 85.6   # churnerek lefedése: 501 / 585
+    TEST_PRECISION_PCT  = 71.4   # lista tisztasága:   501 / 701
+    TEST_TP             = 501    # valódi churner, helyesen azonosítva
+    TEST_TOTAL_CHURNERS = 585    # összes churner a teszt szettben
+    TEST_FP             = 200    # téves riasztás (valójában maradó ügyfél)
+    TEST_FLAGGED        = 701    # összesen churnernek jelölt (TP + FP)
 
     # VIP Veszélyben szegmens külön (expander kontextushoz)
     vip_tx = df_tx[df_tx['Customer ID'].isin(vip_at_risk_ids)]
@@ -139,6 +145,15 @@ if not df_preds.empty and not df_tx.empty:
         bg_css = ""
 
     # -------------------------------------------------------
+    # Adatfrissesség / modell badge
+    # -------------------------------------------------------
+    data_start = df_tx['InvoiceDate'].min().strftime('%Y-%m-%d')
+    st.caption(
+        f"Adatok alapja: {data_start} – {cutoff_date.strftime('%Y-%m-%d')}"
+        f"  ·  Modell: XGBoost  ·  Teszt PR-AUC: {TEST_PR_AUC:.4f}"
+    )
+
+    # -------------------------------------------------------
     # Egyéni KPI kártyák CSS stílusa
     # -------------------------------------------------------
     st.markdown(f"""
@@ -203,12 +218,17 @@ if not df_preds.empty and not df_tx.empty:
             <div class="kpi-card">
                 <div class="kpi-label">🚨 Becsült veszélyben lévő éves bevétel</div>
                 <div class="kpi-value">£ {revenue_at_risk/1000:,.0f}k</div>
-                <div class="kpi-sub">a 2010-es éves bevétel (£ {revenue_2010:,.0f}) ~{risk_pct:.1f}%-ának megfelelő összeg, {model_precision_pct:.2f}%-os modellprecizitással korrigálva · <b style="color:#1aff6e;">Ebből reálisan menthető: £ {salvageable_revenue/1000:,.0f}k</b> (szürke zóna, 15%-os iparági benchmark retenció)</div>
+                <div class="kpi-sub">{model_precision_pct:.2f}%-os modellprecizitással korrigálva · <b style="color:#1aff6e;">Ebből reálisan menthető: £ {salvageable_revenue/1000:,.0f}k</b></div>
+                <div class="kpi-sub">(15%-os iparági benchmark retenciót feltételezve)</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">👥 Veszélyben lévő VIP ügyfelek</div>
-                <div class="kpi-value">{vip_at_risk_count:,} fő</div>
-                <div class="kpi-sub">A teljes ügyfélbázison {model_precision_pct:.2f}%-os, a VIP Bajnokok szegmensen belül {vip_precision_pct:.2f}%-os megbízhatósággal tudtuk azonosítani a lemorzsolódókat.</div>
+                <div class="kpi-label">🎯 Modell teljesítménye (holdout teszt, 1 049 fő)</div>
+                <div class="kpi-value" style="font-size:22px; line-height:1.6;">
+                    <span style="color:#1aff6e;">{TEST_RECALL_PCT:.1f}% Recall</span>&nbsp;&nbsp;·&nbsp;&nbsp;<span style="color:#ff8c1a;">{TEST_PRECISION_PCT:.1f}% Precision</span>
+                </div>
+                <div class="kpi-sub">
+                    <span style="color:#1aff6e;">{TEST_TP} churner megtalálva a {TEST_TOTAL_CHURNERS}-ból</span> &nbsp;·&nbsp; <span style="color:#ff8c1a;">{TEST_FP} téves riasztás a {TEST_FLAGGED} jelzésből</span>
+                </div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">🎯 "Szürke Zóna"  Bizonytalan churn-valószínűségű ügyfelek</div>
@@ -269,28 +289,59 @@ if not df_preds.empty and not df_tx.empty:
             """)
 
     with col2:
-        with st.expander("ℹ️ Hogyan számoltuk? VIP ügyfelek száma"):
+        with st.expander("ℹ️ Hogyan értelmezzük? Recall és Precision"):
             st.markdown(f"""
-            **Célcsoport:** Magas RFM-értékű ügyfelek, akiknél a modell lemorzsolódást jelez.
-
-            **Kiválasztás feltétele:** Az ügyfél egyidejűleg teljesíti az alábbi két kritériumot:
-            1. **VIP szegmens** a vásárló magas értéket képvisel (Champions / Top szegmens az RFM-besorolás alapján).
-            2. **Lemorzsolódás előrejelzett** a modell által becsült valószínűség átlépi az **optimalizált döntési küszöböt** (`churn_proba ≥ {effective_threshold:.3f}`).
-
-            **A küszöb meghatározása:** Az F1-score-t maximalizáló threshold a Precision-Recall görbéből, kizárólag a holdout teszthalmazon számítva (1 049 ügyfél). Az F1-optimális küszöb matematikai egyensúlyt keres a téves riasztások (FP) és az elszalasztott lemorzsolódók (FN) között - ez az üzletileg ésszerű kompromisszum.
+            A modell teljesítményét két egymást kiegészítő mutatóval mérjük, mert egyikük sem elegendő önmagában.
 
             ---
-            **Historikus validáció - mennyire „tiszta" a lista?**
 
-            | | Ügyfelek száma | Arány |
+            ### 🟢 Recall — „Mennyit találtunk meg?"
+
+            > A modell az összes valódi churner **{TEST_RECALL_PCT:.1f}%-át** azonosítja.
+
+            **Hogyan számoltuk?** A holdout teszt szett {TEST_TOTAL_CHURNERS} valódi churneréből a modell **{TEST_TP} főt** jelölt helyesen churn-re:
+
+            $$ \\text{{Recall}} = \\frac{{\\text{{helyesen jelölt churnerek}}}}{{\\text{{összes valódi churner}}}} = \\frac{{{TEST_TP}}}{{{TEST_TOTAL_CHURNERS}}} = {TEST_RECALL_PCT:.1f}\\% $$
+
+            **Üzleti jelentés:** A lemorzsolódók 86%-a rajta van a kampánylistán. A maradék ~14% (≈ {TEST_TOTAL_CHURNERS - TEST_TP} fő) „kicsúszik" — ők modell nélkül nem lennének elérhetők.
+
+            ---
+
+            ### 🟠 Precision — „Mennyire tiszta a lista?"
+
+            > A kampánylistán szereplők **{TEST_PRECISION_PCT:.1f}%-a** valóban lemorzsolódik.
+
+            **Hogyan számoltuk?** A modell összesen {TEST_FLAGGED} ügyfelet jelölt churn-re. Ebből {TEST_TP} valódi churner, **{TEST_FP} téves riasztás**:
+
+            $$ \\text{{Precision}} = \\frac{{\\text{{valódi churner a listán}}}}{{\\text{{összes listán szereplő}}}} = \\frac{{{TEST_TP}}}{{{TEST_FLAGGED}}} = {TEST_PRECISION_PCT:.1f}\\% $$
+
+            **Üzleti jelentés:** A listán lévők 71%-át valóban érdemes megkeresni. A {TEST_FP} téves riasztás azt jelenti, hogy {TEST_FP} valójában maradó ügyfelet is elér a kampány — ez proaktív ügyfélgondozásnak tekinthető, nem veszteségnek.
+
+            ---
+
+            ### ⚖️ Miért kell mindkettő?
+
+            | Ha csak Recall-t optimalizálnánk... | Ha csak Precision-t optimalizálnánk... |
+            |---|---|
+            | Mindenkit megjelölnénk churnernek | Csak a „biztosan churnölők" kerülnének a listára |
+            | Recall = 100%, Precision → rossz | Precision magas, de sok churner lemaradna |
+            | Kampány-ROI szétesik | Lehetőség-kiesés |
+
+            A modell az F1-optimális küszöbön (`churn_proba ≥ {effective_threshold:.3f}`) egyensúlyt tart a kettő között — ez az üzletileg ésszerű kompromisszum.
+
+            ---
+
+            ### 📊 Technikai összefoglaló
+
+            | Metrika | Érték | Mit mér? |
             |---|---|---|
-            | ✅ Valódi churner (TP) | {vip_tp:,} fő | {vip_precision_pct:.2f}% |
-            | ⚠️ Téves riasztás (FP) | {vip_fp:,} fő | {100 - vip_precision_pct:.2f}% |
-            | **Összesen (akció-lista)** | **{vip_at_risk_count:,} fő** | **100%** |
+            | **Recall** | **{TEST_RECALL_PCT:.1f}%** | Churnerek lefedése |
+            | **Precision** | **{TEST_PRECISION_PCT:.1f}%** | Lista tisztasága |
+            | F1-score | 0,785 | A kettő harmónikus átlaga |
+            | PR-AUC | {TEST_PR_AUC:.4f} | Összesített görbe-terület (modellválasztási metrika) |
 
-            A lista **{vip_precision_pct:.2f}%-os precizitással** azonosítja a valódi lemorzsolódókat. A fennmaradó {100 - vip_precision_pct:.2f}% (téves riasztás) proaktív megkeresése üzletileg nem kockázatos - egy VIP ügyfelet felhívni soha nem árt.
-
-            *Megjegyzés: Az `actual_churn` kizárólag historikus validációs label. Éles működésben ez az érték nem ismert előre - ezért is van szükség a modellre.*
+            *Mérés alapja: holdout teszt szett — 1 049 érintetlen ügyfél, akiket a modell tanítása során soha nem látott.*
+            *Az `actual_churn` historikus validációs label; éles működésben ez az érték előre nem ismert.*
             """)
 
     col3, col4 = st.columns(2)
@@ -476,7 +527,7 @@ if not df_preds.empty and not df_tx.empty:
 
                 **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
-                *Modell megbízhatósága: ROC-AUC = {roc_auc:.3f} - döntéstámogatásra alkalmas szint.*
+                *Modell megbízhatósága: Teszt PR-AUC = {TEST_PR_AUC:.4f} — holdout teszt szett, döntéstámogatásra alkalmas szint.*
                 """)
 
         except Exception as e:
