@@ -31,7 +31,7 @@ import subprocess
 NOTEBOOKS_DIR = '.'
 DOCS_DIR      = 'docs'
 IMAGES_BASE   = os.path.join(DOCS_DIR, 'images')
-README_PATH   = 'README.md'
+README_PATH   = '../README.md'
 
 # Opcionális kézi elnevezések.
 # Kulcs:  "{notebook_alap_neve}/{jupyter_stem}"
@@ -295,7 +295,7 @@ def build_steps_table(notebooks_dir: str, docs_dir: str) -> str:
             title = m.group(2).strip()
 
             anchor = github_anchor(heading)
-            link   = f"docs/{md_file}{anchor}"
+            link   = f"notebooks/docs/{md_file}{anchor}"
             rows.append(f"| {num} | {title} | `{nb_file}` | [📊 Megtekintés]({link}) |")
 
     return header_row + '\n'.join(rows) + '\n'

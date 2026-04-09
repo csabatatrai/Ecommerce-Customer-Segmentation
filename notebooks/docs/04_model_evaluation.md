@@ -632,7 +632,7 @@ print(f"   Feature nevek: {FEATURE_NAMES}")
     SHAP értékek számítása az összes ügyfélen (néhány perc)...
     
 
-    ExactExplainer explainer:  22%|███████████▍                                       | 1172/5243 [00:17<00:12, 327.40it/s]
+    ExactExplainer explainer:  71%|████████████████████████████████████▎              | 3732/5243 [00:24<00:04, 319.53it/s]
 
 ### 12.2 SHAP Summary Plot – Globális feature fontosság
 

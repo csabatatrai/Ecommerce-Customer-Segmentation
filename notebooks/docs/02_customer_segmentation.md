@@ -856,7 +856,7 @@ lost_idx     = cluster_profile_raw['recency_days'].idxmax()
 
 # Új/Ígéretes: a maradék klaszterek közül a legalacsonyabb frequency-jű
 # (A recency alapú elkülönítés törékeny, mert az Új/Ígéretes és VIP Bajnokok
-# recency-je szinte azonos lehet — az igazi különbség a frequency-ben van:
+# recency-je szinte azonos lehet, az igazi különbség a frequency-ben van:
 # VIP ~19 vásárlás vs Új/Ígéretes ~3 vásárlás)
 remaining    = [c for c in cluster_profile_raw.index if c not in [vip_idx, lost_idx]]
 new_idx      = cluster_profile_raw.loc[remaining, 'frequency'].idxmin()
@@ -1219,8 +1219,7 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     [02_customer_segmentation.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 15 sor, 1 csere.
-    
+    [README] Nem található: 'README.md' – táblázat frissítés kihagyva.
     ==================================================
     Kesz!
     

@@ -22,7 +22,7 @@
 
 A nyers adathalmaz betöltése teljesen automatizált: a `0.1` cella letölti az UCI ML Repository-ból
 az Online Retail II adathalmazt (id=502), kibontja a zip-ből az XLSX-et, majd a `0.2` cella
-mindkét sheetből (2009–2010, 2010–2011) összefűzve közvetlenül Parquet formátumba konvertálja —
+mindkét sheetből (2009–2010, 2010–2011) összefűzve közvetlenül Parquet formátumba konvertálja
 CSV közbenső lépés nélkül.
 
 Mindkét cella **idempotens**: ha a fájl már létezik lemezen, a letöltés és a konverzió automatikusan
@@ -179,13 +179,13 @@ else:
 ```
 
     XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
-      • Sheet 'Year 2009-2010': 525,461 sor  (13.8s)
-      • Sheet 'Year 2010-2011': 541,910 sor  (28.7s)
+      • Sheet 'Year 2009-2010': 525,461 sor  (14.8s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (29.6s)
     
     ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
        Fájlméret:  6.9 MB
        Sorok:      1,067,371 | Oszlopok: 8
-       Futási idő: 30.6s
+       Futási idő: 31.5s
     
     Séma:
     Invoice        string[python]
@@ -567,11 +567,10 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     Docs frissitese...
     ==================================================
     [01_data_preparation.ipynb] Konvertalas Markdown-ra...
-    [01_data_preparation.ipynb] [OK] Kesz! (0 kep)
+    [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 15 sor, 1 csere.
-    
+    [README] Nem található: 'README.md' – táblázat frissítés kihagyva.
     ==================================================
     Kesz!
     

@@ -143,21 +143,21 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 
 | # | Lépés | Notebook | Lefutott eredmények megtekintése (ugrás adott részhez) |
 |---|-------|----------|----------------------------------|
-| 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` | [📊 Megtekintés](docs/01_data_preparation.md#0-adatbetöltés-és-parquet-konverzió) |
-| 1 | Adattisztítás | `01_data_preparation.ipynb` | [📊 Megtekintés](docs/01_data_preparation.md#1-adattisztítás) |
-| 2 | Feature Engineering és az adatszivárgás megelőzése | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md#2-feature-engineering-és-az-adatszivárgás-megelőzése) |
-| 3 | Statisztikai Outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md#3-statisztikai-outlier-kezelés-és-skálázás) |
-| 4 | K-means Klaszterezés | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md#4-k-means-klaszterezés) |
-| 5 | Kiterjesztett EDA | `02_customer_segmentation.ipynb` | [📊 Megtekintés](docs/02_customer_segmentation.md#5-kiterjesztett-eda) |
-| 6 | Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#6-adatbetöltés-time-split-és-célváltozó-churn-kialakítása) |
-| 7 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#7-ab-modellezés-pipeline-ok-felépítése) |
-| 8 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#8-keresztvalidáció-és-modellek-összehasonlítása) |
-| 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](docs/03_churn_prediction.md#9-végleges-modell-exportja) |
-| 10 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#10-modell-betöltése-és-adatok-előkészítése) |
-| 11 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#11-modell-kiértékelése) |
-| 12 | Modell magyarázata, SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
-| 13 | Üzleti kiértékelés és akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#13-üzleti-kiértékelés-és-akciótervek) |
-| 14 | Export, előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](docs/04_model_evaluation.md#14-export-előrejelzések-mentése) |
+| 0 | Adatbetöltés és Parquet-konverzió | `01_data_preparation.ipynb` | [📊 Megtekintés](notebooks/docs/01_data_preparation.md#0-adatbetöltés-és-parquet-konverzió) |
+| 1 | Adattisztítás | `01_data_preparation.ipynb` | [📊 Megtekintés](notebooks/docs/01_data_preparation.md#1-adattisztítás) |
+| 2 | Feature Engineering és az adatszivárgás megelőzése | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#2-feature-engineering-és-az-adatszivárgás-megelőzése) |
+| 3 | Statisztikai Outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#3-statisztikai-outlier-kezelés-és-skálázás) |
+| 4 | K-means Klaszterezés | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#4-k-means-klaszterezés) |
+| 5 | Kiterjesztett EDA | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#5-kiterjesztett-eda) |
+| 6 | Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#6-adatbetöltés-time-split-és-célváltozó-churn-kialakítása) |
+| 7 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#7-ab-modellezés-pipeline-ok-felépítése) |
+| 8 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#8-keresztvalidáció-és-modellek-összehasonlítása) |
+| 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#9-végleges-modell-exportja) |
+| 10 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#10-modell-betöltése-és-adatok-előkészítése) |
+| 11 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#11-modell-kiértékelése) |
+| 12 | Modell magyarázata, SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
+| 13 | Üzleti kiértékelés és akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#13-üzleti-kiértékelés-és-akciótervek) |
+| 14 | Export, előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#14-export-előrejelzések-mentése) |
 
 <a id="dashboard"></a>
 ## Dashboard
@@ -246,8 +246,8 @@ ecommerce-customer-segmentation/
 ├── <a href="notebooks/">notebooks/</a>               # Jupyter notebookok és pipeline szkriptek
 ├── models/                  # 🚨 notebook hozza létre – szerializált modellek (joblib)
 ├── <a href="pages/">pages/</a>                   # Streamlit oldalak
-├── <a href="src/">src/</a>                     # Streamlit segédmodulok
-└── <a href="docs/">docs/</a>                    # 🟢 Lefuttatott notebookok markdownban és grafikonjaik
+├── <a href="src/">src/</a>                     # Streamlit segédmodulok, segédfájlok
+└── notebooks/docs/              # 🟢 Lefuttatott notebookok markdownban és grafikonjaik
 </pre>
 
 <details>

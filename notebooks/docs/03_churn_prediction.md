@@ -1256,8 +1256,7 @@ print("  (SHAP, kalibráció, feature importance, threshold optimalizálás, akc
     [03_churn_prediction.ipynb] [OK] Kesz! (0 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Táblázat frissítve: 15 sor, 1 csere.
-    
+    [README] Nem található: 'README.md' – táblázat frissítés kihagyva.
     ==================================================
     Kesz!
     
