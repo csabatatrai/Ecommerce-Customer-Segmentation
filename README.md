@@ -175,9 +175,9 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 </p>
 
 <details>
-<summary>💡 Streamlit memóriaoptimalizálás – tanulságok éles üzemeltetésből</summary>
+<summary>💡 Streamlit memóriaoptimalizálás tanulságok</summary>
 
-> A dashboard Streamlit Community Cloudra van deployolva. Magas látogatószám esetén az app memórialimitbe ütközött. Az alábbi változtatások oldották meg a problémát:
+> A dashboard Streamlit Community Cloudra van deployolva. Intenzív használat esetén az app memórialimitbe ütközött és elérhetetlenné vált. Az alábbi változtatások oldották meg a problémát:
 >
 > **1. `@st.cache_resource` a `@st.cache_data` helyett**
 > A `cache_data` minden egyes felhasználónak külön másolatot készít az adatból – sok egyidejű látogató esetén ez arányosan növeli a memóriaigényt. A `cache_resource` egyetlen objektumot tárol, amelyet az összes munkamenet oszt. Kizárólag olvasásra használt adatnál (DataFrame-ek) ez biztonságos és lényegesen hatékonyabb.
