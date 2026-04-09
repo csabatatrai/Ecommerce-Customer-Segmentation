@@ -174,6 +174,26 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
   </a>
 </p>
 
+<details>
+<summary>💡 Streamlit memóriaoptimalizálás – tanulságok éles üzemeltetésből</summary>
+
+> A dashboard Streamlit Community Cloudra van deployolva. Magas látogatószám esetén az app memórialimitbe ütközött. Az alábbi változtatások oldották meg a problémát:
+>
+> **1. `@st.cache_resource` a `@st.cache_data` helyett**
+> A `cache_data` minden egyes felhasználónak külön másolatot készít az adatból – sok egyidejű látogató esetén ez arányosan növeli a memóriaigényt. A `cache_resource` egyetlen objektumot tárol, amelyet az összes munkamenet oszt. Kizárólag olvasásra használt adatnál (DataFrame-ek) ez biztonságos és lényegesen hatékonyabb.
+>
+> **2. Közös `data_loader.py` modul**
+> A többoldalas Streamlit appban (`app.py` + `pages/`) minden oldal saját `@st.cache_data` függvényt definiált – ezek külön cache-bejegyzésként éltek, így a nagyméretű tranzakciós fájl kétszer töltődött be a memóriába. Egy megosztott modul egyetlen `@st.cache_resource` funkcióval ezt megszünteti.
+>
+> **3. Csak a szükséges oszlopok betöltése**
+> A `pd.read_parquet(path, columns=[...])` paraméterrel csak a ténylegesen használt oszlopok kerülnek be a memóriába. A ~1 milliós tranzakciós Parquet-fájlnál ez érdemi méretcsökkentést jelent.
+>
+> **Összefoglalás:** sok egyidejű felhasználó esetén a Streamlit memóriaproblémájának első gyanúsítottjai a `cache_data` és a duplikált betöltések.
+
+</details>
+
+---
+
 <a id="setup"></a>
 ## Lokális futtatás és környezet beállítása (Setup)
 
