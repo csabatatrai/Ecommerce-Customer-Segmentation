@@ -243,11 +243,10 @@ ecommerce-customer-segmentation/
 │
 ├── <a href="data/">data/</a>                    # 💾 nyers és feldolgozott adatfájlok, a nyers adatot notebook tölti le
 ├── <a href="sql/">sql/</a>                     # SQL szkriptek (EDA)
-├── <a href="notebooks/">notebooks/</a>               # Jupyter notebookok és pipeline szkriptek
+├── <a href="notebooks/">notebooks/</a>               # Jupyter notebookok, pipeline szkriptek, exportált notebook kimenetek
 ├── models/                  # 🚨 notebook hozza létre – szerializált modellek (joblib)
 ├── <a href="pages/">pages/</a>                   # Streamlit oldalak
-├── <a href="src/">src/</a>                     # Streamlit segédmodulok, segédfájlok
-└── notebooks/docs/              # 🟢 Lefuttatott notebookok markdownban és grafikonjaik
+└── <a href="src/">src/</a>                     # Streamlit segédmodulok, segédfájlok
 </pre>
 
 <details>
