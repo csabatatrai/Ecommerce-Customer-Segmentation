@@ -31,10 +31,16 @@ render_sidebar()
 df_preds = load_churn_predictions()
 df_tx    = load_transactions()
 
+# PR-AUC: holdout teszt szett alapú (04_model_evaluation.ipynb), nem számolható újra itt
+TEST_PR_AUC = 0.8322
+
 # ==========================================
 # 2. Dashboard fejléc
 # ==========================================
 st.title("Vezetői összefoglaló")
+st.caption(
+    f"Adatok alapja: 2009-12-01 – 2011-09-09  ·  Modell: XGBoost  ·  Teszt PR-AUC: {TEST_PR_AUC:.4f}"
+)
 st.markdown("---")
 
 if not df_preds.empty and not df_tx.empty:
@@ -64,8 +70,6 @@ if not df_preds.empty and not df_tx.empty:
     model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
     model_precision = model_precision_pct / 100
     revenue_at_risk = all_churn_ttm * model_precision
-    # PR-AUC: holdout teszt szett alapú (04_model_evaluation.ipynb), nem számolható újra itt
-    TEST_PR_AUC = 0.8322
 
     # VIP Veszélyben szegmens külön (expander kontextushoz)
     vip_tx = df_tx[df_tx['Customer ID'].isin(vip_at_risk_ids)]
@@ -140,14 +144,6 @@ if not df_preds.empty and not df_tx.empty:
     else:
         bg_css = ""
 
-    # -------------------------------------------------------
-    # Adatfrissesség / modell badge
-    # -------------------------------------------------------
-    data_start = df_tx['InvoiceDate'].min().strftime('%Y-%m-%d')
-    st.caption(
-        f"Adatok alapja: {data_start} – {cutoff_date.strftime('%Y-%m-%d')}"
-        f"  ·  Modell: XGBoost  ·  Teszt PR-AUC: {TEST_PR_AUC:.4f}"
-    )
 
     # -------------------------------------------------------
     # Egyéni KPI kártyák CSS stílusa
@@ -472,7 +468,7 @@ if not df_preds.empty and not df_tx.empty:
                 x=fi_series.values * 100,
                 y=fi_series.index,
                 orientation='h',
-                marker=dict(color=bar_colors, line=dict(width=0)),
+                marker=dict(color=bar_colors, line=dict(width=0), opacity=0.6),
                 text=[f'<b>{v:.1f}%</b>' for v in fi_series.values * 100],
                 textposition='outside',
                 textfont=dict(color='white', size=13),
@@ -493,7 +489,7 @@ if not df_preds.empty and not df_tx.empty:
                     tickfont=dict(size=13),
                 ),
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(168,16,34,0.12)',
+                plot_bgcolor='rgba(168,16,34,0.08)',
                 font=dict(color='white'),
                 margin=dict(l=10, r=80, t=20, b=40),
                 height=300,
