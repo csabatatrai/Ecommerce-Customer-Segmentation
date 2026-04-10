@@ -6,7 +6,6 @@ Egyedi ügyfél RFM-profil és churn-kockázat kereső
 import base64
 
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from pathlib import Path
@@ -198,6 +197,7 @@ decision_threshold_pct = float(combined.loc[combined["churn_pred"] == 1, "churn_
 
 # ── Fő fejléc ─────────────────────────────────────────────────────────────────
 st.title("Ügyfélkereső értékesítőknek")
+st.caption("Operatív CRM-et segítő modul")
 st.markdown("---")
 
 # ── Keresősáv ─────────────────────────────────────────────────────────────────

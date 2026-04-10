@@ -27,7 +27,7 @@ CSV közbenső lépés nélkül.
 
 Mindkét cella **idempotens**: ha a fájl már létezik lemezen, a letöltés és a konverzió automatikusan
 kimarad. Kézi beavatkozásra csak akkor van szükség, ha az UCI szervere nem elérhető
-(ebben az esetben a cella részletes instrukciót ad a Kaggle-ről történő kézi letöltéshez).
+(ebben az esetben a cella részletes instrukciót ad az alternatív, Kaggle-ről történő letöltéshez).
 
 
 ### 0.1 – Konfiguráció, könyvtárak és adathalmaz letöltése
@@ -35,7 +35,7 @@ kimarad. Kézi beavatkozásra csak akkor van szükség, ha az UCI szervere nem e
 
 ```python
 # ============================================================
-# 0.1 – Konfiguráció, könyvtárak és adathalmaz letöltése
+# 0.1 - Konfiguráció, könyvtárak és adathalmaz letöltése
 # ============================================================
 import io
 import zipfile
@@ -55,56 +55,52 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 print(f"PROJECT_ROOT : {PROJECT_ROOT}")
 print(f"RAW_XLSX     : {RAW_XLSX}")
-print(f"PARQUET_OUT  : {PARQUET_OUT}\n")
+print(f"PARQUET_OUT  : {PARQUET_OUT}")
 
-UCI_ZIP_URL = "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
+# Idő közben kiderült, hogy az egyik link hajlamos elérhetetlenné válni, régi, robusztusabb, ha több forrás is elérhető a datasethez
+UCI_ZIP_URLS = [
+    "https://cdn.uci-ics-mlr-prod.aws.uci.edu/502/online%2Bretail%2Bii.zip",
+    "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
+]
 
 if PARQUET_OUT.exists():
-    print(f"✅ Parquet már létezik, nincs szükség letöltésre: {PARQUET_OUT}")
+    print(f"Parquet mar letezik, nincs szukseg letoltesre: {PARQUET_OUT}")
 elif RAW_XLSX.exists():
-    print(f"✅ Nyers XLSX megtalálható, konverzió következik: {RAW_XLSX}")
+    print(f"Nyers XLSX megtalalhato, konverzio kovetkezik: {RAW_XLSX}")
 else:
-    print(f"⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...")
-    print(f"   URL: {UCI_ZIP_URL}")
-    try:
-        with urllib.request.urlopen(UCI_ZIP_URL, timeout=120) as response:
-            zip_bytes = response.read()
-        print(f"   Letöltve: {len(zip_bytes) / 1e6:.1f} MB")
+    zip_bytes = None
+    for url in UCI_ZIP_URLS:
+        print(f"Adathalmaz letoltese: {url}")
+        try:
+            with urllib.request.urlopen(url, timeout=120) as response:
+                zip_bytes = response.read()
+            print(f"Letoltve: {len(zip_bytes) / 1e6:.1f} MB")
+            break
+        except Exception as exc:
+            print(f"Sikertelen ({exc}), kovetkezo URL probalkozas...")
 
-        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
-            xlsx_names = [n for n in zf.namelist() if n.lower().endswith(".xlsx")]
-            if not xlsx_names:
-                raise FileNotFoundError(
-                    f"Nem találtam XLSX-et a zip-ben. Tartalom: {zf.namelist()}"
-                )
-            target = max(xlsx_names, key=lambda n: zf.getinfo(n).file_size)
-            print(f"   Kibontás: {target} → {RAW_XLSX.name}")
-            RAW_XLSX.write_bytes(zf.read(target))
+    if zip_bytes is None:
+        print("Automatikus letoltes mindket URL-rol sikertelen, próbálja Kaggle-ről manuálisan letölteni és helyezze csv-ként konvertálva a root/data/raw mappába: https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data")
+        raise RuntimeError("Az adathalmaz letoltese nem sikerult egyik URL-rol sem.")
 
-        print(f"\n✅ Nyers XLSX mentve: {RAW_XLSX}  ({RAW_XLSX.stat().st_size / 1e6:.1f} MB)")
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+        xlsx_names = [n for n in zf.namelist() if n.lower().endswith(".xlsx")]
+        if not xlsx_names:
+            raise FileNotFoundError(f"Nem talaltam XLSX-et a zip-ben. Tartalom: {zf.namelist()}")
+        target = max(xlsx_names, key=lambda n: zf.getinfo(n).file_size)
+        print(f"   Kibontas: {target} -> {RAW_XLSX.name}")
+        RAW_XLSX.write_bytes(zf.read(target))
 
-    except Exception as exc:
-        print(f"\n❌ Automatikus letöltés sikertelen: {exc}")
-        print(
-            "\nKézi alternatíva (Kaggle):\n"
-            "  1. Töltsd le: https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci/data\n"
-            "  2. Csomagold ki az 'online_retail_II.xlsx'-et ide: " + str(RAW_XLSX) + "\n"
-            "  3. Futtasd újra ezt a cellát!"
-        )
-        raise
-
+    print(f"Nyers XLSX mentve: {RAW_XLSX}  ({RAW_XLSX.stat().st_size / 1e6:.1f} MB)")
 ```
 
     PROJECT_ROOT : D:\Workspace\ecommerce-customer-segmentation
     RAW_XLSX     : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
     PARQUET_OUT  : D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
-    
-    ⬇️  Adathalmaz letöltése az UCI ML Repository-ból ...
-       URL: https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip
-       Letöltve: 45.6 MB
-       Kibontás: online_retail_II.xlsx → online_retail_II.xlsx
-    
-    ✅ Nyers XLSX mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx  (45.6 MB)
+    Adathalmaz letoltese: https://cdn.uci-ics-mlr-prod.aws.uci.edu/502/online%2Bretail%2Bii.zip
+    Letoltve: 45.6 MB
+       Kibontas: online_retail_II.xlsx -> online_retail_II.xlsx
+    Nyers XLSX mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx  (45.6 MB)
     
 
 ### 0.2 – XLSX → Parquet konverzió (python-calamine engine)
@@ -179,13 +175,13 @@ else:
 ```
 
     XLSX betöltése (calamine engine): D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_II.xlsx
-      • Sheet 'Year 2009-2010': 525,461 sor  (14.8s)
-      • Sheet 'Year 2010-2011': 541,910 sor  (29.6s)
+      • Sheet 'Year 2009-2010': 525,461 sor  (14.9s)
+      • Sheet 'Year 2010-2011': 541,910 sor  (30.3s)
     
     ✅ Parquet mentve: D:\Workspace\ecommerce-customer-segmentation\data\raw\online_retail_raw.parquet
        Fájlméret:  6.9 MB
        Sorok:      1,067,371 | Oszlopok: 8
-       Futási idő: 31.5s
+       Futási idő: 32.3s
     
     Séma:
     Invoice        string[python]
@@ -570,7 +566,8 @@ print(f"Egyedi vásárlók a célablakban: {target_window['Customer ID'].nunique
     [01_data_preparation.ipynb] [OK] Kesz! (1 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Nem található: 'README.md' – táblázat frissítés kihagyva.
+    [README] Táblázat frissítve: 16 sor, 1 csere.
+    
     ==================================================
     Kesz!
     

@@ -46,7 +46,7 @@ def render_sidebar():
         st.markdown("---")
         st.markdown("**Adatforrás**")
         st.markdown(
-            "🗃️ [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii)"
+            "🗃️ [UCI Online Retail II](https://archive-beta.ics.uci.edu/dataset/502/online+retail+ii)"
         )
         st.markdown("---")
         st.markdown("**Módszertan**")

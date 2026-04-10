@@ -151,22 +151,23 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 | 1 | Adattisztítás | `01_data_preparation.ipynb` | [📊 Megtekintés](notebooks/docs/01_data_preparation.md#1-adattisztítás) |
 | 2 | Feature Engineering és az adatszivárgás megelőzése | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#2-feature-engineering-és-az-adatszivárgás-megelőzése) |
 | 3 | Statisztikai Outlier-kezelés és skálázás | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#3-statisztikai-outlier-kezelés-és-skálázás) |
-| 4 | K-means Klaszterezés | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#4-k-means-klaszterezés) |
+| 4 | K-means Klaszterezés (csak CUTOFF előtti adatokon) | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#4-k-means-klaszterezés-csak-cutoff-előtti-adatokon) |
 | 5 | Kiterjesztett EDA | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#5-kiterjesztett-eda) |
-| 6 | Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#6-adatbetöltés-time-split-és-célváltozó-churn-kialakítása) |
-| 7 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#7-ab-modellezés-pipeline-ok-felépítése) |
-| 8 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#8-keresztvalidáció-és-modellek-összehasonlítása) |
-| 9 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#9-végleges-modell-exportja) |
-| 10 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#10-modell-betöltése-és-adatok-előkészítése) |
-| 11 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#11-modell-kiértékelése) |
-| 12 | Modell magyarázata, SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#12-modell-magyarázata-shap-elemzés) |
-| 13 | Üzleti kiértékelés és akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#13-üzleti-kiértékelés-és-akciótervek) |
-| 14 | Export, előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#14-export-előrejelzések-mentése) |
+| 6 | Klaszterezés teljes adatsoron (operatív szegmentáció) | `02_customer_segmentation.ipynb` | [📊 Megtekintés](notebooks/docs/02_customer_segmentation.md#6-klaszterezés-teljes-adatsoron-operatív-szegmentáció) |
+| 7 | Adatbetöltés, Time-Split és Célváltozó (Churn) kialakítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#7-adatbetöltés-time-split-és-célváltozó-churn-kialakítása) |
+| 8 | A/B Modellezés: Pipeline-ok felépítése | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#8-ab-modellezés-pipeline-ok-felépítése) |
+| 9 | Keresztvalidáció és modellek összehasonlítása | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#9-keresztvalidáció-és-modellek-összehasonlítása) |
+| 10 | Végleges modell exportja | `03_churn_prediction.ipynb` | [📊 Megtekintés](notebooks/docs/03_churn_prediction.md#10-végleges-modell-exportja) |
+| 11 | Modell betöltése és adatok előkészítése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#11-modell-betöltése-és-adatok-előkészítése) |
+| 12 | Modell kiértékelése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#12-modell-kiértékelése) |
+| 13 | Modell magyarázata, SHAP elemzés | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#13-modell-magyarázata-shap-elemzés) |
+| 14 | Üzleti kiértékelés és akciótervek | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#14-üzleti-kiértékelés-és-akciótervek) |
+| 15 | Export, előrejelzések mentése | `04_model_evaluation.ipynb` | [📊 Megtekintés](notebooks/docs/04_model_evaluation.md#15-export-előrejelzések-mentése) |
 
 <a id="dashboard"></a>
 ## Dashboard
 
-> Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be.
+> Az alábbi animáció a vásárlási tranzakciók időbeli dinamikáját és a projekt interaktív felületét mutatja be. A dashboard adatvezérelt, beégetett adatok helyett dinamikusan, fájlból olvassa be az értékeket, ha a fájl tartalma frissül, a dashboard is.
 
 <p align="center">
   <a href="https://churn-elemzes.streamlit.app/">
@@ -196,6 +197,13 @@ A pipeline két PR-AUC értéket produkál, amelyek különböző célokat szolg
 
 </details>
 
+<details>
+<summary>💡 Gyakorlati tapasztalat AI-támogatással készített grafikonok esetén</summary>
+
+> A projekt során számos grafikontípussal kísérleteztem. Azt tapasztaltam, hogy nem érdemes csoportosan grafikonokat generálni, és különösen oda kell figyelni a generált grafikonok helyes adatbekötésére, mert az LLM hajlamos beégetni konstans értékeket. Az üzleti értelmezhetőség olyan domaintudás, amit jelenleg nem lehet kizárólag AI-ra bízni: kell az emberi intuíció és tapasztalat. A testreszabásban viszont kifejezetten hatékonynak bizonyult, az adatvizualizációk értékét tehát nem a megjelenés minősége, hanem ember által validált üzleti hasznossága adja.
+
+</details>
+
 ---
 
 <a id="setup"></a>
@@ -222,7 +230,7 @@ conda activate ecommerce_env
 pip install -r requirements.txt
 ```
 
-4. A nyers adathalmazt a 01_data_preparation.ipynb notebook automatikusan letölti, de beszerezhető innen is: [online-retail-II letöltése](https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip) . A `data/raw/` mappában lesz megtalálható az első notebook futtatása után!  
+4. A nyers adathalmazt a 01_data_preparation.ipynb notebook automatikusan letölti, de beszerezhető innen is: [online-retail-II letöltése](https://cdn.uci-ics-mlr-prod.aws.uci.edu/502/online%2Bretail%2Bii.zip) . A `data/raw/` mappában lesz megtalálható az első notebook futtatása után!  
 
 5. Indítsd el a Jupytert:
 ```bash
@@ -265,7 +273,8 @@ ecommerce-customer-segmentation/
 | `online_retail_cleaned.parquet` | Köztes tisztított tranzakciós adat | 01 kimenet |
 | `online_retail_ready_for_rfm.parquet` | RFM-re kész végső tranzakciós adat | 01 kimenet → 02, 03 bemenet |
 | `rfm_features.parquet` | RFM-aggregátum outlier-szűrés előtt | 02 közbenső kimenet |
-| `customer_segments.parquet` | K-means szegmenscímkékkel ellátott ügyféladatok | 02 kimenet |
+| `customer_segments.parquet` | K-means szegmenscímkékkel ellátott ügyféladatok (cutoff előtti adatokon, churn modell tanításához) | 02 kimenet |
+| `customer_segments_current.parquet` | Teljes adatbázison futtatott aktuális szegmentáció (5 838 ügyfél, dashboard RFM szegmens megjelenítéséhez) | 02 kimenet → Streamlit bemenet |
 | `test_set.parquet` | Holdout teszt szett (~1 049 ügyfél) | 03 kimenet → 04 bemenet |
 | `churn_predictions.parquet` | Teljes ügyfélbázis churn-valószínűségekkel és akciócímkékkel | 04 kimenet → Streamlit bemenet |
 | `shap_importance.parquet` | SHAP-alapú feature fontossági értékek (mean\|SHAP\| / sum, feature-enként normalizálva) | 04 kimenet → Streamlit bemenet |
@@ -312,7 +321,7 @@ flowchart TD
     PREP --> SEG --> CHURN --> EVAL --> DASH
 
     PREP -.->|kimenet| P1[("💾 Parquet fájlok\nraw · cleaned · rfm_ready")]
-    SEG  -.->|kimenet| M1[("🧩 Modellek × 2\nscaler · kmeans_rfm .joblib")]
+    SEG  -.->|kimenet| M1[("🧩 Modellek × 2 + Parquet × 2\nscaler · kmeans_rfm .joblib\ncustomer_segments.parquet · customer_segments_current.parquet")]
     CHURN-.->|kimenet| P2[("🤖 Modell + teszt szett\nxgboost.joblib · test_set.parquet")]
     EVAL -.->|kimenet| P3[("📈 Előrejelzések + SHAP\nchurn_predictions.parquet · shap_importance.parquet")]
 ```

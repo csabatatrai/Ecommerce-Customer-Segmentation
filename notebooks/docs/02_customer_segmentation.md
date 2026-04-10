@@ -524,7 +524,7 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
        Dimenziók: 5,243 ügyfél, 9 oszlop
     
 
-## 4. K-means Klaszterezés
+## 4. K-means Klaszterezés (csak CUTOFF előtti adatokon)
 
 ### 4.1 Klaszterszám vizuális meghatározása
 Ez a kód kiszámolja a WCSS-t (Könyök-módszerhez) és a Sziluett-pontszámot 2-től 10 klaszterig.
@@ -978,7 +978,7 @@ fig = px.scatter_3d(
     z='monetary_scaled',
     color='Segment',
     opacity=0.6,
-    title='Ügyfélszegmensek 3D térben',
+    title='Ügyfélszegmensek 3D térben (csak CUTOFF előtti adatok alapján!)',
     labels={
         'recency_scaled': 'Recency (Skálázott)',
         'frequency_scaled': 'Frequency (Skálázott)',
@@ -1031,6 +1031,25 @@ fig.show()
 ![png](images/02_customer_segmentation/02_4.5_Klaszterek_3D_térbeli_vizualizációja.png)
     
 
+
+# Miért látszanak "hézagok" az RFM klaszterező felülnézetén?
+ 
+## Jelenség
+ 
+A recency-frequency síkon nézve az ügyfelek nem egyenletesen töltik ki a teret, hanem szabályos **rácsszerű mintát** alkotnak, mintha diszkrét értékek lennének.
+ 
+Mindkét tengely **egész számokat** tartalmaz:
+ 
+| Dimenzió | Értékkészlet | Következmény |
+|---|---|---|
+| **Frequency** | 1, 2, 3, 4... (rendelések száma) | Vízszintes "sorok" jelennek meg |
+| **Recency** | 0, 1, 2, 3... (napok száma) | Függőleges "oszlopok" jelennek meg |
+ 
+A két diszkrét tengely metszéspontjain keletkeznek a pontcsomók, a köztük lévő rések pedig üresek maradnak -- ez a látható "hézag".
+ 
+## Értékelés
+ 
+Ez **nem hiba**, hanem az RFM adatok természetes tulajdonsága. A rácsszerű megjelenés különösen szembetűnő, ha az adatokban bizonyos napokhoz (pl. hónapvégék, hétfők) kiemelkedően sok tranzakció tartozik.
 
 ## 5. Kiterjesztett EDA
 
@@ -1193,6 +1212,313 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
        Dimenziók: 5,243 ügyfél, 11 oszlop
     
 
+## 6. Klaszterezés teljes adatsoron (operatív szegmentáció)
+
+### 6.1 Miért szükséges ez a lépés?
+
+A fenti klaszterezés (4.4) kizárólag a **megfigyelési ablakra** (cutoff előtti időszakra) fut, mivel az a churn modell feature-engineering pipeline-jának része: a cutoff utáni adatok bevonása **adatszivárgást (data leakage)** okozna a tanítás során.
+
+Azonban a 03-as notebookban bebizonyosodott, hogy a churn modell **saját belső KMeansFeaturizer**-t tartalmaz a sklearn Pipeline-ban, és **nem** a `customer_segments.parquet` fájlból olvassa be a klaszter-labeleket. Ebből következik, hogy a `customer_segments.parquet` célja **kizárólag az üzleti szegmentáció** (dashboard, riportok) – és erre a célra a cutoff-alapú korlátozás szükségtelen, sőt félrevezető.
+
+**A probléma a dashboardon:** az értékesítő a KPI kártyákon a teljes tranzakcióhistória alapján számolt friss RFM értékeket lát, de a szegmens-besorolás a cutoff előtti (akár 90+ nappal elavult) állapotot tükrözi. Ez inkonzisztens képet ad.
+
+**A megoldás:** futtatunk egy második klaszterezést a **teljes, tisztított adatbázison**, ahol a recency referencia-dátuma az adathalmaz legfrissebb tranzakciója. Az eredmény a `customer_segments_current.parquet` fájlba kerül, amelyet a dashboard az operatív szegmentációhoz használ.
+
+> ⚠️ **Fontos:** Ez az operatív szegmentáció **nem** befolyásolja a churn modell tanítási pipeline-ját – a két klaszterezés teljesen független egymástól.
+
+
+### 6.2 Teljes adatbázison alapuló RFM klaszterezés
+
+
+```python
+# ============================================================
+# 6.1 Teljes adatbázison alapuló RFM klaszterezés
+# Kimenet: customer_segments_current.parquet
+# ============================================================
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+print("Teljes adatbázison alapuló RFM számítás...")
+
+# 6.1 – Referencia-dátum: a teljes adathalmaz legfrissebb tranzakciója
+ref_date_full = df["InvoiceDate"].max()
+print(f"Referencia-dátum (teljes adathalmaz): {ref_date_full.date()}")
+
+# 6.2 – RFM feature engineering a teljes adathalmazon
+purchases_full = df[df["Quantity"] > 0]
+returns_full   = df[df["Quantity"] < 0]
+
+rfm_full = purchases_full.groupby("Customer ID").agg(
+    recency_days=("InvoiceDate", lambda x: (ref_date_full - x.max()).days),
+    frequency=("Invoice", "nunique")
+)
+monetary_full = df.groupby("Customer ID")["LineTotal"].sum().rename("monetary_total")
+rfm_full = rfm_full.join(monetary_full)
+
+return_counts_full = returns_full.groupby("Customer ID")["Invoice"].nunique().rename("return_count")
+rfm_full = rfm_full.join(return_counts_full).fillna({"return_count": 0})
+rfm_full["monetary_avg"] = rfm_full["monetary_total"] / rfm_full["frequency"]
+rfm_full["return_ratio"] = rfm_full["return_count"] / (rfm_full["frequency"] + rfm_full["return_count"])
+rfm_full = rfm_full[rfm_full["monetary_total"] > 0]
+
+print(f"RFM mátrix (teljes): {rfm_full.shape[0]:,} ügyfél, {rfm_full.shape[1]} feature")
+
+# 6.3 – Log-transzformáció + StandardScaler (külön scaler a teljes adathoz)
+rfm_features  = ["recency_days", "frequency", "monetary_total"]
+rfm_log_full  = np.log1p(rfm_full[rfm_features])
+scaler_full   = StandardScaler()
+rfm_scaled_full = pd.DataFrame(
+    scaler_full.fit_transform(rfm_log_full),
+    index=rfm_log_full.index,
+    columns=rfm_features
+)
+
+# 6.4 – K-means illesztés (K=4, ugyanaz az üzleti szegmensstruktúra)
+kmeans_full = KMeans(n_clusters=4, random_state=42, n_init=10)
+kmeans_full.fit(rfm_scaled_full)
+rfm_full["cluster"] = kmeans_full.labels_
+
+# 6.5 – Dinamikus szegmens-névhozzárendelés (újrafuttatás-biztos)
+profile_full  = rfm_full.groupby("cluster")[["recency_days", "frequency", "monetary_total", "return_ratio"]].mean()
+rank_mon_f    = profile_full["monetary_total"].rank(ascending=False)
+rank_freq_f   = profile_full["frequency"].rank(ascending=False)
+
+vip_idx_f   = (rank_mon_f + rank_freq_f).idxmin()
+lost_idx_f  = profile_full["recency_days"].idxmax()
+remaining_f = [c for c in profile_full.index if c not in [vip_idx_f, lost_idx_f]]
+new_idx_f   = profile_full.loc[remaining_f, "frequency"].idxmin()
+sleep_idx_f = [c for c in remaining_f if c != new_idx_f][0]
+
+segment_map_full = {
+    vip_idx_f:   "VIP Bajnokok",
+    lost_idx_f:  "Elvesztett / Inaktív",
+    new_idx_f:   "Új / Ígéretes",
+    sleep_idx_f: "Lemorzsolódó / Alvó",
+}
+rfm_full["Segment"] = rfm_full["cluster"].map(segment_map_full)
+
+print("\n✅ Szegmens-eloszlás (teljes adathalmaz):")
+display(rfm_full["Segment"].value_counts().to_frame("Ügyfélszám"))
+
+# Scaled oszlopok hozzáfűzése (opcionális vizualizációhoz)
+rfm_full["recency_scaled"]   = rfm_scaled_full["recency_days"]
+rfm_full["frequency_scaled"] = rfm_scaled_full["frequency"]
+rfm_full["monetary_scaled"]  = rfm_scaled_full["monetary_total"]
+
+# 6.6 – Mentés külön fájlba
+CURRENT_SEGMENTS_PATH = PROCESSED_DIR / "customer_segments_current.parquet"
+rfm_full.to_parquet(CURRENT_SEGMENTS_PATH, compression="snappy")
+print(f"\n✔️  Teljes adatbázis-alapú szegmentáció mentve: {CURRENT_SEGMENTS_PATH}")
+print(f"    Dimenziók: {rfm_full.shape[0]:,} ügyfél, {rfm_full.shape[1]} oszlop")
+display(profile_full.round(1))
+
+```
+
+    Teljes adatbázison alapuló RFM számítás...
+    Referencia-dátum (teljes adathalmaz): 2011-12-09
+    RFM mátrix (teljes): 5,838 ügyfél, 6 feature
+    
+    ✅ Szegmens-eloszlás (teljes adathalmaz):
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Ügyfélszám</th>
+    </tr>
+    <tr>
+      <th>Segment</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Elvesztett / Inaktív</th>
+      <td>2053</td>
+    </tr>
+    <tr>
+      <th>Lemorzsolódó / Alvó</th>
+      <td>1499</td>
+    </tr>
+    <tr>
+      <th>Új / Ígéretes</th>
+      <td>1202</td>
+    </tr>
+    <tr>
+      <th>VIP Bajnokok</th>
+      <td>1084</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    
+    ✔️  Teljes adatbázis-alapú szegmentáció mentve: D:\Workspace\ecommerce-customer-segmentation\data\processed\customer_segments_current.parquet
+        Dimenziók: 5,838 ügyfél, 11 oszlop
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>recency_days</th>
+      <th>frequency</th>
+      <th>monetary_total</th>
+      <th>return_ratio</th>
+    </tr>
+    <tr>
+      <th>cluster</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>26.3</td>
+      <td>3.0</td>
+      <td>820.3</td>
+      <td>0.1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24.1</td>
+      <td>20.2</td>
+      <td>10768.7</td>
+      <td>0.2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>388.0</td>
+      <td>1.4</td>
+      <td>331.5</td>
+      <td>0.1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>205.0</td>
+      <td>5.5</td>
+      <td>2011.1</td>
+      <td>0.1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### 6.3 Az aktuális szegmensek 3D térbeli vizualizációja
+
+A teljes adatbázison futtatott klaszterezés eredményének interaktív 3D megjelenítése — ugyanolyan módszertannal, mint a 4.5-ös pontban, de most a **legfrissebb adatokon** alapuló szegmenseket mutatja. Ez az ábra tükrözi az ügyfelek jelenlegi RFM-pozícióját.
+
+
+
+```python
+# ============================================================
+# 6.2 - Aktuális klaszterek 3D vizualizációja (teljes adathalmaz)
+# ============================================================
+import plotly.express as px
+import plotly.graph_objects as go
+
+segment_color_map = {
+    "Lemorzsolódó / Alvó":  "#E69F00",
+    "Elvesztett / Inaktív": "#56B4E9",
+    "VIP Bajnokok":         "#009E73",
+    "Új / Ígéretes":        "#CC79A7",
+}
+
+df_viz_full = rfm_scaled_full.copy()
+df_viz_full["Segment"] = rfm_full["Segment"].values
+
+fig_full = px.scatter_3d(
+    df_viz_full,
+    x="recency_days",
+    y="frequency",
+    z="monetary_total",
+    color="Segment",
+    opacity=0.6,
+    title="Ügyfélszegmensek 3D térben – teljes adathalmaz (aktuális szegmensek)",
+    labels={
+        "recency_days":    "Recency (Skálázott)",
+        "frequency":       "Frequency (Skálázott)",
+        "monetary_total":  "Monetary (Skálázott)",
+    },
+    color_discrete_map=segment_color_map,
+)
+fig_full.update_traces(marker=dict(line=dict(width=0)))
+
+# Centroidok hozzáadása
+centroids_full = kmeans_full.cluster_centers_
+fig_full.add_trace(go.Scatter3d(
+    x=centroids_full[:, 0],
+    y=centroids_full[:, 1],
+    z=centroids_full[:, 2],
+    mode="markers",
+    marker=dict(
+        size=16,
+        color="#000000",
+        symbol="diamond",
+        opacity=1.0,
+        line=dict(width=2, color="#FFFFFF"),
+    ),
+    name="Klaszter középpontok (centroidok)",
+))
+
+fig_full.update_layout(
+    margin=dict(l=0, r=0, b=0, t=40),
+    legend_title_text="Ügyfélszegmensek",
+    template="plotly_white",
+    width=800,
+    height=600,
+)
+fig_full.show()
+
+```
+
+
+    
+![png](images/02_customer_segmentation/02_6.3_Az_aktuális_szegmensek_3D_térbeli_vizualizációja.png)
+    
+
+
+<div class="alert alert-success">
+<b>✅ Üzleti felismerés (insight): szegmentáció stabilitása</b>
+Bár egyéni szinten mutatkozhatnak látványos eltérések, amit egy értékesítőnek az ügyfélkezeléshez fontos látnia, de a 3 hónappal bővebb adathalmazon futtatott klaszterezés nem mutat látványos változást jellegében, ezért a vállalkozás számára elégséges lehet havi egyszer újrafuttatni a klaszterezést jelen körülmények között.
+</div>
+
 <div align="center">
   <br>
   <a href="#teteje">
@@ -1216,10 +1542,11 @@ print(f"   Dimenziók: {rfm_export.shape[0]:,} ügyfél, {rfm_export.shape[1]} o
     Docs frissitese...
     ==================================================
     [02_customer_segmentation.ipynb] Konvertalas Markdown-ra...
-    [02_customer_segmentation.ipynb] [OK] Kesz! (0 kep)
+    [02_customer_segmentation.ipynb] [OK] Kesz! (5 kep)
     
     [README] Elemzés főbb lépései táblázat frissítése...
-    [README] Nem található: 'README.md' – táblázat frissítés kihagyva.
+    [README] Táblázat frissítve: 16 sor, 1 csere.
+    
     ==================================================
     Kesz!
     
