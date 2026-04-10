@@ -274,7 +274,7 @@ if not df_preds.empty and not df_tx.empty:
 
             $$ \\text{{Menthető}} = \\underbrace{{\\text{{Szürke zóna TTM}}}}_{{£\\,{grey_zone_ttm:,.0f}}} \\times \\underbrace{{50\\%\\text{{ átlag churn proba}}}}_{{\\text{{várható veszteség}}}} \\times \\underbrace{{{retention_benchmark_pct:.0f}\\%\\text{{ retenció}}}}_{{\\text{{iparági benchmark}}}} = £\\,{salvageable_revenue:,.0f} $$
 
-            Ez a kiesés ~{salvageable_pct_of_risk:.0f}%-a — a reálisan elérhető bevédelmi sáv egy közepes minőségű, célzott megtartási kampánnyal.
+            Ez a kiesés ~{salvageable_pct_of_risk:.0f}%-a: a reálisan elérhető bevédelmi sáv egy közepes minőségű, célzott megtartási kampánnyal.
 
             *TTM (Trailing Twelve Months): a cutoff dátum (2011-09-09) előtti gördülő 365 nap tranzakcióinak összege - a legfrissebb viselkedést tükrözi, nem egy rögzített naptári évet.*
             *A legpontosabb előrejelzéshez jövőbeli fejlesztésként Prediktív CLV modell bevezetése javasolt.*
@@ -287,7 +287,7 @@ if not df_preds.empty and not df_tx.empty:
 
             ---
 
-            ### 🟢 Recall — „Mennyit találtunk meg?"
+            ### 🟢 Recall: „Mennyit találtunk meg?"
 
             > A modell az összes valódi churner **{model_recall_pct:.1f}%-át** azonosítja.
 
@@ -295,11 +295,11 @@ if not df_preds.empty and not df_tx.empty:
 
             $$ \\text{{Recall}} = \\frac{{\\text{{helyesen jelölt churnerek}}}}{{\\text{{összes valódi churner}}}} = \\frac{{{_tp}}}{{{churned_customers}}} = {model_recall_pct:.1f}\\% $$
 
-            **Üzleti jelentés:** A lemorzsolódók {model_recall_pct:.0f}%-a rajta van a kampánylistán. A maradék ~{100 - model_recall_pct:.0f}% (≈ {churned_customers - _tp:,} fő) „kicsúszik" — ők modell nélkül nem lennének elérhetők.
+            **Üzleti jelentés:** A lemorzsolódók {model_recall_pct:.0f}%-a rajta van a kampánylistán. A maradék ~{100 - model_recall_pct:.0f}% (≈ {churned_customers - _tp:,} fő) „kicsúszik": ők modell nélkül nem lennének elérhetők.
 
             ---
 
-            ### 🟠 Precision — „Mennyire tiszta a lista?"
+            ### 🟠 Precision: „Mennyire tiszta a lista?"
 
             > A kampánylistán szereplők **{model_precision_pct:.1f}%-a** valóban lemorzsolódik.
 
@@ -307,7 +307,7 @@ if not df_preds.empty and not df_tx.empty:
 
             $$ \\text{{Precision}} = \\frac{{\\text{{valódi churner a listán}}}}{{\\text{{összes listán szereplő}}}} = \\frac{{{_tp}}}{{{_pp}}} = {model_precision_pct:.1f}\\% $$
 
-            **Üzleti jelentés:** A listán lévők {model_precision_pct:.0f}%-át valóban érdemes megkeresni. A {_fp:,} téves riasztás azt jelenti, hogy {_fp:,} valójában maradó ügyfelet is elér a kampány — ez proaktív ügyfélgondozásnak tekinthető, nem veszteségnek.
+            **Üzleti jelentés:** A listán lévők {model_precision_pct:.0f}%-át valóban érdemes megkeresni. A {_fp:,} téves riasztás azt jelenti, hogy {_fp:,} valójában maradó ügyfelet is elér a kampány: ez proaktív ügyfélgondozásnak tekinthető, nem veszteségnek.
 
             ---
 
@@ -319,7 +319,7 @@ if not df_preds.empty and not df_tx.empty:
             | Recall = 100%, Precision → rossz | Precision magas, de sok churner lemaradna |
             | Kampány-ROI szétesik | Lehetőség-kiesés |
 
-            A modell az F1-optimális küszöbön (`churn_proba ≥ {effective_threshold:.3f}`) egyensúlyt tart a kettő között — ez az üzletileg ésszerű kompromisszum.
+            A modell az F1-optimális küszöbön (`churn_proba ≥ {effective_threshold:.3f}`) egyensúlyt tart a kettő között: ez az üzletileg ésszerű kompromisszum.
 
             ---
 
@@ -332,7 +332,7 @@ if not df_preds.empty and not df_tx.empty:
             | F1-score | 0,785 | A kettő harmónikus átlaga |
             | PR-AUC | {TEST_PR_AUC:.4f} | Összesített görbe-terület (modellválasztási metrika) |
 
-            *Mérés alapja: holdout teszt szett — 1 049 érintetlen ügyfél, akiket a modell tanítása során soha nem látott.*
+            *Mérés alapja: holdout teszt szett: 1 049 érintetlen ügyfél, akiket a modell tanítása során soha nem látott.*
             *Az `actual_churn` historikus validációs label; éles működésben ez az érték előre nem ismert.*
             """)
 
@@ -519,7 +519,7 @@ if not df_preds.empty and not df_tx.empty:
 
                 **Következmény:** A megtartási stratégia fókusza az **email reaktivációs kampány** és a **vásárlási frekvencia növelése** (pl. loyalty program). A visszáru-folyamat hatásának vizsgálatához önálló elemzés javasolt.
 
-                *Modell megbízhatósága: Teszt PR-AUC = {TEST_PR_AUC:.4f} — holdout teszt szett, döntéstámogatásra alkalmas szint.*
+                *Modell megbízhatósága: Teszt PR-AUC = {TEST_PR_AUC:.4f}: holdout teszt szett, döntéstámogatásra alkalmas szint.*
                 """)
 
         except Exception as e:
@@ -741,4 +741,127 @@ if not df_preds.empty and not df_tx.empty:
         **Üzleti következtetés:** A megtartási erőforrások elosztásakor ez a {pareto_customer_pct:.1f}%-os mag jelenti a legkritikusabb célcsoportot.
         Az ő elvesztésük aránytalanul nagy bevételkiesést okoz - ezért indokolt a VIP-szegmens kiemelt kezelése.
         """)
+
+    # ==========================================
+    # 11. CHART 3 - Churn-valószínűség eloszlás (szürke zóna)
+    # ==========================================
+    st.markdown("---")
+    st.subheader("Mekkora az intervenciós potenciál? - Churn-valószínűség eloszlása")
+
+    LOW_T  = 0.30
+    HIGH_T = 0.70
+
+    stable   = (df_preds['churn_proba'] <  LOW_T).sum()
+    grey     = ((df_preds['churn_proba'] >= LOW_T) & (df_preds['churn_proba'] < HIGH_T)).sum()
+    highrisk = (df_preds['churn_proba'] >= HIGH_T).sum()
+    total_p  = len(df_preds)
+
+    fig_hist = go.Figure()
+
+    fig_hist.add_trace(go.Histogram(
+        x=df_preds[df_preds['churn_proba'] <  LOW_T]['churn_proba'],
+        xbins=dict(start=0, end=1, size=0.04),
+        name=f"Stabil ({stable:,} ügyfél)",
+        marker_color='rgba(154,205,80,0.6)',
+    ))
+    fig_hist.add_trace(go.Histogram(
+        x=df_preds[(df_preds['churn_proba'] >= LOW_T) & (df_preds['churn_proba'] < HIGH_T)]['churn_proba'],
+        xbins=dict(start=0, end=1, size=0.04),
+        name=f"Szürke zóna ({grey:,} ügyfél)",
+        marker_color='rgba(255,200,60,0.6)',
+    ))
+    fig_hist.add_trace(go.Histogram(
+        x=df_preds[df_preds['churn_proba'] >= HIGH_T]['churn_proba'],
+        xbins=dict(start=0, end=1, size=0.04),
+        name=f"Magas kockázat ({highrisk:,} ügyfél)",
+        marker_color='rgba(168,16,34,0.6)',
+    ))
+
+    fig_hist.add_vline(x=LOW_T,  line_dash='dash', line_color='rgba(255,200,60,0.7)',  line_width=1.5)
+    fig_hist.add_vline(x=HIGH_T, line_dash='dash', line_color='rgba(255,100,60,0.7)',  line_width=1.5)
+
+    fig_hist.update_layout(
+        barmode='stack',
+        xaxis=dict(
+            title='Churn-valószínűség',
+            color='rgba(200,207,232,0.6)',
+            gridcolor='rgba(255,255,255,0.08)',
+            tickformat='.0%',
+            range=[0, 1],
+        ),
+        yaxis=dict(
+            title='Ügyfelek száma',
+            color='rgba(200,207,232,0.6)',
+            gridcolor='rgba(255,255,255,0.08)',
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(168,16,34,0.08)',
+        font=dict(color='white'),
+        legend=dict(
+            orientation='h',
+            yanchor='top',
+            y=-0.18,
+            xanchor='center',
+            x=0.5,
+            bgcolor='rgba(0,0,0,0.3)',
+            bordercolor='rgba(255,255,255,0.15)',
+            borderwidth=1,
+        ),
+        margin=dict(l=10, r=10, t=20, b=90),
+        height=360,
+    )
+
+    st.plotly_chart(fig_hist, use_container_width=True)
+
+    with st.expander("ℹ️ Magyarázat"):
+        st.markdown(f"""
+        **Mit mutat?** Az ügyfélbázis churn-valószínűség szerinti megoszlása három kategóriában:
+        - **Stabil** (< {LOW_T}): {stable:,} ügyfél ({stable/total_p*100:.0f}%) — alacsony kockázat, nem igényel azonnali beavatkozást
+        - **Szürke zóna** ({LOW_T}–{HIGH_T}): {grey:,} ügyfél ({grey/total_p*100:.0f}%) — billegő állapot, alacsony költségű proaktív megkereséssel megtartható
+        - **Magas kockázat** (> {HIGH_T}): {highrisk:,} ügyfél ({highrisk/total_p*100:.0f}%) — közvetlen, személyes intervenció indokolt
+
+        **Üzleti következtetés:** A szürke zóna az ügyfélbázis legnagyobb szegmense. Mivel ezek az ügyfelek még nem döntöttek a lemorzsolódás mellett, alacsony intenzitású kampányokkal (e-mail, push értesítő) várhatóan magasabb megtérülés érhető el, mint a már lemorzsolódott ügyfelek visszahozásával.
+        """)
+
+    st.markdown("---")
+    st.markdown(
+        '<div style="background:rgba(168,16,34,0.35);border:1px solid rgba(255,200,60,0.45);border-left:4px solid rgba(255,200,60,0.85);border-radius:12px;padding:1.25rem 1.5rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.35);">'
+        '<div style="font-size:13px;font-weight:600;color:rgba(255,200,60,0.9);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;">Ajánlott akcióterv</div>'
+
+        '<div style="margin-bottom:0.75rem;">'
+        '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">1. Modell újrafuttatása</div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">Az ügyfélszegmentációt végző modell rendszeres, az üzleti ciklushoz igazított (kezdetben havi egyszeri) újrafuttatása</div>'
+        '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: adatcsapat / BI vezető</div><div>Határidő: 1 hónapon belül</div><div>Várható hatás: a modell aktuális ügyféladatokon való futtatása megakadályozza a szegmensek elavulását, és fenntartja a churn-előrejelzés pontosságát</div></div>'
+        '</div>'
+
+        '<div style="margin-bottom:0.75rem;">'
+        '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">2. Churn-kockázat kezelése</div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">A legmagasabb lemorzsolódási kockázatú ügyfelek közvetlen felkeresése, fontosságukkal (CLV modul hiányában átmenetileg TTM-mel becsült CLV) súlyozott sorrendben. Megjegyzés: a modell valószínűségi értékei rangsorolásra alkalmasak, nem kemény küszöbként értelmezendők.</div>'
+        '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: értékesítési / ügyfélkapcsolati csapat</div><div>Határidő: 1 hónapon belül</div><div>Várható hatás: a modell által azonosított, veszélyes bevétel visszatartása: részletes számítás a KPI-kártyákon</div></div>'
+        '</div>'
+
+        '<div style="margin-bottom:0.75rem;">'
+        '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">3. Szürke zóna aktiválása</div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">Az ügyfélbázis 61%-a billegő, köztes churn-kockázatú állapotban van (churn-valószínűség: 0,30–0,70). Számukra alacsony költségű, proaktív megkeresés (e-mail, értesítő) javasolt: várható ROI-ja magasabb, mint a már lemorzsolódott ügyfelek visszahozásáé. Kiindulópontként: ~90 napos inaktivitás után automatikus érintkezés, mivel a modell szerint a recency a churn legerősebb jelzője (SHAP-súly: 55,7%).</div>'
+        '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: marketing / CRM csapat</div><div>Határidő: 1 negyedéven belül</div><div>Várható hatás: a billegő ügyfelek egy részének visszatérítése alacsony intervenciós költség mellett</div></div>'
+        '</div>'
+
+        '<div style="margin-bottom:0.1rem;">'
+        '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">4. VIP visszaküldések felülvizsgálata</div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">A VIP-szegmensben tapasztalt magas visszaküldési arány operatív felülvizsgálata. Fontos kontextus: a modell szerint a visszaküldési arány churn-kockázathoz alig járul hozzá (SHAP-súly: 2,5%), a probléma tehát nem megtartási, hanem operatív és minőségi jellegű. 2 lehetséges irány:<br>– VIP-ek által gyakran visszaküldött termékek minőségének felülvizsgálata, helyettesítő termék keresése<br>– A visszaküldési folyamat sebességének és minőségének javítása, mivel a legértékesebb ügyfelek kiemelten élnek ezzel a lehetőséggel</div>'
+        '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: termékmenedzsment + logisztika</div><div>Határidő: 1 negyedéven belül</div><div>Várható hatás: a VIP-szegmens megtartási arányának javulása, visszaküldési költségek csökkentése</div></div>'
+        '</div>'
+
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div style="margin-top:1rem;background:rgba(20,20,40,0.5);border:1px solid rgba(255,255,255,0.12);border-left:4px solid rgba(120,160,255,0.7);border-radius:12px;padding:1.25rem 1.5rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.35);">'
+        '<div style="font-size:13px;font-weight:600;color:rgba(120,160,255,0.9);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;">Következő lépések</div>'
+        '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">Production-ready data product</div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">Üzletfejlesztési ajánlat: CLV modult is tartalmazó, a vállalat belső rendszereihez integrált, adatokat valós időben feldolgozni képes production-ready data product megrendelése: a jelenlegi statikus modell ugyanis nem képes valós idejű beavatkozást támogatni</div>'
+        '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: ügyvezetés / IT stratégia</div><div>Határidő: 1 negyedéven belül (döntés), 2–3 negyedéven belül (megvalósítás)</div><div>Várható hatás: az elemzés egyedi futtatásból folyamatos, automatizált ügyfélértékelési rendszerré válik, amely önállóan azonosítja a beavatkozási pontokat</div></div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
