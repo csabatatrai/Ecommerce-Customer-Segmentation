@@ -336,4 +336,4 @@ for _, row in seg_stats.iterrows():
                 st.markdown(f"- {tactic}")
 
 st.markdown("---")
-st.caption("Adatforrás: churn_predictions.parquet · online_retail_ready_for_rfm.parquet · TTM: 2010-09-09 – 2011-09-09")
+st.caption(f"Adatforrás: churn_predictions.parquet · online_retail_ready_for_rfm.parquet · TTM: {start_ttm.strftime('%Y-%m-%d')} – {cutoff_date.strftime('%Y-%m-%d')}")

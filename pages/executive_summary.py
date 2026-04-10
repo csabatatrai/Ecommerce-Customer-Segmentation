@@ -64,14 +64,8 @@ if not df_preds.empty and not df_tx.empty:
     model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
     model_precision = model_precision_pct / 100
     revenue_at_risk = all_churn_ttm * model_precision
-    # Dokumentált, holdout teszt szett alapú metrikák (04_model_evaluation.ipynb)
-    TEST_PR_AUC         = 0.8322
-    TEST_RECALL_PCT     = 85.6   # churnerek lefedése: 501 / 585
-    TEST_PRECISION_PCT  = 71.4   # lista tisztasága:   501 / 701
-    TEST_TP             = 501    # valódi churner, helyesen azonosítva
-    TEST_TOTAL_CHURNERS = 585    # összes churner a teszt szettben
-    TEST_FP             = 200    # téves riasztás (valójában maradó ügyfél)
-    TEST_FLAGGED        = 701    # összesen churnernek jelölt (TP + FP)
+    # PR-AUC: holdout teszt szett alapú (04_model_evaluation.ipynb), nem számolható újra itt
+    TEST_PR_AUC = 0.8322
 
     # VIP Veszélyben szegmens külön (expander kontextushoz)
     vip_tx = df_tx[df_tx['Customer ID'].isin(vip_at_risk_ids)]
@@ -125,6 +119,8 @@ if not df_preds.empty and not df_tx.empty:
     total_customers = len(df_preds)
     churned_customers = int((df_preds['actual_churn'] == 1).sum())
     churn_rate_pct = churned_customers / total_customers * 100
+    _fp = _pp - _tp
+    model_recall_pct = _tp / churned_customers * 100 if churned_customers > 0 else 0.0
 
     # ==========================================
     # 7. KPI VIP Bajnokok visszaküldési aránya
@@ -222,12 +218,12 @@ if not df_preds.empty and not df_tx.empty:
                 <div class="kpi-sub">(15%-os iparági benchmark retenciót feltételezve)</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">🎯 Modell teljesítménye (holdout teszt, 1 049 fő)</div>
+                <div class="kpi-label">🎯 Modell teljesítménye</div>
                 <div class="kpi-value" style="font-size:22px; line-height:1.6;">
-                    <span style="color:#1aff6e;">{TEST_RECALL_PCT:.1f}% Recall</span>&nbsp;&nbsp;·&nbsp;&nbsp;<span style="color:#ff8c1a;">{TEST_PRECISION_PCT:.1f}% Precision</span>
+                    <span style="color:#1aff6e;">{model_recall_pct:.1f}% Recall</span>&nbsp;&nbsp;·&nbsp;&nbsp;<span style="color:#ff8c1a;">{model_precision_pct:.1f}% Precision</span>
                 </div>
                 <div class="kpi-sub">
-                    <span style="color:#1aff6e;">{TEST_TP} churner megtalálva a {TEST_TOTAL_CHURNERS}-ból</span> &nbsp;·&nbsp; <span style="color:#ff8c1a;">{TEST_FP} téves riasztás a {TEST_FLAGGED} jelzésből</span>
+                    <span style="color:#1aff6e;">{_tp:,} churner megtalálva a {churned_customers:,}-ból</span> &nbsp;·&nbsp; <span style="color:#ff8c1a;">{_fp:,} téves riasztás a {_pp:,} jelzésből</span>
                 </div>
             </div>
             <div class="kpi-card">
@@ -297,25 +293,25 @@ if not df_preds.empty and not df_tx.empty:
 
             ### 🟢 Recall — „Mennyit találtunk meg?"
 
-            > A modell az összes valódi churner **{TEST_RECALL_PCT:.1f}%-át** azonosítja.
+            > A modell az összes valódi churner **{model_recall_pct:.1f}%-át** azonosítja.
 
-            **Hogyan számoltuk?** A holdout teszt szett {TEST_TOTAL_CHURNERS} valódi churneréből a modell **{TEST_TP} főt** jelölt helyesen churn-re:
+            **Hogyan számoltuk?** Az ügyfélbázis {churned_customers:,} valódi churneréből a modell **{_tp:,} főt** jelölt helyesen churn-re:
 
-            $$ \\text{{Recall}} = \\frac{{\\text{{helyesen jelölt churnerek}}}}{{\\text{{összes valódi churner}}}} = \\frac{{{TEST_TP}}}{{{TEST_TOTAL_CHURNERS}}} = {TEST_RECALL_PCT:.1f}\\% $$
+            $$ \\text{{Recall}} = \\frac{{\\text{{helyesen jelölt churnerek}}}}{{\\text{{összes valódi churner}}}} = \\frac{{{_tp}}}{{{churned_customers}}} = {model_recall_pct:.1f}\\% $$
 
-            **Üzleti jelentés:** A lemorzsolódók 86%-a rajta van a kampánylistán. A maradék ~14% (≈ {TEST_TOTAL_CHURNERS - TEST_TP} fő) „kicsúszik" — ők modell nélkül nem lennének elérhetők.
+            **Üzleti jelentés:** A lemorzsolódók {model_recall_pct:.0f}%-a rajta van a kampánylistán. A maradék ~{100 - model_recall_pct:.0f}% (≈ {churned_customers - _tp:,} fő) „kicsúszik" — ők modell nélkül nem lennének elérhetők.
 
             ---
 
             ### 🟠 Precision — „Mennyire tiszta a lista?"
 
-            > A kampánylistán szereplők **{TEST_PRECISION_PCT:.1f}%-a** valóban lemorzsolódik.
+            > A kampánylistán szereplők **{model_precision_pct:.1f}%-a** valóban lemorzsolódik.
 
-            **Hogyan számoltuk?** A modell összesen {TEST_FLAGGED} ügyfelet jelölt churn-re. Ebből {TEST_TP} valódi churner, **{TEST_FP} téves riasztás**:
+            **Hogyan számoltuk?** A modell összesen {_pp:,} ügyfelet jelölt churn-re. Ebből {_tp:,} valódi churner, **{_fp:,} téves riasztás**:
 
-            $$ \\text{{Precision}} = \\frac{{\\text{{valódi churner a listán}}}}{{\\text{{összes listán szereplő}}}} = \\frac{{{TEST_TP}}}{{{TEST_FLAGGED}}} = {TEST_PRECISION_PCT:.1f}\\% $$
+            $$ \\text{{Precision}} = \\frac{{\\text{{valódi churner a listán}}}}{{\\text{{összes listán szereplő}}}} = \\frac{{{_tp}}}{{{_pp}}} = {model_precision_pct:.1f}\\% $$
 
-            **Üzleti jelentés:** A listán lévők 71%-át valóban érdemes megkeresni. A {TEST_FP} téves riasztás azt jelenti, hogy {TEST_FP} valójában maradó ügyfelet is elér a kampány — ez proaktív ügyfélgondozásnak tekinthető, nem veszteségnek.
+            **Üzleti jelentés:** A listán lévők {model_precision_pct:.0f}%-át valóban érdemes megkeresni. A {_fp:,} téves riasztás azt jelenti, hogy {_fp:,} valójában maradó ügyfelet is elér a kampány — ez proaktív ügyfélgondozásnak tekinthető, nem veszteségnek.
 
             ---
 
@@ -335,8 +331,8 @@ if not df_preds.empty and not df_tx.empty:
 
             | Metrika | Érték | Mit mér? |
             |---|---|---|
-            | **Recall** | **{TEST_RECALL_PCT:.1f}%** | Churnerek lefedése |
-            | **Precision** | **{TEST_PRECISION_PCT:.1f}%** | Lista tisztasága |
+            | **Recall** | **{model_recall_pct:.1f}%** | Churnerek lefedése |
+            | **Precision** | **{model_precision_pct:.1f}%** | Lista tisztasága |
             | F1-score | 0,785 | A kettő harmónikus átlaga |
             | PR-AUC | {TEST_PR_AUC:.4f} | Összesített görbe-terület (modellválasztási metrika) |
 

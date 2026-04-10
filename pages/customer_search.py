@@ -189,7 +189,9 @@ TX_REFERENCE_DATE = df_tx_all["InvoiceDate"].max() if not df_tx_all.empty else N
 # Modell megbízhatósága: precision a churn=1 osztályon (historikus validáció alapján)
 _tp = int(((combined["churn_pred"] == 1) & (combined["actual_churn"] == 1)).sum())
 _pp = int((combined["churn_pred"] == 1).sum())
+_total_churners = int((combined["actual_churn"] == 1).sum())
 model_precision_pct = _tp / _pp * 100 if _pp > 0 else 0.0
+model_recall_pct    = _tp / _total_churners * 100 if _total_churners > 0 else 0.0
 
 # Döntési küszöb: az a legkisebb churn_proba, aminél a modell már churnernek jelöl
 decision_threshold_pct = float(combined.loc[combined["churn_pred"] == 1, "churn_proba"].min()) * 100
@@ -388,7 +390,8 @@ st.markdown(
     f"border-radius:0 6px 6px 0; padding:8px 14px; font-size:0.85em;'>"
     f"<span style='color:#ff1aff; font-weight:700;'>▲ {decision_threshold_pct:.1f}%-os döntési küszöb:</span>"
     f"<span style='color:rgba(200,207,232,0.85);'> efölött jelöli a modell churnernek az ügyfelet. "
-    f"A churnernek jelöltek <b>{model_precision_pct:.2f}%-a</b> valóban lemorzsolódott a historikus adatban.</span>"
+    f"A churnernek jelöltek <b>{model_precision_pct:.2f}%-a</b> (precision) valóban lemorzsolódott a historikus adatban, "
+    f"a modell képes a lemorzsolódók <b>{model_recall_pct:.1f}%-át</b> megtalálni (recall).</span>"
     f"</div>"
 
     f"<div style='background:rgba(200,207,232,0.05); border-left:3px solid rgba(200,207,232,0.25); "
