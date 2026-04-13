@@ -143,43 +143,43 @@ _wf_cols = st.columns([10, 1, 10, 1, 10])
 with _wf_cols[0]:
     st.markdown(
         "<div style='background:rgba(255,26,60,0.1); border:1px solid rgba(255,26,60,0.25); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ff1a3c; margin-bottom:6px;'>① KINEK</div>"
         "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Célcsoport azonosítás</div>"
         "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
         "Szűrd le az ügyfeleket szegmens, churn-kockázat és összköltés alapján. "
-        "kampánysablonnal vagy egyéni beállítással. A lista prioritás szerint rendezve, azonnal letölthető."
+        "Kampánysablonnal vagy egyéni beállítással. A lista prioritás szerint rendezve, azonnal letölthető."
         "</div></div>",
         unsafe_allow_html=True,
     )
 with _wf_cols[1]:
     st.markdown(
-        "<div style='display:flex; align-items:center; justify-content:center; height:100%; "
-        "font-size:22px; color:rgba(200,207,232,0.3); padding-top:30px;'>→</div>",
+        "<div style='display:flex; align-items:center; justify-content:center; height:190px; "
+        "font-size:22px; color:rgba(200,207,232,0.3);'>→</div>",
         unsafe_allow_html=True,
     )
 with _wf_cols[2]:
     st.markdown(
         "<div style='background:rgba(26,180,255,0.08); border:1px solid rgba(26,180,255,0.22); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#1ab4ff; margin-bottom:6px;'>② MIT</div>"
         "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Kampánytartalom</div>"
         "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
-        "A célcsoport szegmensének top termékei TTM alapján. mi szerepeljen az ajánlóban, "
+        "A célcsoport szegmensének top termékei TTM alapján: mi szerepeljen az ajánlóban, "
         "és mit kerülj (visszáruk fül)."
         "</div></div>",
         unsafe_allow_html=True,
     )
 with _wf_cols[3]:
     st.markdown(
-        "<div style='display:flex; align-items:center; justify-content:center; height:100%; "
-        "font-size:22px; color:rgba(200,207,232,0.3); padding-top:30px;'>→</div>",
+        "<div style='display:flex; align-items:center; justify-content:center; height:190px; "
+        "font-size:22px; color:rgba(200,207,232,0.3);'>→</div>",
         unsafe_allow_html=True,
     )
 with _wf_cols[4]:
     st.markdown(
         "<div style='background:rgba(255,215,64,0.08); border:1px solid rgba(255,215,64,0.22); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ffd740; margin-bottom:6px;'>③ MIKOR</div>"
         "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Időzítés</div>"
         "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
@@ -1133,37 +1133,32 @@ _preset_badge = (
 )
 
 _sum_c1, _sum_c2, _sum_c3 = st.columns(3)
-
 with _sum_c1:
     st.markdown(
         "<div style='background:rgba(255,26,60,0.1); border:1px solid rgba(255,26,60,0.22); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ff1a3c; margin-bottom:10px;'>① KINEK</div>"
         f"{_preset_badge}"
         f"<div style='font-size:28px; font-weight:700; color:white; margin:8px 0 2px 0;'>{_target_size:,} fő</div>"
-        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-bottom:8px;'>Átl. churn: {_avg_churn}</div>"
-        f"<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.6;'>{_seg_labels}</div>"
-        f"<div style='font-size:11px; color:rgba(200,207,232,0.4); margin-top:8px;'>"
-        f"Churn szűrő: {_f_churn_now[0]:.0%} – {_f_churn_now[1]:.0%}</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-bottom:6px;'>Átl. churn: {_avg_churn}</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.65);'>{_seg_labels}</div>"
         "</div>",
         unsafe_allow_html=True,
     )
-
 with _sum_c2:
     st.markdown(
         "<div style='background:rgba(26,180,255,0.08); border:1px solid rgba(26,180,255,0.22); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#1ab4ff; margin-bottom:10px;'>② MIT</div>"
         "<div style='font-size:13px; font-weight:600; color:white; margin-bottom:10px;'>Top 3 ajánlott termék</div>"
         f"{_top3_html}"
         "</div>",
         unsafe_allow_html=True,
     )
-
 with _sum_c3:
     st.markdown(
         "<div style='background:rgba(255,215,64,0.08); border:1px solid rgba(255,215,64,0.22); "
-        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "border-radius:10px; padding:18px 20px; height:190px; box-sizing:border-box; overflow:hidden;'>"
         "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ffd740; margin-bottom:10px;'>③ MIKOR</div>"
         "<div style='font-size:13px; font-weight:600; color:white; margin-bottom:10px;'>Optimális időzítés</div>"
         f"<div style='font-size:13px; color:rgba(200,207,232,0.85); line-height:1.7;'>"
@@ -1171,9 +1166,7 @@ with _sum_c3:
         f"🕙 <b>{_peak_start}:00 – {_peak_end+1}:00</b><br>"
         f"<span style='font-size:11px; color:rgba(200,207,232,0.5);'>{_peak_mode}</span>"
         "</div>"
-        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-top:10px; line-height:1.6;'>"
-        f"{_peak_tactic}"
-        "</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-top:8px;'>{_peak_tactic}</div>"
         "</div>",
         unsafe_allow_html=True,
     )
