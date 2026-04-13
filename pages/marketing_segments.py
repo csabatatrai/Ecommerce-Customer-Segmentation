@@ -7,7 +7,6 @@ import base64
 
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 import streamlit as st
 from pathlib import Path
 from src.sidebar import render_sidebar
@@ -490,36 +489,17 @@ for _, row in seg_stats.iterrows():
     color = row["color"]
 
     with st.expander(f"{strategy['icon']} {seg_name} — {strategy['priority']}"):
-        col_kpi, col_tactics = st.columns([1, 2])
-
-        with col_kpi:
-            st.markdown(
-                f"<div style='background:rgba(168,16,34,0.3); border:1px solid rgba(255,255,255,0.12); "
-                f"border-radius:8px; padding:12px 16px;'>"
-                f"<div style='font-size:12px; color:#c8cfe8; margin-bottom:4px;'>Szegmens méret</div>"
-                f"<div style='font-size:22px; font-weight:700; color:white;'>{int(row['n_customers']):,} fő</div>"
-                f"<div style='font-size:12px; color:#c8cfe8; margin-top:10px; margin-bottom:4px;'>TTM bevétel</div>"
-                f"<div style='font-size:22px; font-weight:700; color:white;'>£{row['ttm_revenue']/1000:,.0f}k</div>"
-                f"<div style='font-size:12px; color:#c8cfe8; margin-top:10px; margin-bottom:4px;'>Előrejelzett churner</div>"
-                f"<div style='font-size:22px; font-weight:700; color:{color};'>{int(row['n_predicted_churn']):,} fő</div>"
-                f"<div style='font-size:12px; color:#c8cfe8; margin-top:10px; margin-bottom:4px;'>Szürke zóna (befolyásolható)</div>"
-                f"<div style='font-size:22px; font-weight:700; color:#ffd740;'>{int(row['n_grey_zone']):,} fő</div>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
-
-        with col_tactics:
-            st.markdown(
-                f"<div style='background:rgba(200,207,232,0.05); border-left:3px solid {color}; "
-                f"border-radius:0 6px 6px 0; padding:10px 14px; margin-bottom:10px; font-size:0.9em;'>"
-                f"<b style='color:{color};'>Cél:</b> "
-                f"<span style='color:rgba(200,207,232,0.85);'>{strategy['goal']}</span>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
-            st.markdown("**Javasolt taktikák:**")
-            for tactic in strategy["tactics"]:
-                st.markdown(f"- {tactic}")
+        st.markdown(
+            f"<div style='background:rgba(200,207,232,0.05); border-left:3px solid {color}; "
+            f"border-radius:0 6px 6px 0; padding:10px 14px; margin-bottom:10px; font-size:0.9em;'>"
+            f"<b style='color:{color};'>Cél:</b> "
+            f"<span style='color:rgba(200,207,232,0.85);'>{strategy['goal']}</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("**Javasolt taktikák:**")
+        for tactic in strategy["tactics"]:
+            st.markdown(f"- {tactic}")
 
 st.markdown("---")
 st.caption(f"Adatforrás: churn_predictions.parquet · online_retail_ready_for_rfm.parquet · TTM: {start_ttm.strftime('%Y-%m-%d')} – {cutoff_date.strftime('%Y-%m-%d')}")
