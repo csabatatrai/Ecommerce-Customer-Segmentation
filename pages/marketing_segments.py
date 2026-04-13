@@ -193,6 +193,23 @@ with _wf_cols[4]:
         unsafe_allow_html=True,
     )
 
+st.markdown(
+    "<div style='margin-top:12px; background:rgba(200,207,232,0.04); border:1px solid rgba(200,207,232,0.12); "
+    "border-radius:8px; padding:10px 20px; display:flex; align-items:center; gap:24px;'>"
+    "<span style='font-size:11px; font-weight:700; letter-spacing:0.12em; color:rgba(200,207,232,0.4); white-space:nowrap;'>PRIORITÁS KÉPLETE</span>"
+    "<span style='font-size:13px; color:rgba(200,207,232,0.75); white-space:nowrap;'>"
+    "<b style='color:rgba(200,207,232,0.95);'>churn valószínűség</b>"
+    "<span style='color:rgba(200,207,232,0.35); margin:0 8px;'>×</span>"
+    "<b style='color:rgba(200,207,232,0.95);'>összköltés (CLV)</b>"
+    "</span>"
+    "<span style='font-size:11px; color:rgba(200,207,232,0.4);'>—</span>"
+    "<span style='font-size:12px; color:rgba(200,207,232,0.55);'>"
+    "A letölthető listákban a legnagyobb kockázatú és legértékesebb ügyfelek kerülnek előre"
+    "</span>"
+    "</div>",
+    unsafe_allow_html=True,
+)
+
 st.markdown("---")
 
 # ── Szegmens szintű aggregáció ────────────────────────────────────────────────
