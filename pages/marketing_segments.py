@@ -316,6 +316,7 @@ with tab_seg:
                 mime="text/csv",
                 use_container_width=True,
                 key=f"dl_{safe}",
+                help="Prioritás = churn valószínűség × összköltés (CLV) – a legnagyobb kockázatú és értékű ügyfelek kerülnek elöre",
             )
             st.download_button(
                 label=f"🎯 Szürke zóna ({n_gz:,} fő)",
@@ -324,6 +325,7 @@ with tab_seg:
                 mime="text/csv",
                 use_container_width=True,
                 key=f"dl_gz_{safe}",
+                help="Prioritás = churn valószínűség × összköltés (CLV) – a legnagyobb kockázatú és értékű ügyfelek kerülnek elöre",
                 disabled=(n_gz == 0),
             )
 
