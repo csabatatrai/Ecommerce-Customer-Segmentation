@@ -278,13 +278,21 @@ with tab_seg:
 
         seg_df = (
             df[df["rfm_segment"] == seg_name]
-            [["rfm_segment", "churn_proba", "churn_pred", "action"]]
-            .copy().reset_index().rename(columns=_RENAME)
+            [["rfm_segment", "churn_proba", "churn_pred", "monetary_total", "action"]]
+            .copy()
+            .assign(prioritas=lambda x: (x["churn_proba"] * x["monetary_total"]).round(1))
+            .sort_values("prioritas", ascending=False)
+            .drop(columns=["prioritas", "monetary_total"])
+            .reset_index().rename(columns=_RENAME)
         )
         gz_df = (
             df[(df["rfm_segment"] == seg_name) & grey_mask]
-            [["rfm_segment", "churn_proba", "churn_pred", "action"]]
-            .copy().reset_index().rename(columns=_RENAME)
+            [["rfm_segment", "churn_proba", "churn_pred", "monetary_total", "action"]]
+            .copy()
+            .assign(prioritas=lambda x: (x["churn_proba"] * x["monetary_total"]).round(1))
+            .sort_values("prioritas", ascending=False)
+            .drop(columns=["prioritas", "monetary_total"])
+            .reset_index().rename(columns=_RENAME)
         )
         n_gz = len(gz_df)
 
