@@ -135,7 +135,12 @@ if df.empty:
 
 # ── Fejléc ────────────────────────────────────────────────────────────────────
 st.title("Kampánytervező marketingeseknek")
-st.caption("Szegmensszintű churn-kockázat, bevételi súly és kampánycélpont-azonosítás marketingstratégia tervezéséhez.")
+st.markdown(
+    "<div style='margin-top:-1rem; color:rgba(250,250,250,0.6); font-size:0.875rem;'>"
+    "Szegmensszintű churn-kockázat, bevételi súly és kampánycélpont-azonosítás marketingstratégia tervezéséhez."
+    "</div>",
+    unsafe_allow_html=True,
+)
 st.markdown("---")
 
 # ── Workflow bevezető ─────────────────────────────────────────────────────────
