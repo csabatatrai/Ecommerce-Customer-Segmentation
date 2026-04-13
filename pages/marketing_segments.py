@@ -671,7 +671,7 @@ with tab_cl:
     km1, km2, km3 = st.columns(3)
     km1.metric("Célcsoport mérete", f"{len(target):,} fő")
     km2.metric(
-        "Becsült veszélyes bevétel",
+        "Becsült bevételkiesés",
         f"£{target['prioritas'].sum():,.0f}" if not target.empty else "£0",
         help="Szűrt ügyfelek churn_proba × monetary_total összege",
     )
