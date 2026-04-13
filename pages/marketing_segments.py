@@ -293,23 +293,27 @@ with tab_seg:
         seg_name = row["rfm_segment"]
         safe     = _safe(seg_name)
 
-        seg_df = (
+        def _ranked(frame):
+            out = (
+                frame
+                .assign(prioritas=lambda x: (x["churn_proba"] * x["monetary_total"]).round(1))
+                .sort_values("prioritas", ascending=False)
+                .drop(columns=["prioritas", "monetary_total"])
+                .reset_index()
+                .rename(columns=_RENAME)
+            )
+            out.insert(0, "#", range(1, len(out) + 1))
+            return out
+
+        seg_df = _ranked(
             df[df["rfm_segment"] == seg_name]
             [["rfm_segment", "churn_proba", "churn_pred", "monetary_total", "action"]]
             .copy()
-            .assign(prioritas=lambda x: (x["churn_proba"] * x["monetary_total"]).round(1))
-            .sort_values("prioritas", ascending=False)
-            .drop(columns=["prioritas", "monetary_total"])
-            .reset_index().rename(columns=_RENAME)
         )
-        gz_df = (
+        gz_df = _ranked(
             df[(df["rfm_segment"] == seg_name) & grey_mask]
             [["rfm_segment", "churn_proba", "churn_pred", "monetary_total", "action"]]
             .copy()
-            .assign(prioritas=lambda x: (x["churn_proba"] * x["monetary_total"]).round(1))
-            .sort_values("prioritas", ascending=False)
-            .drop(columns=["prioritas", "monetary_total"])
-            .reset_index().rename(columns=_RENAME)
         )
         n_gz = len(gz_df)
 
@@ -694,6 +698,7 @@ with tab_cl:
             .reset_index()
             .rename(columns=_PREVIEW_COLS)
         )
+        dl_target.insert(0, "#", range(1, len(dl_target) + 1))
         st.download_button(
             label=f"📥 Célista letöltése: {len(target):,} ügyfél, prioritás szerint rendezve",
             data=_to_csv(dl_target),
