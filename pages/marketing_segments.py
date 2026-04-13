@@ -93,7 +93,7 @@ if df.empty:
 
 # ── Fejléc ────────────────────────────────────────────────────────────────────
 st.title("Marketing szegmenselemzés")
-st.markdown("Szegmensszintű churn-kockázat, bevételi súly és kampánycélpont-azonosítás marketingstratégia tervezéséhez.")
+st.caption("Szegmensszintű churn-kockázat, bevételi súly és kampánycélpont-azonosítás marketingstratégia tervezéséhez.")
 st.markdown("---")
 
 # ── Szegmens szintű aggregáció ────────────────────────────────────────────────
@@ -128,16 +128,48 @@ seg_stats["grey_pct"]      = seg_stats["n_grey_zone"] / seg_stats["n_customers"]
 seg_stats["color"]         = seg_stats["rfm_segment"].map(SEG_COLORS).fillna("#9898c0")
 seg_stats = seg_stats.sort_values("ttm_revenue", ascending=False).reset_index(drop=True)
 
-# ── 1. Szegmens KPI kártyák ───────────────────────────────────────────────────
+# ── 1. Szegmens KPI kártyák + névsorok ───────────────────────────────────────
 st.subheader("Szegmensek áttekintése")
+
+_RENAME = {
+    "Customer ID": "Ügyfél azonosító",
+    "rfm_segment": "Szegmens",
+    "churn_proba": "Churn valószínűség",
+    "churn_pred":  "Churn előrejelzés (1=igen)",
+    "action":      "Javasolt akció",
+}
+
+def _safe(name: str) -> str:
+    return (name.replace(" ", "_").replace("/", "-")
+                .replace("á","a").replace("é","e").replace("í","i")
+                .replace("ó","o").replace("ö","o").replace("ő","o")
+                .replace("ú","u").replace("ü","u").replace("ű","u"))
+
+def _to_csv(frame: pd.DataFrame) -> bytes:
+    return frame.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig")
 
 cols = st.columns(len(seg_stats))
 for col, (_, row) in zip(cols, seg_stats.iterrows()):
-    color = row["color"]
+    color    = row["color"]
+    seg_name = row["rfm_segment"]
+    safe     = _safe(seg_name)
+
+    seg_df = (
+        df[df["rfm_segment"] == seg_name]
+        [["rfm_segment", "churn_proba", "churn_pred", "action"]]
+        .copy().reset_index().rename(columns=_RENAME)
+    )
+    gz_df = (
+        df[(df["rfm_segment"] == seg_name) & grey_mask]
+        [["rfm_segment", "churn_proba", "churn_pred", "action"]]
+        .copy().reset_index().rename(columns=_RENAME)
+    )
+    n_gz = len(gz_df)
+
     with col:
         st.markdown(
             f"<div class='seg-card' style='border-top: 3px solid {color};'>"
-            f"<div class='seg-label' style='color:{color};'>{row['rfm_segment']}</div>"
+            f"<div class='seg-label' style='color:{color};'>{seg_name}</div>"
             f"<div class='seg-value'>{int(row['n_customers']):,} fő</div>"
             f"<div class='seg-sub'>TTM bevétel: £{row['ttm_revenue']/1000:,.0f}k "
             f"({row['revenue_share']:.1f}%)</div>"
@@ -146,6 +178,23 @@ for col, (_, row) in zip(cols, seg_stats.iterrows()):
             f"({row['churn_rate']:.1f}%)</div>"
             f"</div>",
             unsafe_allow_html=True,
+        )
+        st.download_button(
+            label=f"📥 Teljes névsor ({len(seg_df):,} fő)",
+            data=_to_csv(seg_df),
+            file_name=f"szegmens_{safe}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key=f"dl_{safe}",
+        )
+        st.download_button(
+            label=f"🎯 Szürke zóna ({n_gz:,} fő)",
+            data=_to_csv(gz_df),
+            file_name=f"szurkezone_{safe}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key=f"dl_gz_{safe}",
+            disabled=(n_gz == 0),
         )
 
 st.markdown("---")
@@ -199,7 +248,7 @@ st.plotly_chart(fig_bubble, use_container_width=True)
 st.markdown("---")
 
 # ── 3. Kampánycélpont-elemzés: Szürke Zóna szegmensenként ────────────────────
-st.subheader("Kampánycélpont-elemzés — Szürke Zóna (30–70%)")
+st.subheader("Kampánycélpont-elemzés: szürke zóna (30–70% közti churn-valószínűségűek)")
 st.markdown(
     "<div class='callout' style='background:rgba(200,207,232,0.05); border-left:3px solid rgba(200,207,232,0.3);'>"
     "💡 A <b>30–70% közötti churn-valószínűségű</b> ügyfelek a leginkább befolyásolható kimenetelűek — "
@@ -243,7 +292,144 @@ st.plotly_chart(fig_grey, use_container_width=True)
 
 st.markdown("---")
 
-# ── 4. Szegmens-szintű kampányajánlások ──────────────────────────────────────
+# ── 4. Top termékek szegmensenként ───────────────────────────────────────────
+st.subheader("Top termékek szegmensenként")
+st.caption(
+    "TTM-időszaki tényleges vásárlások alapján — kampánytartalom és termékajánló tervezéséhez. "
+    "Csak pozitív tételek (visszáru kizárva)."
+)
+
+# Aggregáció: szegmens × termék — eladás és visszáru külön
+tx_sales   = tx_ttm[(tx_ttm["Quantity"] > 0) & (tx_ttm["LineTotal"] > 0)]
+tx_returns = tx_ttm[(tx_ttm["Quantity"] < 0) & (tx_ttm["LineTotal"] < 0)]
+
+seg_product = (
+    tx_sales.groupby(["rfm_segment", "Description"])
+    .agg(forgalom=("Quantity", "sum"), bevetel=("LineTotal", "sum"))
+    .reset_index()
+)
+seg_returns = (
+    tx_returns.groupby(["rfm_segment", "Description"])
+    .agg(visszaruzott=("Quantity", "sum"), visszaru_ertek=("LineTotal", "sum"))
+    .assign(
+        visszaruzott   = lambda d: d["visszaruzott"].abs(),
+        visszaru_ertek = lambda d: d["visszaru_ertek"].abs(),
+    )
+    .reset_index()
+)
+
+RETURN_COLOR = "#e07b20"
+
+
+def _rgba(hex6, alpha):
+    return f"rgba({int(hex6[1:3],16)},{int(hex6[3:5],16)},{int(hex6[5:7],16)},{alpha:.2f})"
+
+
+def _bar_colors(hex6, n):
+    return [_rgba(hex6, 0.40 + 0.60 * i / max(n - 1, 1)) for i in range(n - 1, -1, -1)]
+
+
+def _draw_bar(df_top, x_col, bar_texts, x_title, color):
+    fig = go.Figure(go.Bar(
+        x=df_top[x_col],
+        y=df_top["label"],
+        orientation="h",
+        marker=dict(color=_bar_colors(color, len(df_top)), line=dict(width=0)),
+        text=bar_texts,
+        textposition="outside",
+        textfont=dict(color="rgba(200,207,232,0.85)", size=11),
+        hovertemplate="<b>%{y}</b><br>£%{x:,.0f}<extra></extra>",
+    ))
+    fig.update_layout(
+        paper_bgcolor=CHART_BG, plot_bgcolor=CHART_PLT,
+        font=dict(color="white"),
+        xaxis=dict(title=x_title, color=TICK_CLR, gridcolor=GRID_CLR, tickprefix="£"),
+        yaxis=dict(color=TICK_CLR, gridcolor="rgba(0,0,0,0)",
+                   categoryorder="total ascending", tickfont=dict(size=11)),
+        height=380, margin=dict(l=10, r=110, t=10, b=30), showlegend=False,
+    )
+    return fig
+
+
+seg_order = list(seg_stats["rfm_segment"])
+tabs_top  = st.tabs(seg_order)
+
+for tab, seg_name in zip(tabs_top, seg_order):
+    seg_color     = SEG_COLORS.get(seg_name, "#9898c0")
+    seg_total_rev = ttm_by_seg.get(seg_name, 1)
+
+    top10 = (
+        seg_product[seg_product["rfm_segment"] == seg_name]
+        .sort_values("bevetel", ascending=False)
+        .head(10).reset_index(drop=True)
+    )
+    top10["arany"] = top10["bevetel"] / seg_total_rev * 100
+    top10["label"] = top10["Description"].str.slice(0, 38).str.strip()
+
+    ret10 = (
+        seg_returns[seg_returns["rfm_segment"] == seg_name]
+        .sort_values("visszaru_ertek", ascending=False)
+        .head(10).reset_index(drop=True)
+    )
+    ret10["arany"] = ret10["visszaru_ertek"] / seg_total_rev * 100
+    ret10["label"] = ret10["Description"].str.slice(0, 38).str.strip()
+
+    with tab:
+        sub_sales, sub_ret = st.tabs(["📦 Top eladások", "↩️ Top visszáruk"])
+
+        with sub_sales:
+            if top10.empty:
+                st.info("Nincs TTM-eladás ebben a szegmensben.")
+            else:
+                st.plotly_chart(
+                    _draw_bar(
+                        top10, "bevetel",
+                        [f"£{v/1000:.1f}k  ({a:.1f}%)" for v, a in zip(top10["bevetel"], top10["arany"])],
+                        "TTM bevétel (£)", seg_color,
+                    ),
+                    use_container_width=True,
+                )
+                tbl_s = top10[["Description", "forgalom", "bevetel", "arany"]].copy()
+                tbl_s.insert(0, "#", range(1, len(tbl_s) + 1))
+                st.dataframe(tbl_s, hide_index=True, use_container_width=True,
+                    column_config={
+                        "#":           st.column_config.NumberColumn("#", width=40),
+                        "Description": st.column_config.TextColumn("Termék neve", width="large"),
+                        "forgalom":    st.column_config.NumberColumn("Forgalom (db)", format="%d", width="small"),
+                        "bevetel":     st.column_config.NumberColumn("Bevétel (£)", format="£%.0f", width="small"),
+                        "arany":       st.column_config.ProgressColumn(
+                            "Szegmens-arány", format="%.1f%%", min_value=0, max_value=100, width="medium"),
+                    },
+                )
+
+        with sub_ret:
+            if ret10.empty:
+                st.info("Nincs rögzített visszáru ebben a szegmensben.")
+            else:
+                st.plotly_chart(
+                    _draw_bar(
+                        ret10, "visszaru_ertek",
+                        [f"£{v/1000:.1f}k  ({a:.1f}%)" for v, a in zip(ret10["visszaru_ertek"], ret10["arany"])],
+                        "Visszáru értéke (£)", RETURN_COLOR,
+                    ),
+                    use_container_width=True,
+                )
+                tbl_r = ret10[["Description", "visszaruzott", "visszaru_ertek", "arany"]].copy()
+                tbl_r.insert(0, "#", range(1, len(tbl_r) + 1))
+                st.dataframe(tbl_r, hide_index=True, use_container_width=True,
+                    column_config={
+                        "#":              st.column_config.NumberColumn("#", width=40),
+                        "Description":    st.column_config.TextColumn("Termék neve", width="large"),
+                        "visszaruzott":   st.column_config.NumberColumn("Visszáruzott (db)", format="%d", width="small"),
+                        "visszaru_ertek": st.column_config.NumberColumn("Visszáru értéke (£)", format="£%.0f", width="small"),
+                        "arany":          st.column_config.ProgressColumn(
+                            "Szegmens-arány", format="%.1f%%", min_value=0, max_value=100, width="medium"),
+                    },
+                )
+
+st.markdown("---")
+
+# ── 5. Szegmens-szintű kampányajánlások ──────────────────────────────────────
 st.subheader("Kampányajánlások szegmensenként")
 
 SEGMENT_STRATEGY = {
