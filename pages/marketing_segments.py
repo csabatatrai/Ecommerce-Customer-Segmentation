@@ -58,6 +58,16 @@ st.markdown(f"""
             font-size: 12px;
             color: rgba(200,207,232,0.6);
         }}
+        .section-tag {{
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }}
         .callout {{
             border-radius: 0 6px 6px 0;
             padding: 8px 14px;
@@ -85,6 +95,15 @@ st.markdown(f"""
             }}
             .seg-value {{
                 font-size: 20px;
+            }}
+            h1 {{
+                font-size: 1.5rem !important;
+                line-height: 1.3 !important;
+            }}
+        }}
+        @media (max-width: 768px) and (min-width: 481px) {{
+            h1 {{
+                font-size: 1.8rem !important;
             }}
         }}
     </style>
@@ -115,8 +134,60 @@ if df.empty:
     st.stop()
 
 # ── Fejléc ────────────────────────────────────────────────────────────────────
-st.title("Marketing szegmenselemzés")
+st.title("Kampánytervező marketingeseknek")
 st.caption("Szegmensszintű churn-kockázat, bevételi súly és kampánycélpont-azonosítás marketingstratégia tervezéséhez.")
+st.markdown("---")
+
+# ── Workflow bevezető ─────────────────────────────────────────────────────────
+_wf_cols = st.columns([10, 1, 10, 1, 10])
+with _wf_cols[0]:
+    st.markdown(
+        "<div style='background:rgba(255,26,60,0.1); border:1px solid rgba(255,26,60,0.25); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ff1a3c; margin-bottom:6px;'>① KINEK</div>"
+        "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Célcsoport azonosítás</div>"
+        "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
+        "Szűrd le az ügyfeleket szegmens, churn-kockázat és összköltés alapján. "
+        "kampánysablonnal vagy egyéni beállítással. A lista prioritás szerint rendezve, azonnal letölthető."
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
+with _wf_cols[1]:
+    st.markdown(
+        "<div style='display:flex; align-items:center; justify-content:center; height:100%; "
+        "font-size:22px; color:rgba(200,207,232,0.3); padding-top:30px;'>→</div>",
+        unsafe_allow_html=True,
+    )
+with _wf_cols[2]:
+    st.markdown(
+        "<div style='background:rgba(26,180,255,0.08); border:1px solid rgba(26,180,255,0.22); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#1ab4ff; margin-bottom:6px;'>② MIT</div>"
+        "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Kampánytartalom</div>"
+        "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
+        "A célcsoport szegmensének top termékei TTM alapján. mi szerepeljen az ajánlóban, "
+        "és mit kerülj (visszáruk fül)."
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
+with _wf_cols[3]:
+    st.markdown(
+        "<div style='display:flex; align-items:center; justify-content:center; height:100%; "
+        "font-size:22px; color:rgba(200,207,232,0.3); padding-top:30px;'>→</div>",
+        unsafe_allow_html=True,
+    )
+with _wf_cols[4]:
+    st.markdown(
+        "<div style='background:rgba(255,215,64,0.08); border:1px solid rgba(255,215,64,0.22); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ffd740; margin-bottom:6px;'>③ MIKOR</div>"
+        "<div style='font-size:15px; font-weight:600; color:white; margin-bottom:8px;'>Időzítés</div>"
+        "<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.65;'>"
+        "Nap és óra szerinti vásárlási csúcsok: mikor a legvalószínűbb, hogy a kampány eléri a célcsoportot."
+        "</div></div>",
+        unsafe_allow_html=True,
+    )
+
 st.markdown("---")
 
 # ── Szegmens szintű aggregáció ────────────────────────────────────────────────
@@ -154,6 +225,11 @@ seg_stats = seg_stats.sort_values("ttm_revenue", ascending=False).reset_index(dr
 seg_order = list(seg_stats["rfm_segment"])
 
 # ── Főtabs ────────────────────────────────────────────────────────────────────
+st.markdown(
+    "<span class='section-tag' style='background:rgba(255,26,60,0.15); color:#ff1a3c;'>"
+    "① KINEK: célcsoport azonosítás</span>",
+    unsafe_allow_html=True,
+)
 st.subheader("Kampánytervező")
 tab_cl, tab_seg, tab_bubble, tab_grey = st.tabs([
     "⚙️ Céllistakészítő",
@@ -175,6 +251,12 @@ with tab_seg:
     }
 
     def _safe(name: str) -> str:
+        import re as _re_safe
+        name = _re_safe.sub(
+            r"[\U0001F300-\U0001F9FF\U00002600-\U000027BF"
+            r"\U0001FA00-\U0001FAFF\U0000FE00-\U0000FE0F]+",
+            "", name,
+        ).strip()
         return (name.replace(" ", "_").replace("/", "-")
                     .replace("á","a").replace("é","e").replace("í","i")
                     .replace("ó","o").replace("ö","o").replace("ő","o")
@@ -284,7 +366,7 @@ with tab_grey:
     st.subheader("Kampánycélpont-elemzés: szürke zóna (30–70% közti churn-valószínűségűek)")
     st.markdown(
         "<div class='callout' style='background:rgba(200,207,232,0.05); border-left:3px solid rgba(200,207,232,0.3);'>"
-        "💡 A <b>30–70% közötti churn-valószínűségű</b> ügyfelek a leginkább befolyásolható kimenetelűek — "
+        "💡 A <b>30–70% közötti churn-valószínűségű</b> ügyfelek a leginkább befolyásolható kimenetelűek, "
         "ők alkotják az optimális kampánycélcsoportot. Az alábbi diagram szegmensenként mutatja a szürke zónás ügyfelek arányát és bevételi súlyát."
         "</div>",
         unsafe_allow_html=True,
@@ -327,7 +409,7 @@ with tab_grey:
 with tab_cl:
     st.subheader("Céllistakészítő")
     st.caption(
-        "Szűrd az ügyfeleket saját kampánylogikád szerint — "
+        "Szűrd az ügyfeleket saját kampánylogikád szerint. "
         "a lista prioritás szerint rendezve, azonnal letölthető."
     )
 
@@ -354,13 +436,13 @@ with tab_cl:
             "bg":     "rgba(200,207,232,0.07)",
             "filters": "Minden szegmens · Churn: 30–70%",
             "desc": (
-                "Az ügyfélbázis azon részét célozza, ahol a kimenetel még nem dőlt el — "
+                "Az ügyfélbázis azon részét célozza, ahol a kimenetel még nem dőlt el, "
                 "sem a lojalitás, sem a lemorzsolódás nem biztos. "
                 "A modell szerint ez a befolyásolható csoport adja a legjobb reaktivációs ROI-t."
             ),
             "reco": [
                 "Proaktív e-mail trigger ~90 napos inaktivitást követően",
-                "Mérsékelt ösztönző (5–10% kedvezmény) — ne árazd le a teljes bázist",
+                "Mérsékelt ösztönző (5–10% kedvezmény), ne árazd le a teljes bázist",
                 "A/B teszteld az üzenet tónusát: lojalitáserősítő vs. visszatérési ösztönző",
             ],
         },
@@ -370,13 +452,13 @@ with tab_cl:
             "filters": "VIP Bajnokok · Churn: 50–100%",
             "desc": (
                 "A legmagasabb értékű ügyfelek, akik churn-jelet mutatnak. "
-                "Ez a szegmens generálja a bevétel legnagyobb részét — "
+                "Ez a szegmens generálja a bevétel legnagyobb részét, "
                 "egyetlen VIP elveszítése aránytalanul nagy kiesést jelent."
             ),
             "reco": [
                 "Személyes megkeresés (account manager, nem automatikus e-mail)",
                 "Prémium megtartási ajánlat: exkluzív kedvezmény vagy korai termékbevezetés",
-                "NPS/CSAT felmérés — panasz esetén azonnali eszkaláció, ne várd meg a következő vásárlást",
+                "NPS/CSAT felmérés: panasz esetén azonnali eszkaláció, ne várd meg a következő vásárlást",
             ],
         },
         "💰 Értékes kockázat": {
@@ -385,11 +467,11 @@ with tab_cl:
             "filters": "Minden szegmens · Churn: 50–100% · Összköltés (CLV) ≥ medián",
             "desc": (
                 "Bevétel-súlyozott prioritizálás: azok az ügyfelek kerülnek előre, "
-                "akiknek elveszítése a legnagyobb kiesést okozná — szegmenstől függetlenül. "
+                "akiknek elveszítése a legnagyobb kiesést okozná, szegmenstől függetlenül. "
                 "Segít eldönteni, hol érdemes személyes beavatkozást alkalmazni tömeges kampány helyett."
             ),
             "reco": [
-                "Személyre szabott ajánlat — ne tömeges e-mail, hanem direkt csatorna",
+                "Személyre szabott ajánlat, ne tömeges e-mail, hanem direkt csatorna",
                 "Értékalapú kupon: az ügyfél eddigi átlagos kosárméretéhez igazítva",
                 "Prioritás-pontszám (churn × összköltés) alapján sorold: felső 20% = személyes megkeresés",
             ],
@@ -399,14 +481,14 @@ with tab_cl:
             "bg":     "rgba(255,140,26,0.08)",
             "filters": "Lemorzsolódó / Alvó · Churn: 30–70%",
             "desc": (
-                "A win-back kampány hatékonysága drasztikusan csökken teljes inaktivitás után — "
+                "A win-back kampány hatékonysága drasztikusan csökken teljes inaktivitás után. "
                 "a 45–90 napos ablak a kritikus. "
                 "A szürke zónás Lemorzsolódó ügyfelek még elérhetők, de hamarosan elvesznek."
             ),
             "reco": [
                 "Időkorlátozott visszatérési kupon (10–15%, 30 napos érvényességgel)",
                 "Korábbi vásárlások alapján személyre szabott termékajánlás (Top visszáruk fül: mit NE ajánlj)",
-                "Szezonális reaktivációs kampány — ünnepi időszak előtt 6 héttel indítsd",
+                "Szezonális reaktivációs kampány: ünnepi időszak előtt 6 héttel indítsd",
             ],
         },
         "🌱 Onboarding": {
@@ -414,14 +496,14 @@ with tab_cl:
             "bg":     "rgba(26,180,255,0.07)",
             "filters": "Új / Ígéretes · Minden churn-szint",
             "desc": (
-                "A 2. vásárlás a szokáskialakítás kritikus pontja — aki kétszer vásárolt, "
+                "A 2. vásárlás a szokáskialakítás kritikus pontja: aki kétszer vásárolt, "
                 "sokkal valószínűbb, hogy visszatér. "
                 "Az onboarding sorozat az első 60 napban köt le, vagy nem."
             ),
             "reco": [
                 "3–5 üzenetes onboarding e-mail sorozat az első vásárlástól számított 60 napon belül",
                 "2. vásárlást ösztönző kupon (5–10%, 21 napos érvényességgel) a 2. üzenetben",
-                "Loyalty program meghívó a 2. vásárlás után — ne hamarabb, különben értékét veszíti",
+                "Loyalty program meghívó a 2. vásárlás után, ne hamarabb, különben értékét veszíti",
             ],
         },
         "💤 Elvesztett": {
@@ -429,14 +511,14 @@ with tab_cl:
             "bg":     "rgba(152,152,192,0.07)",
             "filters": "Elvesztett / Inaktív · Minden churn-szint",
             "desc": (
-                "A legrégebben inaktív ügyfelek — a reaktiváció valószínűsége alacsony, "
+                "A legrégebben inaktív ügyfelek, a reaktiváció valószínűsége alacsony, "
                 "ezért az erőforrás-befektetés minimalizálása a cél. "
                 "Egyetlen kísérlet, ha nincs visszajelzés: lista-eltávolítás."
             ),
             "reco": [
-                "Egyetlen reaktivációs e-mail — ha nincs megnyitás vagy kattintás, lista-eltávolítás (ne küldd sorozatban)",
+                "Egyetlen reaktivációs e-mail: ha nincs megnyitás vagy kattintás, lista-eltávolítás (ne küldd sorozatban)",
                 "Alacsony értékű, széles körű promóció: szezonális kiárusítás vagy újdonság-értesítő",
-                "Ne fektess személyes beavatkozást ebbe a szegmensbe — az így felszabaduló kapacitást VIP megtartásra fordítsd",
+                "Ne fektess személyes beavatkozást ebbe a szegmensbe, az így felszabaduló kapacitást VIP megtartásra fordítsd",
             ],
         },
     }
@@ -559,7 +641,7 @@ with tab_cl:
     )
     km3.metric(
         "Átl. churn valószínűség",
-        f"{target['churn_proba'].mean():.1%}" if not target.empty else "—",
+        f"{target['churn_proba'].mean():.1%}" if not target.empty else "-",
     )
 
     if target.empty:
@@ -581,7 +663,7 @@ with tab_cl:
             .rename(columns=_PREVIEW_COLS)
         )
         st.download_button(
-            label=f"📥 Célista letöltése — {len(target):,} ügyfél, prioritás szerint rendezve",
+            label=f"📥 Célista letöltése: {len(target):,} ügyfél, prioritás szerint rendezve",
             data=_to_csv(dl_target),
             file_name="celcsoport_lista.csv",
             mime="text/csv",
@@ -617,20 +699,25 @@ with tab_cl:
         )
         if len(target) > 20:
             st.caption(
-                f"Előnézet: top 20 / {len(target):,} ügyfél — "
+                f"Előnézet: top 20 / {len(target):,} ügyfél, "
                 "a teljes, prioritás szerint rendezett lista a letöltött fájlban."
             )
 
 st.markdown("---")
 
 # ── Top termékek szegmensenként ───────────────────────────────────────────────
+st.markdown(
+    "<span class='section-tag' style='background:rgba(26,180,255,0.12); color:#1ab4ff;'>"
+    "② MIT: kampánytartalom és termékajánló</span>",
+    unsafe_allow_html=True,
+)
 st.subheader("Top termékek szegmensenként")
 st.caption(
-    "TTM-időszaki tényleges vásárlások alapján — kampánytartalom és termékajánló tervezéséhez. "
+    "TTM-időszaki tényleges vásárlások alapján. kampánytartalom és termékajánló tervezéséhez. "
     "Csak pozitív tételek (visszáru kizárva)."
 )
 
-# Aggregáció: szegmens × termék — eladás és visszáru külön
+# Aggregáció: szegmens × termék, eladás és visszáru külön
 tx_sales   = tx_ttm[(tx_ttm["Quantity"] > 0) & (tx_ttm["LineTotal"] > 0)]
 tx_returns = tx_ttm[(tx_ttm["Quantity"] < 0) & (tx_ttm["LineTotal"] < 0)]
 
@@ -682,9 +769,14 @@ def _draw_bar(df_top, x_col, bar_texts, x_title, color):
     return fig
 
 
-tabs_top = st.tabs(seg_order)
+_seg_for_tabs = st.session_state.get("cl_seg", seg_order) or seg_order
+st.caption(
+    f"Megjelenített szegmensek: {', '.join(_seg_for_tabs)}. "
+    "A kiválasztás a Céllistakészítőben módosítható."
+)
+tabs_top = st.tabs(_seg_for_tabs)
 
-for tab, seg_name in zip(tabs_top, seg_order):
+for tab, seg_name in zip(tabs_top, _seg_for_tabs):
     seg_color     = SEG_COLORS.get(seg_name, "#9898c0")
     seg_total_rev = ttm_by_seg.get(seg_name, 1)
 
@@ -760,11 +852,24 @@ for tab, seg_name in zip(tabs_top, seg_order):
 st.markdown("---")
 
 # ── Vásárlási intenzitás: időbeli eloszlás ────────────────────────────────────
+st.markdown(
+    "<span class='section-tag' style='background:rgba(255,215,64,0.12); color:#ffd740;'>"
+    "③ MIKOR: időzítés és csúcsidőszakok</span>",
+    unsafe_allow_html=True,
+)
 st.subheader("Vásárlási intenzitás – időbeli eloszlás")
-st.caption("Az összes tranzakció alapján, nap és óra szerinti bontásban — kampányok és villámakciók időzítéséhez.")
 
-_heat = df_tx.copy()
-_heat["Hour"] = _heat["InvoiceDate"].dt.hour
+_heat_cids = target.index if not target.empty else pd.Index([])
+_heat      = df_tx[df_tx["Customer ID"].isin(_heat_cids)].copy()
+
+_f_seg_mikor = st.session_state.get("cl_seg", seg_order)
+st.caption(
+    f"A céllistán szereplő {len(_heat_cids):,} ügyfél tranzakciói alapján "
+    f"({', '.join(_f_seg_mikor) if _f_seg_mikor else 'mind'}, aktuális szűrőkkel), "
+    "nap és óra szerinti bontásban, kampányok és villámakciók időzítéséhez."
+)
+
+_heat["Hour"]      = _heat["InvoiceDate"].dt.hour
 _heat["DayOfWeek"] = _heat["InvoiceDate"].dt.day_name()
 _hu_days = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat", "Vasárnap"]
 _day_map = dict(zip(
@@ -776,6 +881,173 @@ _heat["Nap"] = _heat["DayOfWeek"].map(_day_map)
 _hm_data  = _heat.groupby(["Nap", "Hour"])["Invoice"].nunique().reset_index()
 _hm_pivot = _hm_data.pivot(index="Nap", columns="Hour", values="Invoice").fillna(0)
 _hm_pivot = _hm_pivot.reindex([d for d in _hu_days if d in _hm_pivot.index])
+
+# ── Szegmens-szintű heatmap (teljes szegmens, stabilabb prior) ────────────────
+_seg_cids_full    = df[df["rfm_segment"].isin(_f_seg_mikor)].index if _f_seg_mikor else df.index
+_heat_seg         = df_tx[df_tx["Customer ID"].isin(_seg_cids_full)].copy()
+_heat_seg["Hour"]      = _heat_seg["InvoiceDate"].dt.hour
+_heat_seg["DayOfWeek"] = _heat_seg["InvoiceDate"].dt.day_name()
+_heat_seg["Nap"]       = _heat_seg["DayOfWeek"].map(_day_map)
+_seg_hm_data  = _heat_seg.groupby(["Nap", "Hour"])["Invoice"].nunique().reset_index()
+_seg_hm_pivot = _seg_hm_data.pivot(index="Nap", columns="Hour", values="Invoice").fillna(0)
+_seg_hm_pivot = _seg_hm_pivot.reindex([d for d in _hu_days if d in _seg_hm_pivot.index])
+
+# ── Csúcsidő-elemzés algoritmus ───────────────────────────────────────────────
+if not _hm_pivot.empty and _hm_pivot.values.sum() > 0:
+    # ── Súlyozott szintézis: célcsoport + szegmens prior ─────────────────────
+    # Kis céllistán a mintazaj magas → a szegmens-szintű eloszlás stabilabb prior.
+    # Shrinkage weight: lineáris interpoláció 30 és 300 ügyfél között.
+    _n_target   = len(_heat_cids)
+    _n_seg_full = len(_seg_cids_full)
+    _W_MIN, _W_MAX = 30, 300          # célcsoport-méret küszöbök
+    if _n_target >= _W_MAX:
+        _w_target = 0.85
+    elif _n_target >= _W_MIN:
+        _w_target = 0.20 + 0.65 * (_n_target - _W_MIN) / (_W_MAX - _W_MIN)
+    else:
+        _w_target = 0.20
+    _w_seg = 1.0 - _w_target
+
+    # Konfidencia-szint szövegesen
+    if _w_target >= 0.70:
+        _conf_label = "magas"
+    elif _w_target >= 0.45:
+        _conf_label = "közepes"
+    else:
+        _conf_label = "alacsony"
+
+    _synthesis_note = (
+        f"Célcsoport: {_n_target} fő (súly: {_w_target:.0%}), "
+        f"szegmens prior: {_n_seg_full} fő (súly: {_w_seg:.0%}) – "
+        f"jelszintű megbízhatóság: {_conf_label}"
+    )
+
+    # Normalizált óra- és napdisztribúciók, majd súlyozott összevonás
+    _all_hours = list(range(24))
+
+    _t_hour = _hm_pivot.sum(axis=0).reindex(_all_hours, fill_value=0).astype(float)
+    _s_hour = (_seg_hm_pivot.sum(axis=0).reindex(_all_hours, fill_value=0).astype(float)
+               if not _seg_hm_pivot.empty else pd.Series(0.0, index=_all_hours))
+
+    _t_hour_n = _t_hour / _t_hour.sum() if _t_hour.sum() > 0 else _t_hour
+    _s_hour_n = _s_hour / _s_hour.sum() if _s_hour.sum() > 0 else _s_hour
+    _comb_hour = (_w_target * _t_hour_n + _w_seg * _s_hour_n)
+
+    _t_day = _hm_pivot.sum(axis=1).reindex(_hu_days, fill_value=0).astype(float)
+    _s_day = (_seg_hm_pivot.sum(axis=1).reindex(_hu_days, fill_value=0).astype(float)
+              if not _seg_hm_pivot.empty else pd.Series(0.0, index=_hu_days))
+
+    _t_day_n = _t_day / _t_day.sum() if _t_day.sum() > 0 else _t_day
+    _s_day_n = _s_day / _s_day.sum() if _s_day.sum() > 0 else _s_day
+    _comb_day = (_w_target * _t_day_n + _w_seg * _s_day_n).sort_values(ascending=False)
+
+    # ── Csúcsok a kombinált eloszlásból ──────────────────────────────────────
+    _top_days   = list(_comb_day.head(2).index)
+    _total_tx   = float(_hm_pivot.values.sum())
+    _top2_pct   = float(_comb_day.head(2).sum())   # normalizált → arány
+
+    _hour_rolling = _comb_hour.rolling(3, center=True, min_periods=1).mean()
+    _peak_hour    = int(_hour_rolling.idxmax())
+    _peak_start   = max(0, _peak_hour - 1)
+    _peak_end     = min(23, _peak_hour + 1)
+
+    # Hétvége arány a kombinált napdisztribúcióból
+    _wknd_set    = {"Szombat", "Vasárnap"}
+    _weekend_pct = float(sum(_comb_day.get(d, 0) for d in _wknd_set))
+
+    # Bimodális detektálás a kombinált óraeloszláson
+    _hr_norm     = (_hour_rolling / _hour_rolling.max()).fillna(0)
+    _peaks_found = []
+    for _h in range(1, 23):
+        if (_hr_norm.get(_h, 0) >= 0.65
+                and _hr_norm.get(_h, 0) >= _hr_norm.get(_h - 1, 0)
+                and _hr_norm.get(_h, 0) >= _hr_norm.get(_h + 1, 0)):
+            if not _peaks_found or (_h - _peaks_found[-1]) >= 4:
+                _peaks_found.append(_h)
+            elif _hr_norm.get(_h, 0) > _hr_norm.get(_peaks_found[-1], 0):
+                _peaks_found[-1] = _h
+    _is_bimodal = len(_peaks_found) >= 2
+
+    # E-mail küldési idő: 1,5h a csúcs előtt, min 6:00
+    def _fmt_send(_hf):
+        _hh = max(6, int(_hf))
+        _mm = 30 if (_hf - int(_hf)) >= 0.5 else 0
+        return f"{_hh:02d}:{_mm:02d}"
+
+    _send_time   = _fmt_send(_peak_hour - 1.5)
+    _send_time_2 = _fmt_send(_peaks_found[1] - 1.5) if _is_bimodal else None
+
+    # Vásárlói mód + javasolt csatorna
+    if 6 <= _peak_hour <= 9:
+        _peak_mode   = "reggeli döntési mód"
+        _channel     = "push értesítés / SMS"
+        _peak_tactic = "rövid, lényegre törő üzenet – reggeli rutin közben nyitja meg"
+    elif 9 <= _peak_hour <= 12:
+        _peak_mode   = "délelőtti kutatási mód"
+        _channel     = "e-mail"
+        _peak_tactic = "tartalomgazdag ajánlat termékösszehasonlítással – aktív keresési fázis"
+    elif 12 <= _peak_hour <= 14:
+        _peak_mode   = "ebédidős impulzusvásárlás"
+        _channel     = "push értesítés"
+        _peak_tactic = "közvetlen CTA, időkorlátozott ajánlat – rövid döntési ablak"
+    elif 14 <= _peak_hour <= 17:
+        _peak_mode   = "délutáni böngészési mód"
+        _channel     = "e-mail"
+        _peak_tactic = "vizuális, inspiráló termékbemutatás – hosszabb figyelmi idő"
+    elif 17 <= _peak_hour <= 20:
+        _peak_mode   = "esti relaxált vásárlás"
+        _channel     = "e-mail / push"
+        _peak_tactic = "storytelling, bundle ajánlatok – a vásárlónak van ideje dönteni"
+    else:
+        _peak_mode   = "éjszakai / kora reggeli böngészés"
+        _channel     = "push értesítés"
+        _peak_tactic = "exkluzív early bird vagy flash sale – ritka, figyelemfelkeltő"
+
+    _days_str   = " és ".join(d.lower() for d in _top_days[:2])
+    _insight_md = (
+        f"💡 A kombinált elemzés szerint ({_synthesis_note}) a célcsoport "
+        f"forgalma **{_days_str}** napon **{_peak_start}:00–{_peak_end+1}:00** "
+        f"között a legintenzívebb (*{_peak_mode}*). "
+        f"Javasolt küldési idő: **{_send_time}**"
+        + (f", második hullám: **{_send_time_2}**" if _is_bimodal and _send_time_2 else "")
+        + "."
+    )
+
+    _mikor_data = {
+        "top_days":        _top_days,
+        "peak_start":      _peak_start,
+        "peak_end":        _peak_end,
+        "peak_mode":       _peak_mode,
+        "peak_tactic":     _peak_tactic,
+        "send_time":       _send_time,
+        "send_time_2":     _send_time_2,
+        "channel":         _channel,
+        "weekend_pct":     _weekend_pct,
+        "top2_day_pct":    _top2_pct,
+        "is_bimodal":      _is_bimodal,
+        "target_size":     _n_target,
+        "seg_size":        _n_seg_full,
+        "w_target":        _w_target,
+        "conf_label":      _conf_label,
+        "synthesis_note":  _synthesis_note,
+    }
+else:
+    _top_days    = ["-"]
+    _peak_start  = 0
+    _peak_end    = 0
+    _peak_mode   = "-"
+    _peak_tactic = "-"
+    _channel     = "-"
+    _days_str    = "-"
+    _insight_md  = "💡 Nincs elegendő tranzakciós adat a kiválasztott céllistához."
+    _mikor_data  = {
+        "top_days": ["-"], "peak_start": 0, "peak_end": 0,
+        "peak_mode": "-", "peak_tactic": "-",
+        "send_time": "-", "send_time_2": None,
+        "channel": "-", "weekend_pct": 0.0, "top2_day_pct": 0.0,
+        "is_bimodal": False, "target_size": 0, "seg_size": 0,
+        "w_target": 0.0, "conf_label": "-", "synthesis_note": "-",
+    }
 
 tab_hm_2d, tab_hm_3d = st.tabs(["📊 2D Hőtérkép", "⛰️ 3D Csúcsmodell"])
 
@@ -818,7 +1090,506 @@ with tab_hm_3d:
     )
     st.plotly_chart(fig_3d, use_container_width=True)
 
-st.caption("💡 A forgalom kedden és csütörtökön 10–13 óra között a legintenzívebb — villámakciókat ezekre a csúcsokra érdemes időzíteni.")
+st.markdown(_insight_md)
+
+st.markdown("---")
+
+# ── Kampányterv összefoglalója ────────────────────────────────────────────────
+st.markdown(
+    "<span class='section-tag' style='background:rgba(255,255,255,0.06); color:rgba(200,207,232,0.6);'>"
+    "Kampányterv összefoglalója</span>",
+    unsafe_allow_html=True,
+)
+st.subheader("Kampányterv összefoglalója")
+st.caption("Az aktív szűrők alapján. a három dimenzió eredménye egy helyen.")
+
+_active_preset = st.session_state.get("cl_active_preset")
+_f_seg_now     = st.session_state.get("cl_seg", seg_order)
+_f_churn_now   = st.session_state.get("cl_churn", (0.0, 1.0))
+
+# Top 3 termék a kiválasztott szegmensekre
+_sum_top3 = (
+    seg_product[seg_product["rfm_segment"].isin(_f_seg_now)]
+    .groupby("Description")["bevetel"].sum()
+    .nlargest(3)
+    .reset_index()
+)
+_top3_html = "".join(
+    f"<div style='padding:3px 0; font-size:13px; color:rgba(200,207,232,0.85);'>"
+    f"<span style='color:#1ab4ff; font-weight:700;'>#{i+1}</span>&nbsp; "
+    f"{row['Description'][:45]} "
+    f"<span style='color:rgba(200,207,232,0.45); font-size:11px;'>£{row['bevetel']/1000:.1f}k</span>"
+    f"</div>"
+    for i, (_, row) in enumerate(_sum_top3.iterrows())
+) if not _sum_top3.empty else "<div style='color:rgba(200,207,232,0.4); font-size:12px;'>Nincs adat a szűréshez.</div>"
+
+_target_size  = len(target) if not target.empty else 0
+_avg_churn    = f"{target['churn_proba'].mean():.0%}" if not target.empty else "-"
+_seg_labels   = ", ".join(_f_seg_now) if _f_seg_now else "-"
+_preset_badge = (
+    f"<span style='background:rgba(255,255,255,0.08); border-radius:4px; "
+    f"padding:2px 8px; font-size:11px;'>{_active_preset}</span> "
+    if _active_preset else ""
+)
+
+_sum_c1, _sum_c2, _sum_c3 = st.columns(3)
+
+with _sum_c1:
+    st.markdown(
+        "<div style='background:rgba(255,26,60,0.1); border:1px solid rgba(255,26,60,0.22); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ff1a3c; margin-bottom:10px;'>① KINEK</div>"
+        f"{_preset_badge}"
+        f"<div style='font-size:28px; font-weight:700; color:white; margin:8px 0 2px 0;'>{_target_size:,} fő</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-bottom:8px;'>Átl. churn: {_avg_churn}</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.65); line-height:1.6;'>{_seg_labels}</div>"
+        f"<div style='font-size:11px; color:rgba(200,207,232,0.4); margin-top:8px;'>"
+        f"Churn szűrő: {_f_churn_now[0]:.0%} – {_f_churn_now[1]:.0%}</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+with _sum_c2:
+    st.markdown(
+        "<div style='background:rgba(26,180,255,0.08); border:1px solid rgba(26,180,255,0.22); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#1ab4ff; margin-bottom:10px;'>② MIT</div>"
+        "<div style='font-size:13px; font-weight:600; color:white; margin-bottom:10px;'>Top 3 ajánlott termék</div>"
+        f"{_top3_html}"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+with _sum_c3:
+    st.markdown(
+        "<div style='background:rgba(255,215,64,0.08); border:1px solid rgba(255,215,64,0.22); "
+        "border-radius:10px; padding:18px 20px; height:100%;'>"
+        "<div style='font-size:11px; font-weight:700; letter-spacing:0.15em; color:#ffd740; margin-bottom:10px;'>③ MIKOR</div>"
+        "<div style='font-size:13px; font-weight:600; color:white; margin-bottom:10px;'>Optimális időzítés</div>"
+        f"<div style='font-size:13px; color:rgba(200,207,232,0.85); line-height:1.7;'>"
+        f"📅 <b>{_days_str}</b><br>"
+        f"🕙 <b>{_peak_start}:00 – {_peak_end+1}:00</b><br>"
+        f"<span style='font-size:11px; color:rgba(200,207,232,0.5);'>{_peak_mode}</span>"
+        "</div>"
+        f"<div style='font-size:12px; color:rgba(200,207,232,0.55); margin-top:10px; line-height:1.6;'>"
+        f"{_peak_tactic}"
+        "</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+st.markdown("---")
+
+# ── Kampánybrief PDF export ───────────────────────────────────────────────────
+def _generate_brief_pdf(
+    active_preset, seg_labels, target_size, avg_churn_str,
+    churn_range, top_products_df, mikor_data, preset_info_dict, gen_date,
+) -> bytes:
+    import io as _io
+
+    from reportlab.lib.units import cm
+    from reportlab.lib import colors as rc
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable,
+        KeepInFrame,
+    )
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    import matplotlib as mpl
+
+    import re as _re
+    def _pt(text: str) -> str:
+        """Emoji-k és DejaVuSans által nem támogatott karakterek eltávolítása."""
+        return _re.sub(
+            r"[\U0001F300-\U0001F9FF\U00002600-\U000027BF"
+            r"\U0001FA00-\U0001FAFF\U0000FE00-\U0000FE0F]+",
+            "", str(text),
+        ).strip()
+
+    try:
+        fp  = Path(mpl.get_data_path()) / "fonts/ttf/DejaVuSans.ttf"
+        fpb = Path(mpl.get_data_path()) / "fonts/ttf/DejaVuSans-Bold.ttf"
+        pdfmetrics.registerFont(TTFont("DV",  str(fp)))
+        pdfmetrics.registerFont(TTFont("DVB", str(fpb)))
+    except Exception:
+        pass  # már regisztrálva
+
+    def _s(name, size=10, leading=14, color=rc.black,
+           bold=False, align=TA_LEFT):
+        return ParagraphStyle(
+            name, fontName="DVB" if bold else "DV",
+            fontSize=size, leading=leading,
+            textColor=color, alignment=align,
+        )
+
+    RED  = rc.HexColor("#A81022")
+    BLUE = rc.HexColor("#1565a0")
+    GOLD = rc.HexColor("#9a6f00")
+    LGRAY = rc.HexColor("#f5f5f7")
+    MGRAY = rc.HexColor("#cccccc")
+
+    S = {
+        "title":   _s("title",  size=18, bold=True,  color=rc.HexColor("#1a1a2e"), align=TA_CENTER, leading=22),
+        "sub":     _s("sub",    size=8,  color=rc.HexColor("#666666"), align=TA_CENTER),
+        "sec_hdr": _s("sec_hdr",size=10, bold=True,  color=rc.white,  leading=13),
+        "body":    _s("body",   size=9,  leading=12),
+        "body_b":  _s("body_b", size=9,  bold=True,  leading=12),
+        "small":   _s("small",  size=7.5,color=rc.HexColor("#888888"), leading=10),
+        "tbl_hdr": _s("tbl_hdr",size=8.5,bold=True,  color=rc.HexColor("#222222"), align=TA_CENTER),
+        "tbl_val": _s("tbl_val",size=8.5,leading=11),
+        "reco":    _s("reco",   size=8.5,leading=11, color=rc.HexColor("#333333")),
+    }
+
+    def _sec_header(text, color):
+        return Table(
+            [[Paragraph(text, S["sec_hdr"])]],
+            colWidths=["100%"],
+            style=TableStyle([
+                ("BACKGROUND",    (0, 0), (-1, -1), color),
+                ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+                ("TOPPADDING",    (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]),
+        )
+
+    def _kv_table(rows, col1_w=6):
+        return Table(
+            rows,
+            colWidths=[col1_w * cm, None],
+            style=TableStyle([
+                ("ROWBACKGROUNDS", (0, 0), (-1, -1), [rc.white, LGRAY]),
+                ("TOPPADDING",     (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING",  (0, 0), (-1, -1), 3),
+                ("LEFTPADDING",    (0, 0), (-1, -1), 6),
+                ("GRID",           (0, 0), (-1, -1), 0.3, MGRAY),
+            ]),
+        )
+
+    story = []
+
+    # Fejléc
+    story += [
+        Paragraph("Marketing kampányterv", S["title"]),
+        Spacer(1, 3),
+        Paragraph(
+            f"Generálva: {gen_date}  |  Sablon: {_pt(active_preset) if active_preset else 'Egyéni szűrés'}",
+            S["sub"],
+        ),
+        Spacer(1, 8),
+        HRFlowable(width="100%", thickness=2, color=RED),
+        Spacer(1, 8),
+    ]
+
+    # ① KINEK
+    story += [
+        _sec_header("(1) KINEK: Célcsoport", RED),
+        Spacer(1, 4),
+        _kv_table([
+            [Paragraph("Szegmensek",              S["body_b"]), Paragraph(seg_labels,    S["body"])],
+            [Paragraph("Célcsoport mérete",        S["body_b"]), Paragraph(f"{target_size:,} fő", S["body"])],
+            [Paragraph("Átl. churn valószínűség", S["body_b"]), Paragraph(avg_churn_str, S["body"])],
+            [Paragraph("Churn szűrő",             S["body_b"]),
+             Paragraph(f"{churn_range[0]:.0%} – {churn_range[1]:.0%}", S["body"])],
+        ]),
+        Spacer(1, 8),
+    ]
+
+    # ② MIT
+    story += [_sec_header("(2) MIT: Top ajánlott termékek", BLUE), Spacer(1, 4)]
+    if top_products_df.empty:
+        story.append(Paragraph("Nincs termékadata a szűréshez.", S["body"]))
+    else:
+        tbl_rows = [[
+            Paragraph("#",              S["tbl_hdr"]),
+            Paragraph("Termék neve",    S["tbl_hdr"]),
+            Paragraph("TTM bevétel",    S["tbl_hdr"]),
+        ]]
+        for i, (_, row) in enumerate(top_products_df.head(5).iterrows()):
+            tbl_rows.append([
+                Paragraph(str(i + 1),                  S["tbl_val"]),
+                Paragraph(row["Description"][:55],     S["tbl_val"]),
+                Paragraph(f"£{row['bevetel']:,.0f}",   S["tbl_val"]),
+            ])
+        story.append(Table(
+            tbl_rows,
+            colWidths=[1 * cm, None, 3 * cm],
+            style=TableStyle([
+                ("BACKGROUND",    (0, 0), (-1, 0),  rc.HexColor("#e8e8ed")),
+                ("TEXTCOLOR",     (0, 0), (-1, 0),  rc.HexColor("#333333")),
+                ("ROWBACKGROUNDS",(0, 1), (-1, -1), [rc.white, LGRAY]),
+                ("TOPPADDING",    (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("LEFTPADDING",   (0, 0), (-1, -1), 6),
+                ("GRID",          (0, 0), (-1, -1), 0.3, MGRAY),
+            ]),
+        ))
+    story.append(Spacer(1, 8))
+
+    # ③ MIKOR – adatvezérelt, céllistára szabott időzítési elemzés
+    _md = mikor_data
+    _m_days_str  = " és ".join(d.lower() for d in _md["top_days"][:2])
+    _m_peak_str  = f"{_md['peak_start']}:00 – {_md['peak_end'] + 1}:00"
+    _m_conc_str  = f"{_md['top2_day_pct']:.0%} a célcsoport forgalmából"
+    _m_wknd_str  = f"{_md['weekend_pct']:.0%}"
+
+    _m_conf_str = (
+        f"célcsoport {_md['target_size']} fő ({_md['w_target']:.0%})"
+        f" + szegmens {_md['seg_size']} fő ({1 - _md['w_target']:.0%})"
+        f" – megbízhatóság: {_md['conf_label']}"
+    )
+
+    story += [
+        _sec_header("(3) MIKOR: Optimális időzítés", GOLD),
+        Spacer(1, 6),
+        _kv_table([
+            [Paragraph("Elemzés alapja",       S["body_b"]),
+             Paragraph(_m_conf_str, S["body"])],
+            [Paragraph("Csúcsnapok",           S["body_b"]),
+             Paragraph(f"{_m_days_str}  ({_m_conc_str})", S["body"])],
+            [Paragraph("Csúcsidőszak",         S["body_b"]),
+             Paragraph(_m_peak_str, S["body"])],
+            [Paragraph("Javasolt küldési idő", S["body_b"]),
+             Paragraph(
+                 _md["send_time"]
+                 + (f"  +  második hullám: {_md['send_time_2']}" if _md.get("send_time_2") else ""),
+                 S["body"],
+             )],
+            [Paragraph("Javasolt csatorna",    S["body_b"]),
+             Paragraph(_md["channel"], S["body"])],
+            [Paragraph("Vásárlói mód",         S["body_b"]),
+             Paragraph(_md["peak_mode"], S["body"])],
+            [Paragraph("Hétvégi aktivitás",    S["body_b"]),
+             Paragraph(_m_wknd_str, S["body"])],
+        ]),
+        Spacer(1, 6),
+    ]
+
+    # Kampánystruktúra javaslat – 3 sor egyetlen bekezdésként (sortörőkkel)
+    _day1 = _md["top_days"][0].lower() if _md["top_days"] else "-"
+    _day2 = _md["top_days"][1].lower() if len(_md["top_days"]) >= 2 else _day1
+
+    _b1 = (f"1. Elsődleges küldés: {_day1}, {_md['send_time']} – {_md['channel']}. "
+           f"Üzenet: {_md['peak_tactic']}")
+    if _md.get("is_bimodal") and _md.get("send_time_2"):
+        _b2 = (f"2. Bimodális csúcsminta: {_day1}, második hullám {_md['send_time_2']}-kor "
+               f"– eltérő tárgysort, azonos ajánlat")
+    else:
+        _b2 = (f"2. Emlékeztető: {_day2}, {_md['send_time']} – eltérő tárgysort, "
+               f"urgency-elemmel (pl. 'még X órán belül')")
+    if _md["weekend_pct"] > 0.35:
+        _b3 = (f"3. Hétvégi aktivitás ({_m_wknd_str}) szignifikáns – önálló hétvégi kampány javasolt")
+    elif _md["weekend_pct"] < 0.15:
+        _b3 = (f"3. Hétvégi aktivitás ({_m_wknd_str}) alacsony – a büdzsét érdemes hétköznapokra koncentrálni")
+    else:
+        _b3 = f"3. Taktika: {_md['peak_tactic']}"
+
+    story += [
+        Paragraph("Kampánystruktúra javaslat:", S["body_b"]),
+        Spacer(1, 3),
+        Paragraph(
+            f"{_pt(_b1)}<br/>{_pt(_b2)}<br/>{_pt(_b3)}",
+            S["reco"],
+        ),
+    ]
+
+    # Preset javaslatok (ha aktív) – bulletok egyetlen bekezdésként
+    if active_preset and active_preset in preset_info_dict:
+        _reco_lines = "<br/>".join(
+            f"- {_pt(r)}" for r in preset_info_dict[active_preset]["reco"]
+        )
+        story += [
+            Spacer(1, 8),
+            HRFlowable(width="100%", thickness=0.4, color=MGRAY),
+            Spacer(1, 5),
+            Paragraph(f"Javasolt lépések: {_pt(active_preset)}", S["body_b"]),
+            Spacer(1, 3),
+            Paragraph(_reco_lines, S["reco"]),
+        ]
+
+    # ── SVG ikonok betöltése (fekete) ────────────────────────────────────────
+    import tempfile, os as _os
+    from svglib.svglib import svg2rlg
+
+    def _svg_icon_black(path, size=14):
+        """SVG betöltése fekete színnel, megadott méretben."""
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                svg_text = f.read()
+            # Minden szín → fekete
+            svg_text = _re.sub(r'fill\s*=\s*"(?!none)[^"]*"', 'fill="black"', svg_text)
+            svg_text = _re.sub(r'stroke\s*=\s*"(?!none)[^"]*"', 'stroke="black"', svg_text)
+            svg_text = _re.sub(r'fill\s*:\s*(?!none)[^;}"]+', 'fill:black', svg_text)
+            svg_text = _re.sub(r'stroke\s*:\s*(?!none)[^;}"]+', 'stroke:black', svg_text)
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".svg", delete=False, encoding="utf-8"
+            ) as tmp:
+                tmp.write(svg_text)
+                tmp_path = tmp.name
+            d = svg2rlg(tmp_path)
+            _os.unlink(tmp_path)
+            if d is None or d.width == 0:
+                return None
+            sx, sy = size / d.width, size / d.height
+            d.width, d.height = size, size
+            d.transform = (sx, 0, 0, sy, 0, 0)
+            return d
+        except Exception:
+            return None
+
+    _ico_gh  = _svg_icon_black("src/github.svg",   14)
+    _ico_li  = _svg_icon_black("src/linkedin.svg", 14)
+    _ico_web = _svg_icon_black("src/website.svg",  14)
+
+    _link_s = _s("lnk", size=10, color=rc.HexColor("#1a1a2e"), leading=15)
+    _ico_fb = _s("ifb",  size=10, color=rc.black, leading=15)
+
+    def _contact_row(ico, url, display):
+        return [
+            ico if ico else Paragraph("-", _ico_fb),
+            Paragraph(f'<link href="{url}">{display}</link>', _link_s),
+        ]
+
+    _contact_tbl = Table(
+        [
+            _contact_row(_ico_gh,  "https://github.com/csabatatrai",
+                         "github.com/csabatatrai"),
+            _contact_row(_ico_li,  "https://www.linkedin.com/in/csabatatrai-datascientist/",
+                         "linkedin.com/in/csabatatrai-datascientist"),
+            _contact_row(_ico_web, "https://csabatatrai.hu/", "csabatatrai.hu"),
+        ],
+        colWidths=[0.6 * cm, None],
+        style=TableStyle([
+            ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+            ("TOPPADDING",    (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ("LEFTPADDING",   (0, 0), (0, -1),  2),
+            ("LEFTPADDING",   (1, 0), (1, -1),  8),
+        ]),
+    )
+
+    # ── Fix canvas-alapú footer (garantált 1 oldal) ──────────────────────────
+    from reportlab.graphics import renderPDF as _rpdf
+    from reportlab.lib.pagesizes import A4 as _A4
+
+    _LM         = 2 * cm
+    _RM         = 2 * cm
+    _FONT_SMALL = 7.5
+    _FONT_LINK  = 8.5
+    _ICO_SZ     = 14          # meg kell egyeznie a _svg_icon_black size paraméterével
+    _GAP        = 6           # ikon és felirat közötti rés pontban
+    _LINE_H     = 0.65 * cm   # sortávolság a linkek között
+    _N_LINKS    = 3
+    # Foglalt terület alul: 3 link + elválasztó + forrásszöveg + paddinng
+    _FOOTER_H   = _N_LINKS * _LINE_H + 1.4 * cm
+
+    _footer_icons = (_ico_gh, _ico_li, _ico_web)
+
+    def _draw_footer(canvas, doc):
+        from reportlab.graphics import renderPDF as rpdf
+        import reportlab.lib.colors as rlc
+
+        canvas.saveState()
+        pw = _A4[0]
+
+        # Linkek: top-to-bottom sorrendben tárolva, de alulról rajzolunk
+        # Sorrend (felülről): LinkedIn, GitHub, csabatatrai.hu
+        links = [
+            (_footer_icons[2], "csabatatrai.hu",
+             "https://csabatatrai.hu/"),                         # legalsó
+            (_footer_icons[0], "github.com/csabatatrai",
+             "https://github.com/csabatatrai"),                  # középső
+            (_footer_icons[1], "Tátrai Csaba Attila",
+             "https://www.linkedin.com/in/csabatatrai-datascientist/"),  # legfelső
+        ]
+
+        canvas.setFont("DV", _FONT_LINK)
+        canvas.setFillColor(rlc.HexColor("#222222"))
+
+        y_bottom = 0.35 * cm   # legalsó link baseline-ja
+
+        for i, (ico, label, url) in enumerate(links):
+            ty = y_bottom + i * _LINE_H
+
+            if ico:
+                rpdf.draw(ico, canvas, _LM, ty - _ICO_SZ * 0.2)
+
+            tx = _LM + (_ICO_SZ + _GAP if ico else 0)
+            canvas.drawString(tx, ty, label)
+
+            tw = canvas.stringWidth(label, "DV", _FONT_LINK)
+            canvas.linkURL(url, (tx, ty - 2, tx + tw, ty + _ICO_SZ - 2),
+                           relative=0)
+
+        # Elválasztó vonal + forrásszöveg a linkek fölé
+        sep_y = y_bottom + _N_LINKS * _LINE_H + 0.18 * cm
+        canvas.setStrokeColor(rlc.HexColor("#cccccc"))
+        canvas.setLineWidth(0.4)
+        canvas.line(_LM, sep_y, pw - _RM, sep_y)
+
+        canvas.setFont("DV", _FONT_SMALL)
+        canvas.setFillColor(rlc.HexColor("#aaaaaa"))
+        canvas.drawString(
+            _LM, sep_y + 0.12 * cm,
+            "Kampánytervező marketingeseknek  ·  churn_predictions.parquet",
+        )
+
+        canvas.restoreState()
+
+    # Dokumentum összeállítása – KeepInFrame garantálja az egyoldalasságot
+    _top_m    = 2 * cm
+    _bot_m    = _FOOTER_H + 0.6 * cm
+    _avail_w  = _A4[0] - _LM - _RM
+    _avail_h  = _A4[1] - _top_m - _bot_m
+
+    # Ha a tartalom szorosan illeszkedik vagy nem fér el, arányosan zsugorodik
+    story_frame = KeepInFrame(_avail_w, _avail_h, story, mode="shrink")
+
+    buf2  = _io.BytesIO()
+    doc2  = SimpleDocTemplate(
+        buf2, pagesize=_A4,
+        leftMargin=_LM, rightMargin=_RM,
+        topMargin=_top_m, bottomMargin=_bot_m,
+    )
+    doc2.build([story_frame], onFirstPage=_draw_footer, onLaterPages=_draw_footer)
+    return buf2.getvalue()
+
+
+# PDF export gomb
+import datetime as _dt
+_pdf_top5 = (
+    seg_product[seg_product["rfm_segment"].isin(_f_seg_now)]
+    .groupby("Description")["bevetel"].sum()
+    .nlargest(5)
+    .reset_index()
+)
+try:
+    _pdf_bytes = _generate_brief_pdf(
+        active_preset    = _active_preset,
+        seg_labels       = _seg_labels,
+        target_size      = _target_size,
+        avg_churn_str    = _avg_churn,
+        churn_range      = _f_churn_now,
+        top_products_df  = _pdf_top5,
+        mikor_data       = _mikor_data,
+        preset_info_dict = _PRESET_INFO,
+        gen_date         = _dt.date.today().strftime("%Y. %m. %d."),
+    )
+    _pdf_filename = (
+        f"kampanyterv_{_safe(_active_preset) if _active_preset else 'egyeni'}"
+        f"_{_dt.date.today().strftime('%Y%m%d')}.pdf"
+    )
+    st.download_button(
+        label="📄 Kampánybrief letöltése (PDF)",
+        data=_pdf_bytes,
+        file_name=_pdf_filename,
+        mime="application/pdf",
+        use_container_width=True,
+        key="dl_brief_pdf",
+    )
+except Exception as _pdf_err:
+    st.warning(f"PDF generálás nem sikerült: {_pdf_err}")
 
 st.markdown("---")
 st.caption(f"Adatforrás: churn_predictions.parquet · online_retail_ready_for_rfm.parquet · TTM: {start_ttm.strftime('%Y-%m-%d')} – {cutoff_date.strftime('%Y-%m-%d')}")

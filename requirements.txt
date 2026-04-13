@@ -22,6 +22,10 @@ kaleido==1.2.0
 statsmodels==0.14.6
 patsy==1.0.2
 
+# PDF export
+reportlab==4.4.1
+svglib==1.5.1
+
 # --- Fejlesztői Környezet és Verziókezelés ---
 notebook==7.5.5
 # Automatikusan kitisztítja a notebook kimeneteket commit előtt:

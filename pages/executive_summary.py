@@ -816,9 +816,9 @@ if not df_preds.empty and not df_tx.empty:
     with st.expander("ℹ️ Magyarázat"):
         st.markdown(f"""
         **Mit mutat?** Az ügyfélbázis churn-valószínűség szerinti megoszlása három kategóriában:
-        - **Stabil** (< {LOW_T}): {stable:,} ügyfél ({stable/total_p*100:.0f}%) — alacsony kockázat, nem igényel azonnali beavatkozást
-        - **Szürke zóna** ({LOW_T}–{HIGH_T}): {grey:,} ügyfél ({grey/total_p*100:.0f}%) — billegő állapot, alacsony költségű proaktív megkereséssel megtartható
-        - **Magas kockázat** (> {HIGH_T}): {highrisk:,} ügyfél ({highrisk/total_p*100:.0f}%) — közvetlen, személyes intervenció indokolt
+        - **Stabil** (< {LOW_T}): {stable:,} ügyfél ({stable/total_p*100:.0f}%), alacsony kockázat, nem igényel azonnali beavatkozást
+        - **Szürke zóna** ({LOW_T}–{HIGH_T}): {grey:,} ügyfél ({grey/total_p*100:.0f}%), billegő állapot, alacsony költségű proaktív megkereséssel megtartható
+        - **Magas kockázat** (> {HIGH_T}): {highrisk:,} ügyfél ({highrisk/total_p*100:.0f}%), közvetlen, személyes intervenció indokolt
 
         **Üzleti következtetés:** A szürke zóna az ügyfélbázis legnagyobb szegmense. Mivel ezek az ügyfelek még nem döntöttek a lemorzsolódás mellett, alacsony intenzitású kampányokkal (e-mail, push értesítő) várhatóan magasabb megtérülés érhető el, mint a már lemorzsolódott ügyfelek visszahozásával.
         """)
@@ -848,7 +848,7 @@ if not df_preds.empty and not df_tx.empty:
 
         '<div style="margin-bottom:0.1rem;">'
         '<div style="font-size:16px;font-weight:600;color:#ffffff;margin-bottom:0.25rem;">4. VIP visszaküldések felülvizsgálata</div>'
-        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">A VIP-szegmensben tapasztalt magas visszaküldési arány operatív felülvizsgálata. Fontos kontextus: a modell szerint a visszaküldési arány churn-kockázathoz alig járul hozzá (SHAP-súly: 2,5%), a probléma tehát nem megtartási, hanem operatív és minőségi jellegű. 2 lehetséges irány:<br>– VIP-ek által gyakran visszaküldött termékek minőségének felülvizsgálata, helyettesítő termék keresése<br>– A visszaküldési folyamat sebességének és minőségének javítása, mivel a legértékesebb ügyfelek kiemelten élnek ezzel a lehetőséggel<br><span style="color:rgba(255,200,60,0.75);font-size:14px;">A szegmensenként top visszáruk termékszintű bontása — külön lekérdezés nélkül — közvetlenül elérhető a Marketing szegmensek oldalon (↩️ Top visszáruk fül).</span></div>'
+        '<div style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:0.35rem;">A VIP-szegmensben tapasztalt magas visszaküldési arány operatív felülvizsgálata. Fontos kontextus: a modell szerint a visszaküldési arány churn-kockázathoz alig járul hozzá (SHAP-súly: 2,5%), a probléma tehát nem megtartási, hanem operatív és minőségi jellegű. 2 lehetséges irány:<br>– VIP-ek által gyakran visszaküldött termékek minőségének felülvizsgálata, helyettesítő termék keresése<br>– A visszaküldési folyamat sebességének és minőségének javítása, mivel a legértékesebb ügyfelek kiemelten élnek ezzel a lehetőséggel<br><span style="color:rgba(255,200,60,0.75);font-size:14px;">A szegmensenként top visszáruk termékszintű bontása közvetlenül elérhető a Marketing szegmensek oldalon (↩️ Top visszáruk fül), külön lekérdezés nélkül.</span></div>'
         '<div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.8;"><div>Felelős: termékmenedzsment + logisztika</div><div>Határidő: 1 negyedéven belül</div><div>Várható hatás: a VIP-szegmens megtartási arányának javulása, visszaküldési költségek csökkentése</div></div>'
         '</div>'
 
