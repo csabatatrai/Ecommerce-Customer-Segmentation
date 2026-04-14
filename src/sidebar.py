@@ -23,7 +23,12 @@ def render_sidebar():
 
             /* ── Gombok – sidebar nav linkekkel megegyező stílus ── */
             .stApp .stButton > button,
-            .stApp [data-testid^="stBaseButton"] {
+            .stApp .stDownloadButton > button,
+            .stApp [data-testid^="stBaseButton"],
+            .stApp [data-testid="stDownloadButton"] button,
+            .stApp button[kind="secondary"],
+            .stApp button[kind="primary"],
+            .stApp button[kind="tertiary"] {
                 background: rgba(168, 16, 34, 0.35) !important;
                 border: 1px solid rgba(255, 255, 255, 0.12) !important;
                 border-radius: 8px !important;
@@ -31,17 +36,30 @@ def render_sidebar():
                 transition: background 0.2s ease, border-color 0.2s ease !important;
             }
             .stApp .stButton > button:hover,
-            .stApp [data-testid^="stBaseButton"]:hover {
+            .stApp .stDownloadButton > button:hover,
+            .stApp [data-testid^="stBaseButton"]:hover,
+            .stApp [data-testid="stDownloadButton"] button:hover,
+            .stApp button[kind="secondary"]:hover,
+            .stApp button[kind="primary"]:hover,
+            .stApp button[kind="tertiary"]:hover {
                 background: rgba(168, 16, 34, 0.65) !important;
                 border-color: rgba(255, 255, 255, 0.3) !important;
             }
             .stApp .stButton > button:active,
-            .stApp [data-testid^="stBaseButton"]:active {
+            .stApp .stDownloadButton > button:active,
+            .stApp [data-testid^="stBaseButton"]:active,
+            .stApp [data-testid="stDownloadButton"] button:active,
+            .stApp button[kind="secondary"]:active,
+            .stApp button[kind="primary"]:active,
+            .stApp button[kind="tertiary"]:active {
                 background: rgba(168, 16, 34, 0.85) !important;
                 border-color: rgba(255, 255, 255, 0.45) !important;
             }
             .stApp .stButton > button p,
-            .stApp [data-testid^="stBaseButton"] p {
+            .stApp .stDownloadButton > button p,
+            .stApp [data-testid^="stBaseButton"] p,
+            .stApp [data-testid="stDownloadButton"] button p,
+            .stApp button[kind] p {
                 color: #ffffff !important;
             }
 
