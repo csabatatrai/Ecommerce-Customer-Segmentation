@@ -575,7 +575,10 @@ if not df_tx_all.empty:
             return [""] * len(row)
 
         st.dataframe(
-            top_n.style.apply(_highlight_returns, axis=1),
+            top_n.style.set_properties(**{
+                "background-color": "#a10b0b",
+                "color": "#c8cfe8",
+            }).apply(_highlight_returns, axis=1),
             use_container_width=True,
             hide_index=True,
         )

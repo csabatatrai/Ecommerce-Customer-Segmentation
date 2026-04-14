@@ -106,6 +106,7 @@ st.markdown(f"""
                 font-size: 1.8rem !important;
             }}
         }}
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -715,7 +716,10 @@ with tab_cl:
             .rename(columns=_PREVIEW_COLS)
         )
         st.dataframe(
-            preview,
+            preview.style.set_properties(**{
+                "background-color": "#a10b0b",
+                "color": "#c8cfe8",
+            }),
             hide_index=True,
             use_container_width=True,
             column_config={
@@ -850,7 +854,10 @@ for tab, seg_name in zip(tabs_top, _seg_for_tabs):
                 )
                 tbl_s = top10[["Description", "forgalom", "bevetel", "arany"]].copy()
                 tbl_s.insert(0, "#", range(1, len(tbl_s) + 1))
-                st.dataframe(tbl_s, hide_index=True, use_container_width=True,
+                st.dataframe(tbl_s.style.set_properties(**{
+                        "background-color": "#a10b0b",
+                        "color": "#c8cfe8",
+                    }), hide_index=True, use_container_width=True,
                     column_config={
                         "#":           st.column_config.NumberColumn("#", width=40),
                         "Description": st.column_config.TextColumn("Termék neve", width="large"),
@@ -875,7 +882,10 @@ for tab, seg_name in zip(tabs_top, _seg_for_tabs):
                 )
                 tbl_r = ret10[["Description", "visszaruzott", "visszaru_ertek", "arany"]].copy()
                 tbl_r.insert(0, "#", range(1, len(tbl_r) + 1))
-                st.dataframe(tbl_r, hide_index=True, use_container_width=True,
+                st.dataframe(tbl_r.style.set_properties(**{
+                        "background-color": "#a10b0b",
+                        "color": "#c8cfe8",
+                    }), hide_index=True, use_container_width=True,
                     column_config={
                         "#":              st.column_config.NumberColumn("#", width=40),
                         "Description":    st.column_config.TextColumn("Termék neve", width="large"),
@@ -1086,7 +1096,7 @@ else:
         "w_target": 0.0, "conf_label": "-", "synthesis_note": "-",
     }
 
-tab_hm_2d, tab_hm_3d = st.tabs(["📊 2D Hőtérkép", "⛰️ 3D Csúcsmodell"])
+tab_hm_2d, tab_hm_3d, tab_rec = st.tabs(["📊 2D Hőtérkép", "⛰️ 3D Csúcsmodell", "⏳ Inaktivitási eloszlás"])
 
 with tab_hm_2d:
     fig_2d = px.imshow(
@@ -1126,6 +1136,74 @@ with tab_hm_3d:
         autosize=True,
     )
     st.plotly_chart(fig_3d, use_container_width=True)
+
+with tab_rec:
+    # Adatok: az aktív szegmensszűrő alapján, teljes ügyfélkör (nem csak a célcsoport)
+    # – a célcsoport túl kis minta lehet, a szegmens-szintű eloszlás informatívabb
+    _rec_df = df.loc[_seg_cids_full, ["rfm_segment", "recency_days"]].copy()
+
+    fig_rec = go.Figure()
+    for seg in (_f_seg_mikor if _f_seg_mikor else seg_order):
+        _seg_data = _rec_df[_rec_df["rfm_segment"] == seg]["recency_days"]
+        if _seg_data.empty:
+            continue
+        fig_rec.add_trace(go.Histogram(
+            x=_seg_data,
+            name=seg,
+            marker_color=SEG_COLORS.get(seg, "#9898c0"),
+            opacity=0.72,
+            nbinsx=40,
+            hovertemplate=f"<b>{seg}</b><br>Inaktivitás: %{{x}} nap<br>Ügyfelek: %{{y}}<extra></extra>",
+        ))
+
+    # Referenciavonalak a reaktivációs tónus értelmezéséhez
+    fig_rec.add_vline(
+        x=60, line_dash="dash", line_color="rgba(26,255,110,0.7)", line_width=1.5,
+        annotation_text="60 nap – finom emlékeztető",
+        annotation_position="top right",
+        annotation_font=dict(color="rgba(26,255,110,0.85)", size=11),
+    )
+    fig_rec.add_vline(
+        x=180, line_dash="dash", line_color="rgba(255,200,60,0.7)", line_width=1.5,
+        annotation_text="180 nap – reaktivációs ajánlat",
+        annotation_position="top right",
+        annotation_font=dict(color="rgba(255,200,60,0.85)", size=11),
+    )
+    fig_rec.add_vline(
+        x=300, line_dash="dash", line_color="rgba(255,80,80,0.7)", line_width=1.5,
+        annotation_text="300 nap – utolsó próbálkozás",
+        annotation_position="top right",
+        annotation_font=dict(color="rgba(255,80,80,0.85)", size=11),
+    )
+
+    fig_rec.update_layout(
+        barmode="overlay",
+        paper_bgcolor=CHART_BG,
+        plot_bgcolor=CHART_PLT,
+        font=dict(color="white"),
+        legend=dict(
+            font=dict(color="white"),
+            bgcolor="rgba(0,0,0,0)",
+        ),
+        xaxis=dict(
+            title="Inaktivitás (nap)",
+            color=TICK_CLR,
+            gridcolor=GRID_CLR,
+            ticksuffix=" nap",
+        ),
+        yaxis=dict(
+            title="Ügyfelek száma",
+            color=TICK_CLR,
+            gridcolor=GRID_CLR,
+        ),
+        margin=dict(l=10, r=10, t=30, b=10),
+    )
+    st.plotly_chart(fig_rec, use_container_width=True)
+    st.caption(
+        "Az eloszlás alapján ítélhető meg a reaktivációs üzenet tónusa és sürgőssége: "
+        "a 60 napon belüliek finom emlékeztetőt, a 180+ naposak erős ajánlatot, "
+        "a 300+ naposak last-chance kommunikációt igényelnek."
+    )
 
 st.markdown(_insight_md)
 
@@ -1414,6 +1492,37 @@ def _generate_brief_pdf(
         _b3 = (f"3. Hétvégi aktivitás ({_m_wknd_str}) alacsony – a büdzsét érdemes hétköznapokra koncentrálni")
     else:
         _b3 = f"3. Taktika: {_md['peak_tactic']}"
+
+    # ── Inaktivitási eloszlás – reaktivációs tónus ───────────────────────────
+    _rec_pdf = df.loc[_seg_cids_full, ["rfm_segment", "recency_days"]].copy()
+    _rec_buckets = []
+    for _seg in (_f_seg_mikor if _f_seg_mikor else seg_order):
+        _sd = _rec_pdf[_rec_pdf["rfm_segment"] == _seg]["recency_days"]
+        if _sd.empty:
+            continue
+        _n = len(_sd)
+        _b60  = (_sd < 60).sum()
+        _b180 = ((_sd >= 60) & (_sd < 180)).sum()
+        _b300 = ((_sd >= 180) & (_sd < 300)).sum()
+        _b300p = (_sd >= 300).sum()
+        _rec_buckets.append(
+            f"{_seg}: &lt;60 nap {_b60/_n:.0%} · 60–180 nap {_b180/_n:.0%} · "
+            f"180–300 nap {_b300/_n:.0%} · 300+ nap {_b300p/_n:.0%}"
+        )
+    _rec_tonal = (
+        "Emlékeztető (finom) · Reaktivációs ajánlat · Last-chance üzenet · Lista-eltávolítás mérlegelése"
+    )
+
+    story += [
+        Spacer(1, 4),
+        _kv_table([
+            [Paragraph("Inaktivitási eloszlás", S["body_b"]),
+             Paragraph("<br/>".join(_rec_buckets) if _rec_buckets else "–", S["body"])],
+            [Paragraph("Reaktivációs tónus", S["body_b"]),
+             Paragraph(_rec_tonal, S["body"])],
+        ]),
+        Spacer(1, 6),
+    ]
 
     story += [
         Paragraph("Kampánystruktúra javaslat:", S["body_b"]),

@@ -4,6 +4,47 @@ import streamlit as st
 def render_sidebar():
     st.markdown("""
         <style>
+            /* ── Szövegszín egységesítés sötét háttérhez (light/dark mode) ── */
+            .stApp p,
+            .stApp li,
+            .stApp h1, .stApp h2, .stApp h3,
+            .stApp h4, .stApp h5, .stApp h6,
+            [data-testid="stMarkdownContainer"] p,
+            [data-testid="stMarkdownContainer"] li,
+            [data-testid="stWidgetLabel"] p,
+            [data-testid="stMetricLabel"] p,
+            [data-testid="stMetricValue"],
+            [data-testid="stSidebar"] p,
+            [data-testid="stSidebar"] h1,
+            [data-testid="stSidebar"] h2,
+            [data-testid="stSidebar"] li {
+                color: #c8cfe8 !important;
+            }
+
+            /* ── Gombok – sidebar nav linkekkel megegyező stílus ── */
+            .stApp .stButton > button,
+            .stApp [data-testid^="stBaseButton"] {
+                background: rgba(168, 16, 34, 0.35) !important;
+                border: 1px solid rgba(255, 255, 255, 0.12) !important;
+                border-radius: 8px !important;
+                color: #ffffff !important;
+                transition: background 0.2s ease, border-color 0.2s ease !important;
+            }
+            .stApp .stButton > button:hover,
+            .stApp [data-testid^="stBaseButton"]:hover {
+                background: rgba(168, 16, 34, 0.65) !important;
+                border-color: rgba(255, 255, 255, 0.3) !important;
+            }
+            .stApp .stButton > button:active,
+            .stApp [data-testid^="stBaseButton"]:active {
+                background: rgba(168, 16, 34, 0.85) !important;
+                border-color: rgba(255, 255, 255, 0.45) !important;
+            }
+            .stApp .stButton > button p,
+            .stApp [data-testid^="stBaseButton"] p {
+                color: #ffffff !important;
+            }
+
             [data-testid="stSidebar"] {
                 background-color: #000000;
             }
