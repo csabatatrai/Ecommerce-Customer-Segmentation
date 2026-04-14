@@ -701,7 +701,7 @@ with tab_cl:
         )
         dl_target.insert(0, "#", range(1, len(dl_target) + 1))
         st.download_button(
-            label=f"📥 Célista letöltése: {len(target):,} ügyfél, prioritás szerint rendezve",
+            label=f"📥 Céllista letöltése: {len(target):,} ügyfél, prioritás szerint rendezve",
             data=_to_csv(dl_target),
             file_name="celcsoport_lista.csv",
             mime="text/csv",
